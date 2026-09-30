@@ -1,0 +1,28 @@
+# dependencies
+node_modules/
+
+# builds
+dist/
+dist-ssr/
+coverage/
+*.tsbuildinfo
+
+# env — this repo is PUBLIC: never commit real values
+.env
+.env.*
+!.env.example
+
+# logs
+*.log
+npm-debug.log*
+
+# editors / OS
+.DS_Store
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# test artefacts
+playwright-report/
+test-results/
+screenshots/

@@ -1,0 +1,33 @@
+# 03 — Module plan
+
+Twelve build modules after setup. Each is delivered with the workflow in `04-module-workflow.md` and has a spec in `modules/`. Order is fixed by dependencies; do not start a module until the previous one is merged.
+
+| # | Module | Design pages / parts | Backend work (summary) | Depends on | Status |
+|---|---|---|---|---|---|
+| M00 | Setup & docs | — | CLAUDE.md drift fixes, redesign docs, skills | — | ✅ done |
+| M01 | Foundation | tokens, global CSS, DS primitives, marks/icons, API client, auth (PKCE + dev token), router skeleton, test tooling | dev-token script, `.env.example` completeness | M00 | ⏳ next |
+| M02 | App shell | TopBar, split Shell, SectionSwitch, QuickJump/RingNav, WalletMenu + ID sheet, Mya dock, footer + SettingsBody, PathBar, toasts/ack, ExternalGate, flow bar (stub) | nav-summary + preferences (exist); Mya → chatbot | M01 | |
+| M03 | Shared WeO & list kit | SectionHero, ViewBar/view prefs, Scene, Rows, SectionHead/Mark, Fold/Rail, IconSegs, WeoTile/StallTile/WeoView, CircleRecord/Oi/Chip, PersonOi/Spark/StandChip, Snapshot chart/panel, Pip, OWalletPanel, `cardModel` | none (verify WeO projection fields vs `WEO.MISSING`) | M02 | |
+| M04 | Discover · WeO · Collect flow | discover, weo, CollectSheet/CardFlow | discovery gaps (watch, circleIds, trend) | M03 | |
+| M05 | Community | community (hub), circle, thread, circles (manage), stewards, stories; Compose/Push/Report modals | stewards source, hub fields | M03 | |
+| M06 | Collect & Exchange | collect (holdings), exchange (listings), RelistSheet, NeedsYou | pause/activate, redeem, dispute | M04 | |
+| M07 | Create | create (hero, composer, preflight, posted), templates, media upload, PostSheet, AI draft | media upload REST, AI draft, templates | M05, M06 | |
+| M08 | People & requests | creators, requests, tracking; CreatorSheet, OfferSheet, make-for-request | tracking watchlist, offer-a-holding | M04 | |
+| M09 | Identity & money | passport, wallet, settings; profile/tier/ISR sheets, MoveOsSheet, plans | notification channel prefs, plans | M03 | |
+| M10 | Notifications & company | notifications, company | fix `DELETE /notifications/read` shadowing, category map | M02 | |
+| M11 | Worlds & lifecycle | WorldStudio + `<weo-world>` (three.js, lazy), V3 lifecycle (rehearse → react → pledge → live), In-flight, arrivals/walkthrough | reactions & pledges endpoints | M07 | |
+| M12 | Hardening | full regression, a11y, perf, error states, final report | as found | all | |
+
+Legend: ⏳ in progress · ✅ merged · ⛔ blocked
+
+## Why this order
+
+- Everything renders inside the shell (M02), which needs the DS (M01).
+- M03 is the shared kit reused by 9 pages; building it once keeps components consistent.
+- Discover (M04) is the first real data surface and validates `cardModel` against the backend's unified WeO projection.
+- Create (M07) needs circles (M05) for "post to a circle" and listings (M06) for drafts.
+- Worlds (M11) is the heaviest and most isolated (three.js) — last feature module. Until then "Rehearse" buttons open a "coming in M11" toast, and the flow bar hides world actions.
+
+## Tracking progress
+
+Update the Status column here and the header table in the module spec at every state change. Test reports go to `reports/MNN-<slug>.md`.
