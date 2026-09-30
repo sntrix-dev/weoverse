@@ -1,0 +1,9 @@
+/* WeO design-system tokens — verbatim copies of the design's css/ds/tokens/*.css.
+   Never edit a value here without a docs/decisions.md entry. */
+@import './fonts.css';
+@import './colors.css';
+@import './typography.css';
+@import './spacing.css';
+@import './effects.css';
+@import './governance.css';
+@import './world.css';

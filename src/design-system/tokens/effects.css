@@ -1,0 +1,96 @@
+/* ============================================================
+   WeO · Depth, effects & motion tokens
+   Neumorphism + glass are the CONTAINER & CTA treatment (cards,
+   panels, pills, buttons). Orbs are a SEPARATE material — radial
+   light and depth, never neumorphic. Shadows remap per theme.
+   ============================================================ */
+
+:root {
+  /* ---- Neumorphic shadows (light) ----
+     UNDERSTATED by default: containers, forms, panels and pills read as gently
+     lifted, not heavily sculpted. Depth is a whisper here so it never competes
+     with the hero elements (orbs, rings, O-toggle, nav/fan) that own dimension.
+     Use --nm-hero ONLY on those signature interactive elements. */
+  --nm-raised: 5px 5px 14px rgba(170,182,208,.26), -5px -5px 12px rgba(255,255,255,.78);
+  --nm-sm:     3px 3px 8px rgba(170,182,208,.2), -2px -2px 6px rgba(255,255,255,.7);
+  --nm-inset:  inset 3px 3px 7px rgba(170,182,208,.28), inset -3px -3px 6px rgba(255,255,255,.72);
+
+  /* ---- Hero depth — the ONLY bold neumorphism ----
+     Reserved for orbs, ISR + negotiation rings, the O-toggle, the floating O
+     nav + fan bubble, the O media-player border, and a few key CTAs. */
+  --nm-hero:   13px 13px 30px rgba(150,165,200,.5), -11px -11px 24px rgba(255,255,255,.95);
+  --nm-hero-inset: inset 6px 6px 15px rgba(150,165,200,.5), inset -5px -5px 12px rgba(255,255,255,.95);
+
+  /* ---- Elevation ---- */
+  --shadow-card: 0 20px 50px -24px rgba(30,45,90,.28);
+  --shadow-pop:  0 24px 60px -20px rgba(30,45,90,.34);
+
+  /* ---- Glass / backdrop ---- */
+  --blur-glass: 20px; /* @kind other */
+  --blur-soft:  14px; /* @kind other */
+
+  /* ---- Focus ring ---- */
+  --focus-ring: 0 0 0 2px var(--o-blue);
+
+  /* ---- Motion: durations ---- */
+  --dur-instant: 120ms; /* @kind other */
+  --dur-fast:    280ms; /* @kind other */
+  --dur-normal:  450ms; /* @kind other */
+  --dur-slow:    720ms; /* @kind other */
+
+  /* ---- Motion: easing ---- */
+  --ease-portal:   cubic-bezier(.22,1,.36,1); /* @kind other */
+  --ease-standard: cubic-bezier(.4,0,.2,1); /* @kind other */
+  --ease-out:      cubic-bezier(0,0,.2,1); /* @kind other */
+
+  /* ---- Motion: container choreography (Tier 3) ----
+     Records, drawers, panels, sheets, open/collapse. Enter on --ease-portal,
+     exit on --ease-standard ONE STEP FASTER (expand --dur-normal / collapse
+     --dur-fast). Anchored to the causing edge/element; transform+opacity only;
+     monochrome — color-coded motion belongs to the portal jump alone. */
+  --stagger-list: 70ms; /* @kind other */ /* per-row list cascade delay, cap at 8 rows */
+  --ease-settle: cubic-bezier(.16,1,.3,1); /* @kind other */ /* fluid glide — fast attack, long frictionless landing; the container echo of the portal jump. Never bounce, never heavier shadows */
+}
+
+[data-theme="dark"] {
+  --nm-raised: 6px 6px 16px rgba(0,0,0,.4), -3px -3px 10px rgba(255,255,255,.02);
+  --nm-sm:     3px 3px 9px rgba(0,0,0,.38), -2px -2px 6px rgba(255,255,255,.02);
+  --nm-inset:  inset 3px 3px 8px rgba(0,0,0,.45), inset -2px -2px 6px rgba(255,255,255,.02);
+
+  --nm-hero:   16px 16px 32px rgba(0,0,0,.6), -8px -8px 22px rgba(255,255,255,.05);
+  --nm-hero-inset: inset 6px 6px 15px rgba(0,0,0,.62), inset -5px -5px 12px rgba(255,255,255,.05);
+
+  --shadow-card: 0 24px 60px -20px rgba(0,0,0,.6);
+  --shadow-pop:  0 30px 70px -18px rgba(0,0,0,.7);
+}
+
+/* ============================================================
+   Signature keyframes — the O is always alive; idle states
+   breathe, never freeze. Prefixed weo- to avoid collisions.
+   ============================================================ */
+@keyframes weo-breathe    { 0%,100%{ transform:scale(1);   opacity:.7; } 50%{ transform:scale(1.13); opacity:1; } }
+@keyframes weo-breathe-sm { 0%,100%{ transform:scale(.97); } 50%{ transform:scale(1.07); } }
+@keyframes weo-spin       { to { transform:rotate(360deg); } }
+@keyframes weo-ripple     { 0%{ transform:scale(.6); opacity:.55; } 100%{ transform:scale(1.9); opacity:0; } }
+@keyframes weo-ring-burst { 0%{ transform:translate(-50%,-50%) scale(.42); opacity:.85; } 100%{ transform:translate(-50%,-50%) scale(1.85); opacity:0; } }
+@keyframes weo-float      { 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-9px); } }
+@keyframes weo-pop        { 0%{ transform:scale(.62); } 60%{ transform:scale(1.05); } 100%{ transform:scale(1); } }
+@keyframes weo-cardin     { 0%{ transform:scale(.84) translateY(12px); opacity:0; filter:blur(4px); } 100%{ transform:scale(1) translateY(0); opacity:1; filter:blur(0); } }
+/* Tier-3 container choreography: list records glide 30px into place on a long
+   deceleration (pair with --stagger-list) — smooth and dynamic, never bouncy. */
+@keyframes weo-row-in     { 0%{ transform:translateY(30px) scale(.97); opacity:0; } 55%{ opacity:1; } 100%{ transform:translateY(0) scale(1); opacity:1; } }
+@keyframes weo-dot        { 0%,100%{ opacity:.35; } 50%{ opacity:1; } }
+@keyframes weo-shimmer    { 0%{ background-position:0 0; } 100%{ background-position:200px 0; } }
+@keyframes weo-orbit      { to { transform:rotate(360deg); } }
+@keyframes weo-ping       { 0%{ transform:scale(.7); opacity:.5; } 100%{ transform:scale(2.4); opacity:0; } }
+@keyframes weo-orbit-rev  { to { transform:rotate(-360deg); } }
+/* grow-from-orb: a contextual surface (negotiate dial / owner actions) emerging
+   out of the orb it belongs to — set transform-origin at the orb centre inline. */
+@keyframes weo-emerge     { 0%{ transform:scale(.5); opacity:0; } 55%{ opacity:1; } 100%{ transform:scale(1); opacity:1; } }
+@keyframes weo-recede     { from{ transform:scale(1); opacity:1; } to{ transform:scale(.5); opacity:0; } }
+/* Portal jump — the signature section-transition / completion wipe. */
+@keyframes weo-portal-wipe { from{ clip-path:circle(0% at 50% 50%); } to{ clip-path:circle(150% at 50% 50%); } }
+@keyframes weo-portal-wipe-out { from{ clip-path:circle(150% at 50% 50%); } to{ clip-path:circle(0% at 50% 50%); } }
+/* Portal jump — section "what to expect" ring: nodes fly out from centre into place. */
+@keyframes weo-node-pop { 0%{ transform:translate(var(--tx,0), var(--ty,0)) scale(.25); opacity:0; } 60%{ opacity:1; } 100%{ transform:translate(0,0) scale(1); opacity:1; } }
+@keyframes weo-spoke { to { stroke-dashoffset:0; } }

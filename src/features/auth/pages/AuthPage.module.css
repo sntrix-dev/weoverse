@@ -1,0 +1,49 @@
+/* Sign-in and OAuth callback share one frame. The design has no login screen (D-016),
+   so this composes DS primitives in the design's language: centred glass card,
+   drawn WeOverse lettering, violet wash from css/app.css body::before. */
+.frame {
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: 24px 16px;
+}
+
+.card {
+  width: min(440px, 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  text-align: center;
+}
+
+.mark {
+  color: var(--text);
+  margin: 6px 0 2px;
+}
+
+.lede {
+  margin: 0;
+  font-size: var(--type-body, 16px);
+  line-height: 1.55;
+  color: var(--text-dim);
+}
+
+.fine {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--text-faint);
+  line-height: 1.5;
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+.devLink {
+  font-size: 12.5px;
+  color: var(--text-faint);
+}

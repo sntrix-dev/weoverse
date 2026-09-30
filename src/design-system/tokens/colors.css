@@ -1,0 +1,89 @@
+/* ============================================================
+   WeO · Color tokens
+   Two layers: raw brand primitives + semantic aliases.
+   Semantic aliases remap between light (:root) and dark ([data-theme="dark"]).
+   ============================================================ */
+
+:root {
+  /* ---- Section colors (the four cardinal contexts of the O) ---- */
+  --o-blue:      #3A95F2;   /* Top edge  · WeOs / Discovery */
+  --o-blue-deep: #2F80E8;
+  --o-violet:    #D946EF;   /* Right edge · Collect / Remix / WeOverse */
+  --o-green:     #22C55E;   /* Bottom edge · Create / List / Action */
+  --o-gold:      #F7C62B;   /* Left edge  · Rewards / Value (used sparingly) */
+  --o-gold-ink:  #F7B21F;   /* Gold, legible as text/number */
+
+  /* ---- ISR ramp (Individual Success Ring · 0–100 trust) ---- */
+  --isr-starter:  #FF5A2C;  /* 0–24   */
+  --isr-building: #F7B21F;  /* 25–44  */
+  --isr-healthy:  #22C55E;  /* 45–74  */
+  --isr-strong:   #17C3D6;  /* 75–92  */
+  --isr-peak:     #2F6FF0;  /* 93–100 */
+
+  /* ---- Status / functional ---- */
+  --status-success: #22C55E;
+  --status-warning: #F7B21F;
+  --status-error:   #FF5A2C;
+  --status-info:    #3A95F2;
+
+  /* ---- Neutral ink ramp (light) ---- */
+  --ink-900: #181e2e;
+  --ink-600: #5a6478;
+  --ink-400: #97a1b6;
+
+  /* ---- Surfaces (light) ---- */
+  --bg-a:      #ffffff;
+  --bg-b:      #ffffff;
+  --atmo:      transparent;   /* neutral by default — no ambient color wash */
+  --surface:   #ffffff;
+  --surface-2: #f3f4f6;
+  --surface-3: #e8eaee;
+
+  /* ---- Semantic aliases (light) ---- */
+  --text:       var(--ink-900);
+  --text-dim:   var(--ink-600);
+  --text-faint: var(--ink-400);
+  --text-inverse: #ffffff;
+
+  --border: rgba(22,32,60,.08);
+  --hair:   #232a3d;         /* deep chip / toast surface */
+
+  --glass:     rgba(255,255,255,.6);
+  --glass-brd: rgba(255,255,255,.75);
+
+  /* torus = the neutral outer ring material of an O */
+  --torus-a: #ffffff;
+  --torus-b: #eef2fa;
+  --torus-c: #dbe4f2;
+}
+
+[data-theme="dark"] {
+  /* ---- Neutral ink ramp (dark) ---- */
+  --ink-900: #eaeef8;
+  --ink-600: #9aa5bd;
+  --ink-400: #5f6982;
+
+  /* ---- Surfaces (dark) ---- */
+  --bg-a:      #000000;
+  --bg-b:      #050608;
+  --atmo:      transparent;
+  --surface:   #14161b;
+  --surface-2: #191c22;
+  --surface-3: #23262e;
+
+  /* ---- Semantic aliases (dark) ---- */
+  --text:       var(--ink-900);
+  --text-dim:   var(--ink-600);
+  --text-faint: var(--ink-400);
+  --text-inverse: #0b1020;
+
+  --border: rgba(255,255,255,.09);
+  --hair:   #dbe2f2;
+
+  --glass:     rgba(255,255,255,.06);
+  --glass-brd: rgba(255,255,255,.13);
+
+  --torus-a: #232c40;
+  --torus-b: #171f2e;
+  --torus-c: #0e1524;
+}

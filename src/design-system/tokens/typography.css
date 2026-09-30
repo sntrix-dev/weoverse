@@ -1,0 +1,65 @@
+/* ============================================================
+   WeO · Typography tokens
+   Helvetica Neue carries the whole system — display, interface and
+   every numeral — one refined grotesk used editorially by weight and
+   tracking. Its near-circular O harmonises with the brand O.
+   There is NO second family: labels, tokens, ids and timers are the same
+   face, set small, at 600-700 with wide tracking and tabular numerals.
+   --font-mono is retained as an alias for that data voice.
+   ============================================================ */
+
+:root {
+  /* ---- Families ---- */
+  --font-sans: 'Helvetica Neue', Helvetica, 'Segoe UI', Arial, sans-serif;
+  /* Data voice — SAME family. Kept as a token name so existing usages keep
+     working; it never resolves to a second typeface. */
+  --font-mono: 'Helvetica Neue', Helvetica, 'Segoe UI', Arial, sans-serif;
+  --font-data: var(--font-mono);
+
+  /* ---- Weights ---- */
+  --fw-light:   300; /* @kind font */
+  --fw-regular: 400; /* @kind font */
+  --fw-medium:  500; /* @kind font */
+  --fw-semibold:600; /* @kind font */
+  --fw-bold:    700; /* @kind font */
+
+  /* ---- Type scale (named styles) ---- */
+  /* Display · 700 · tight tracking — hero numerals + headlines */
+  --type-display-size: clamp(38px, 6.4vw, 74px);
+  --type-display-lh:   0.98;
+  --type-display-ls:   -0.035em;
+
+  /* Section head · 700 */
+  --type-h2-size: clamp(30px, 4.6vw, 50px);
+  --type-h2-lh:   1.02;
+  --type-h2-ls:   -0.025em;
+
+  /* Headline · 500 */
+  --type-headline-size: 22px;
+  --type-headline-lh:   1.15;
+  --type-headline-ls:   -0.02em;
+
+  /* Title · 700 — card titles */
+  --type-title-size: 20px;
+  --type-title-ls:   -0.02em;
+
+  /* Body · 400 */
+  --type-body-size: 16px;
+  --type-body-lh:   1.55;
+
+  /* Body small · 400 */
+  --type-body-sm-size: 13.5px;
+  --type-body-sm-lh:   1.5;
+
+  /* Label · 600 · caps · wide tracking */
+  --type-label-size: 11px;
+  --type-label-ls:   0.14em;
+
+  /* Overline / eyebrow · mono · caps */
+  --type-overline-size: 12.5px;
+  --type-overline-ls:   0.2em;
+
+  /* Data · numerals, tokens, timers — Helvetica Neue, tabular, tracked */
+  --type-mono-size: 13px;
+  --type-data-ls: 0.02em;
+}

@@ -1,0 +1,57 @@
+.page {
+  max-width: var(--page-w);
+  margin: 0 auto;
+  padding: 40px 24px 190px;
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 28px;
+}
+
+.title {
+  margin: 0;
+  font-size: var(--type-h2, 40px);
+  letter-spacing: -0.03em;
+  color: var(--text);
+}
+
+.section {
+  margin: 0 0 36px;
+}
+
+.sectionTitle {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  margin: 0 0 14px;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+}
+
+.col {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 460px;
+}
+
+.portalStage {
+  position: relative;
+  height: 420px;
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  background: var(--surface-2);
+  box-shadow: var(--nm-inset);
+}

@@ -1,0 +1,65 @@
+/* ============================================================
+   WeO Design System — WORLD tokens
+   The spatial layer: themes and the fidelity ladder for the
+   virtual worlds inside WeO (mobile AR view, desktop world
+   discovery). A world is a REHEARSAL SURFACE for real Os — it
+   never invents an economy, a colour language or a currency.
+   ============================================================ */
+
+:root {
+  /* ---- Fidelity ladder ----
+     Fidelity is chosen for PURPOSE, not taste. Each level names what it is
+     for; the budget numbers are the contract with engineering. */
+  --world-fid-1-poly:   1200;  /* @kind other */ /* BLOCK — wayfinding, AR on phone, low power */
+  --world-fid-2-poly:   6000;  /* @kind other */ /* MASSING — read density and where a market runs thin */
+  --world-fid-3-poly:  24000;  /* @kind other */ /* TEXTURED — commerce browsing; goods legible */
+  --world-fid-4-poly:  90000;  /* @kind other */ /* LIT — presence and events; people feel co-located */
+  --world-fid-5-poly: 400000;  /* @kind other */ /* PHOTOREAL — only where a real good is being judged */
+
+  --world-draw-near:  40;   /* @kind other */ /* metres — block/massing draw distance */
+  --world-draw-far:  240;   /* @kind other */ /* metres — lit/photoreal draw distance */
+  --world-marker-min: 44px; /* @kind spacing */  /* a WeO marker never renders below the touch minimum */
+  --world-marker-max: 30vh; /* @kind spacing */  /* nor larger than a third of the viewport at approach */
+
+  /* ---- Ground shadow & fog: the only depth cues a world may add ---- */
+  --world-shadow: 0 18px 34px -16px rgba(12,24,52,.42); /* @kind shadow */ /* contact shadow under a marker */
+  --world-fog-near: 0.18; /* @kind other */ /* fog density at the near plane */
+  --world-fog-far:  0.72; /* @kind other */ /* fog density at the far plane */
+
+  /* ---- Theme: DAYLIGHT (default) ---- */
+  --world-sky:      #cfe4fb; /* @kind color */
+  --world-sky-2:    #eaf3ff; /* @kind color */
+  --world-ground:   #d9c9a6; /* @kind color */
+  --world-ground-2: #c9b48b; /* @kind color */
+  --world-built:    #eef1f6; /* @kind color */
+  --world-built-2:  #d4dae4; /* @kind color */
+  --world-foliage:  #8fb98a; /* @kind color */
+  --world-water:    #7fb2e8; /* @kind color */
+  --world-fog:      #dfeafc; /* @kind color */
+  --world-key:      #fff7e4; /* @kind color */ /* key light */
+  --world-fill:     #cfe0f5; /* @kind color */ /* sky fill / bounce */
+  --world-ink:      #1b2436; /* @kind color */ /* world-surface text */
+}
+
+/* Theme scopes. A world picks ONE; it never mixes two, and it never
+   introduces a colour outside its theme plus the four section colours. */
+[data-world="dusk"] {
+  --world-sky:#f4c9a8; --world-sky-2:#fbe3cd; --world-ground:#b79a78; --world-ground-2:#9c7f60;
+  --world-built:#e6dcd4; --world-built-2:#c6b6ab; --world-foliage:#7f9a7c; --world-water:#89a8cf;
+  --world-fog:#f2d6bd; --world-key:#ffd9a8; --world-fill:#c9b3d6; --world-ink:#241d2c;
+}
+[data-world="night"] {
+  --world-sky:#131a2c; --world-sky-2:#1d2740; --world-ground:#2a2b33; --world-ground-2:#1e1f26;
+  --world-built:#333747; --world-built-2:#252936; --world-foliage:#39513f; --world-water:#22385c;
+  --world-fog:#1a2135; --world-key:#ffd27a; --world-fill:#4a6ba8; --world-ink:#eef2fb;
+}
+[data-world="studio"] {
+  --world-sky:#f2f4f8; --world-sky-2:#ffffff; --world-ground:#e3e6ec; --world-ground-2:#d2d7e0;
+  --world-built:#ffffff; --world-built-2:#e6eaf1; --world-foliage:#b9c6bb; --world-water:#cfdcea;
+  --world-fog:#f6f8fc; --world-key:#ffffff; --world-fill:#e8edf6; --world-ink:#171c28;
+}
+[data-world="winter"] {
+  --world-sky:#dfe8f2; --world-sky-2:#f4f8fc; --world-ground:#eef3f8; --world-ground-2:#dbe4ee;
+  --world-built:#f7f9fc; --world-built-2:#dde5ee; --world-foliage:#7d9691; --world-water:#a9c6dd;
+  --world-fog:#e9f1f9; --world-key:#f4f8ff; --world-fill:#cddbea; --world-ink:#1b2432;
+}

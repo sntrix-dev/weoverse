@@ -2,7 +2,7 @@
 
 | Status | FE branch | BE branch | Report |
 |---|---|---|---|
-| ⏳ next | `feat/m01-foundation` | `redesign/m01-foundation` | `reports/M01-foundation.md` |
+| ⏳ testing | `feat/m01-foundation` | `redesign/m01-foundation` | `reports/M01-foundation.md` |
 
 ## Scope
 
@@ -44,9 +44,20 @@ Everything later modules stand on. No product screen yet except `/login`, `/call
 | logout | `POST /frontend/auth/logout` `{refresh_token}` |
 | smoke | `GET /frontend/users/me/nav-summary` (proves the token works) |
 
-## Open questions
+## Auth config (from the previous build, D-013)
 
-- Q-1 (previous build's auth keys + IdP authorize URL path). Blocks step 6 only; the dev token unblocks everything else.
+| Env | Value / source |
+|---|---|
+| `VITE_API_URL` | `http://localhost:3002` (remote dev: `https://dev.weo.ai`) |
+| `VITE_WALLET_URL` | `https://wallet.ocono.me` (= backend `AUTH_SERVER`) |
+| `VITE_OAUTH_AUTHORIZE_PATH` | `/oauth/authorize` — **unverified** (IdP not reachable from the Linux workspace); confirm in Chrome |
+| `VITE_OAUTH_CLIENT_ID` | backend `.env` `O_CLIENT_ID` (local `.env.local` only) |
+| `VITE_OAUTH_REDIRECT_URI` | `http://localhost:5173/callback` (= backend `O_REDIRECT_URI`) |
+| `VITE_OAUTH_SCOPE` | `profile` |
+
+Token exchange is server-side: `POST /frontend/auth/verify {code, codeVerifier, redirectUri}` → backend calls `AUTH_SERVER/api/oauth/token` with the client secret.
+
+Not carried over: `VITE_AWS_*` (D-014), `VITE_USE_MOCK_OFFERS`, Didit KYC (server-side, not in scope), Firebase web config (M10 push).
 
 ## Acceptance criteria
 

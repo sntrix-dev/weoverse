@@ -1,0 +1,7 @@
+dist
+node_modules
+src/api/generated
+package-lock.json
+src/design-system/tokens
+src/styles/global.css
+docs

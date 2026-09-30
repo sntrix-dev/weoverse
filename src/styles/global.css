@@ -1,0 +1,220 @@
+/* design: css/app.css — ported verbatim. Global rules only: reset, #atmo/#dots layers,
+   html[data-*] switches, keyframes, weo-* class families. Component styles live in CSS Modules. */
+*{box-sizing:border-box}html,body{margin:0;padding:0}
+body{font-family:var(--font-sans);color:var(--text);background:var(--bg-a);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+a{color:var(--o-violet);text-decoration:none}a:hover{color:var(--o-blue)}
+input,textarea,button,select{font-family:inherit}
+::-webkit-scrollbar{width:10px;height:10px}::-webkit-scrollbar-thumb{background:var(--surface-3);border-radius:999px;border:3px solid var(--bg-a)}
+.weo-scroll-hide::-webkit-scrollbar{display:none}
+/* one horizontal rail: children take --rail-w and snap */
+.weo-rail{display:flex;gap:14px;overflow-x:auto;scroll-snap-type:x mandatory;padding:4px 2px 10px;scrollbar-width:none}
+.weo-rail>*{flex:0 0 auto;width:var(--rail-w,260px);scroll-snap-align:start}
+input[type=range]{-webkit-appearance:none;appearance:none;height:8px;border-radius:999px;background:var(--surface-2);box-shadow:var(--nm-inset)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:radial-gradient(circle at 36% 30%,#f4b7fb,var(--o-violet) 70%);box-shadow:0 4px 10px -3px var(--o-violet);cursor:pointer}
+#atmo{position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(120% 90% at 84% -10%, color-mix(in srgb, var(--o-violet) 11%, transparent), transparent 60%),radial-gradient(90% 70% at -10% 108%, color-mix(in srgb, var(--o-blue) 8%, transparent), transparent 55%)}
+#dots{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.45;background-image:radial-gradient(var(--surface-3) 1px, transparent 1px);background-size:26px 26px;-webkit-mask-image:radial-gradient(72% 60% at 50% 36%, #000, transparent 92%);mask-image:radial-gradient(72% 60% at 50% 36%, #000, transparent 92%)}
+/* the world grid scrolls, so its rows must size to their content — a stretched track left
+   the sim panel at 190px while its children stacked to ~830 and painted outside it */
+@media (max-width:1080px){.weo-world-grid{grid-template-columns:minmax(0,1fr) !important;grid-auto-rows:min-content !important;align-items:start !important}
+.weo-sim-panel{grid-column:1 !important;grid-row:1 !important}
+.weo-sim-card{grid-column:1 !important;grid-row:2 !important;align-items:center}
+.weo-sim-ctrl{grid-column:1 !important;grid-row:3 !important}}
+@media (max-width:1080px){.weo-snap-grid{grid-template-columns:minmax(0,1fr) !important}.weo-world-grid{grid-template-columns:minmax(0,1fr) !important;overflow-y:auto}}
+/* Create: the O holds the centre on wide screens; below that the ring leads and the two
+   side modules stack under it, so the composer still opens from the same object */
+/* below 900px the frame cannot hold O + docks side by side: the docks fall under the O as one row */
+@media (max-width:900px){.weo-create-strip{position:static !important;inset:auto !important;padding:40px 0 0 !important;width:100%}.weo-create-shelf{position:static !important;display:flex !important;flex-wrap:wrap;justify-content:center;gap:10px;padding:0 !important}.weo-create-shelf>div{grid-column:auto !important;flex-direction:row !important;flex-wrap:wrap;justify-content:center}}
+@media (max-width:820px){.weo-tpl-stage{grid-template-columns:minmax(0,1fr) !important}
+.weo-prof-grid{grid-template-columns:repeat(2,minmax(0,1fr)) !important}}
+.weo-nav{scrollbar-width:none}.weo-nav::-webkit-scrollbar{display:none}.weo-nav > button{flex:0 0 auto}
+@media (max-width:1320px){.weo-search{display:none}}
+.orbit-ring:hover *{animation-play-state:paused !important}
+[role="menubar"] > div:last-of-type{display:none !important}
+@media (prefers-reduced-motion: reduce){*{animation:none !important;transition:none !important}}
+/* progressive reveal: sections wait their turn, so the eye lands on one thing */
+/* the section you are in is the colour of the room: a fixed wash keyed to the route */
+body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;transition:background .7s var(--ease-settle);background:radial-gradient(130% 78% at 50% -14%,color-mix(in srgb,var(--focus-tint,#D946EF) 34%,transparent),transparent 58%),radial-gradient(90% 52% at 8% 104%,color-mix(in srgb,var(--focus-tint,#D946EF) 20%,transparent),transparent 60%),linear-gradient(180deg,transparent 42%,color-mix(in srgb,var(--focus-tint,#D946EF) 9%,transparent) 100%)}
+/* one page width for every screen — the shell gutter is taken out of it so the column reads
+   the same whether the split nav is open or not */
+:root{--page-w:min(1560px, 100%)}
+/* The page is a normal block flow again: making #root a flex column stretched fixed chrome
+   (the floating nav, docks) and shrank the centred screen wrappers. The footer's own
+   100vh shadow paints the band to the bottom of the viewport, so no layout trick is needed. */
+#root{position:relative;z-index:1;min-height:100dvh}
+/* the footer band bleeds past its last pixel via its own shadow — nothing below it */
+html{background:#23272e}
+[data-theme="dark"] body::before,#root [data-theme="dark"]{--wash-strength:1}
+/* the lead section still carries its own tighter glow on top of the wash */
+#root [data-lead]{position:relative;isolation:isolate}
+#root [data-lead]::before{content:"";position:absolute;left:50%;top:-18%;width:100%;max-width:1100px;height:150%;transform:translateX(-50%);z-index:-1;pointer-events:none;background:radial-gradient(60% 55% at 50% 30%,color-mix(in srgb,var(--focus-tint,#D946EF) 20%,transparent),transparent 72%)}
+/* Editorial feed as a brick wall: tiles pack up the columns with no holes, and the lead
+   spans the full width like a magazine opener. Column flow, so no row can leave a gap. */
+.weo-edit-grid{column-count:3;column-gap:14px;display:block !important}
+.weo-edit-grid > article{break-inside:avoid;width:100%;margin:0 0 14px;display:flex}
+.weo-edit-grid > article[data-lead]{column-span:all}
+@media (max-width:1180px){.weo-edit-grid{column-count:2}}
+@media (max-width:820px){.weo-edit-grid{column-count:1}}
+/* THE MARK, one rule everywhere: every letter is a single colour — white on dark surfaces,
+   ink on light — and it always carries the same violet drop-shadow. Never two inks. */
+.weo-wordmark{filter:drop-shadow(0 2px 7px color-mix(in srgb, var(--o-violet) 40%, transparent))}
+[data-theme="dark"] .weo-wordmark{filter:drop-shadow(0 2px 10px color-mix(in srgb, var(--o-violet) 62%, transparent))}
+/* cover lines: the row lifts on intent, nothing else */
+.weo-cover-line{transition:background .22s,transform .22s var(--ease-settle)}
+/* the request orb lifts when you point at it — it is the way to answer the brief */
+.weo-req-orb{transition:transform .28s var(--ease-portal)}
+.weo-req-orb:hover{transform:translateY(-4px)}
+/* the profile hub: two ordered stacks either side of the orbit; one column when narrow */
+@media (max-width:1024px){.weo-ohub{grid-template-columns:minmax(0,1fr) !important;justify-items:center}}
+/* Mya’s prompts float: dark convex pills that lift off the surface on approach */
+.weo-mya-prompt{transition:transform .26s var(--ease-portal),box-shadow .26s}
+.weo-mya-prompt:hover{transform:translateY(-3px);box-shadow:var(--shadow-card),inset 0 1px 0 rgba(255,255,255,.7),inset 0 0 0 1px color-mix(in srgb, var(--o-violet) 30%, var(--border))}
+.weo-cover-line:hover{background:rgba(255,255,255,.12);transform:translateX(2px)}
+@media (max-width:820px){.weo-cover-lines{display:none !important}}
+/* ---- Type: dramatic contrast. Display heavy and tightly tracked, body light and open.
+   Weight is the hierarchy, not size alone — and small containers never take a heavy weight. ---- */
+#root h1{font-weight:700;letter-spacing:-.042em;line-height:1.02}
+#root h2{font-weight:700;letter-spacing:-.032em}
+#root h3{font-weight:600;letter-spacing:-.02em}
+#root h4{font-weight:600;letter-spacing:-.015em}
+#root p{font-weight:400;text-wrap:pretty}
+#root p em{font-style:normal;font-weight:600;color:var(--text)}
+/* ---- Menus and sheets are OPAQUE. Glass belongs to bars and chrome, never to a
+   dense panel sitting over content — legibility outranks the material. ---- */
+.weo-menu{background:var(--surface) !important;backdrop-filter:none !important;-webkit-backdrop-filter:none !important;box-shadow:var(--shadow-pop), inset 0 0 0 1px var(--border) !important}
+/* ---- Quiet modules: dense control panels rest near-neutral (a hint of their colour coding)
+   and come to full colour only while engaged — hovered, focused or being operated ---- */
+.weo-quiet{filter:saturate(.18);transition:filter .38s var(--ease-portal)}
+.weo-quiet:hover,.weo-quiet:focus-within,.weo-quiet[data-engaged="1"]{filter:saturate(1)}
+@media (hover:none){.weo-quiet{filter:none}}
+/* ---- Snapshot heroes: glass that thickens as you scroll past, so the page flows ---- */
+.weo-hero{position:relative;overflow:hidden;backdrop-filter:blur(20px) saturate(1.1);-webkit-backdrop-filter:blur(20px) saturate(1.1)}
+.weo-hero-bloom{position:absolute;inset:auto -12% 40% auto;width:min(58%,520px);aspect-ratio:1;border-radius:50%;filter:blur(58px);opacity:.5;pointer-events:none}
+@media (max-width:860px){.weo-hero-art{display:none !important}}
+@media (prefers-reduced-transparency:reduce){.weo-hero{backdrop-filter:none;-webkit-backdrop-filter:none;background:var(--surface) !important}}
+/* ValueLadder prints a fiat approximation per bucket with no prop to omit it — suppressed here,
+   the same way WeOCard's price block is rendered by hand. Both need an upstream fix. */
+.weo-osonly [style*="var(--font-mono)"][style*="font-size: 11px"]{display:none !important}
+/* The O toggle's centre plays the looping WeO logo at full fidelity — no blend mode, no tint,
+   nothing over it. Blending it into the surface is what made the mark read muted. */
+.weo-hero-art video,.weo-hero video{mix-blend-mode:normal;opacity:1;filter:none}
+/* ---- Expanding a snapshot: the panel opens from its own top edge and its blocks slide in,
+   so the reveal is legible even when what it reveals starts below the fold. ---- */
+@keyframes weo-reveal{from{opacity:.4;clip-path:inset(0 0 100% 0)}to{opacity:1;clip-path:inset(0 0 0 0)}}
+@keyframes weo-slide-up{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
+.weo-reveal{animation:weo-reveal .44s var(--ease-portal) both}
+.weo-modpin{opacity:0;transition:opacity .18s var(--ease-standard)}
+.weo-modwell:hover .weo-modpin,.weo-modwell:focus-within .weo-modpin,.weo-modpin[aria-pressed="true"]{opacity:1}
+.weo-reveal > *{animation:weo-slide-up .52s var(--ease-portal) both}
+.weo-reveal > *:nth-child(2){animation-delay:.08s}
+.weo-reveal > *:nth-child(3){animation-delay:.16s}
+/* the head lifts a little as the panel grows — the parallax that says "this opened" */
+.weo-hero > div:first-of-type,.weo-hero-bloom{transition:transform .5s var(--ease-portal)}
+.weo-hero[data-open="1"] > div:first-of-type{transform:translateY(-5px)}
+.weo-hero[data-open="1"] .weo-hero-bloom{transform:translateY(-26px) scale(1.06)}
+/* Below the two-column breakpoint the grid is single-column, so a collapsed module rail has no
+   adjacent column to reclaim — it lays its glyphs out as a wrapping row instead of a tall strip. */
+/* The O toggle's centre media (the looping WeO logo) must read at the front of the portal.
+   Only the stacking order is touched — forcing position here would tear the mark out of the
+   design system's own absolute placement and hide it entirely. */
+.weo-hero-art img,.weo-hero-art video{z-index:8}
+@media (max-width:1080px){.weo-modrail{position:static !important}}
+/* the composer keeps the O centred: modules support it from both sides, and stack under it
+   only when there is genuinely no room for three columns */
+@media (max-width:960px){.weo-make-grid{grid-template-columns:minmax(0,1fr) !important}.weo-make-grid > aside{position:static !important}.weo-make-grid > *:nth-child(2){order:-1}}
+/* The portal's one motion signature: the tube contracts as the aperture blooms. Fill-mode
+   both, so the open state HOLDS — no state flip, no timer, nothing to miss on remount. */
+@keyframes weo-portal-tube{from{border-width:var(--tube-open,40px)}to{border-width:var(--tube,20px)}}
+@keyframes weo-portal-bloom{0%{opacity:0;transform:scale(.82)}100%{opacity:1;transform:scale(1)}}
+.weo-portal-tube{animation:weo-portal-tube .58s var(--ease-portal) both}
+/* the section arrival, in WeO Local's grammar: field · words · orb · tethers · edges */
+@keyframes weoArrField{0%{opacity:0}6%{opacity:1}84%{opacity:1}100%{opacity:0}}
+@keyframes weoArrWords{0%{opacity:0;transform:translateY(14px)}10%{opacity:1;transform:none}40%{opacity:1;transform:none}54%{opacity:0;transform:scale(.62)}100%{opacity:0;transform:scale(.62)}}
+@keyframes weoArrOrb{0%{opacity:0;transform:scale(.18)}36%{opacity:0;transform:scale(.18)}47%{opacity:1;transform:scale(1)}84%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(.9)}}
+@keyframes weoArrLine{0%{opacity:0;transform:rotate(var(--a)) scaleX(0)}22%{opacity:.8;transform:rotate(var(--a)) scaleX(1)}66%{opacity:.5;transform:rotate(var(--a)) scaleX(1)}100%{opacity:0;transform:rotate(var(--a)) scaleX(1)}}
+/* an orb settling: from the centre, sweeping a full turn round the O on its way out, easing into place */
+@keyframes weo-orb-settle{0%{opacity:0;transform:translate(calc(-1 * var(--r) * cos(var(--a))), calc(-1 * var(--r) * sin(var(--a)))) scale(.3)}18%{opacity:1}
+30%{transform:translate(calc(var(--r) * cos(calc(var(--a) - 270deg)) - var(--r) * cos(var(--a))), calc(var(--r) * sin(calc(var(--a) - 270deg)) - var(--r) * sin(var(--a)))) scale(.7)}
+55%{transform:translate(calc(var(--r) * cos(calc(var(--a) - 180deg)) - var(--r) * cos(var(--a))), calc(var(--r) * sin(calc(var(--a) - 180deg)) - var(--r) * sin(var(--a)))) scale(.85)}
+80%{transform:translate(calc(var(--r) * cos(calc(var(--a) - 90deg)) - var(--r) * cos(var(--a))), calc(var(--r) * sin(calc(var(--a) - 90deg)) - var(--r) * sin(var(--a)))) scale(.95)}
+100%{opacity:1;transform:none}}
+/* the WeOverse intro owns the frame: every other fixed layer hides, the page is inert */
+html[data-weo-intro] body > *:not(#root){visibility:hidden !important}
+html[data-weo-intro] #root > *:not([data-weo-intro-screen]){visibility:hidden !important}
+html[data-weo-intro] #root > [data-weo-intro-screen], html[data-weo-intro] #root > [data-weo-intro-screen] *{visibility:visible !important}
+html[data-weo-intro]{overflow:hidden}
+/* a flow sheet (post · collect · relist · offer) owns the screen: no other navigation paints or takes a click under it */
+html[data-weo-flow] .weo-flowbar-wrap,html[data-weo-flow] [aria-label="Floating O navigation"],html[data-weo-flow] div:has(> [aria-label="Floating O navigation"]){visibility:hidden !important;pointer-events:none !important}
+@keyframes weo-fadein{from{opacity:0}to{opacity:1}}
+@keyframes weo-dockin{from{opacity:0;transform:translateX(var(--sx))}to{opacity:1;transform:none}}
+@keyframes weoArrOrbNow{0%{opacity:0;transform:scale(.18)}14%{opacity:1;transform:scale(1)}84%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(.9)}}
+@keyframes weoArrPre{0%{opacity:0;transform:translateY(14px)}9%{opacity:1;transform:none}84%{opacity:1;transform:none}100%{opacity:0;transform:translateY(-10px)}}
+@keyframes weoArrBleed{0%{opacity:1;transform:scale(.04)}34%{opacity:1;transform:scale(1)}62%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(1)}}
+@keyframes weoArrRingIn{0%{opacity:0;transform:scale(1.5)}30%{opacity:.9}100%{opacity:0;transform:scale(.62)}}
+@keyframes weoArrRing{0%{opacity:0;transform:scale(.7)}25%{opacity:1;transform:scale(1)}80%{opacity:1}100%{opacity:0;transform:scale(1.04)}}
+@keyframes weoArrPop{0%{opacity:0;transform:scale(.3)}22%{opacity:1;transform:scale(1)}80%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(1.06)}}
+@keyframes weoArrEmerge{0%{opacity:0;transform:translate(calc(-50% - var(--dx)), calc(-50% - var(--dy))) scale(.32)}20%{opacity:1}46%{opacity:1;transform:translate(-50%,-50%) scale(1)}74%{opacity:1;transform:translate(-50%,-50%) scale(1)}100%{opacity:0;transform:translate(-50%,-50%) scale(1.06)}}
+.weo-portal-aperture{animation:weo-portal-bloom .58s var(--ease-portal) 1 forwards}
+/* Neutral at rest; the section colour arrives on approach (design system: hover introduces
+   colour to an otherwise-neutral surface). */
+.weo-dir-row:hover{background:color-mix(in srgb, var(--surface-2) 70%, var(--surface)) !important}
+/* ---- View preferences: one curation surface, answered by the page rather than by a re-render ---- */
+.weo-viewbar .weo-scroll-hide::-webkit-scrollbar{display:none}
+html[data-weo-density="compact"] .weo-hero{padding:clamp(12px,1.4vw,15px) !important}
+html[data-weo-density="compact"] .weo-hero h1{font-size:clamp(23px,2.8vw,32px) !important}
+html[data-weo-density="compact"] .weo-viewbar{margin-top:9px !important;padding-top:8px !important}
+html[data-weo-media="quiet"] .weo-hero > span[aria-hidden] img{opacity:.1 !important}
+html[data-weo-media="quiet"] .weo-hero-bloom{opacity:.18 !important}
+html[data-weo-motion="calm"] *{animation-duration:.001ms !important;animation-iteration-count:1 !important;transition-duration:.09s !important}
+html[data-weo-value="os"] [style*="var(--font-mono)"][style*="font-size: 11px"]{display:none !important}
+[data-motion="calm"] *{animation-iteration-count:1 !important;animation-duration:.01ms !important}
+/* split nav: the left panel takes its own gutter, the support cluster floats over the top */
+[data-nav="split"] #root{padding-left:var(--shell-left,270px);padding-top:78px;transition:padding-left .34s var(--ease-portal)}
+@media (max-width:820px){[data-nav="split"] #root{padding-left:86px}}
+/* the floating O nav owns a 356px square — only its drawn parts may take the pointer, so the page underneath stays clickable */
+[aria-label="Floating O navigation"]{pointer-events:none !important}
+[aria-label="Floating O navigation"] button{pointer-events:auto !important}
+[aria-label="Floating O navigation"] svg{pointer-events:none !important}
+[aria-label="Floating O navigation"] svg path,[aria-label="Floating O navigation"] svg circle{pointer-events:none !important}
+/* ---- a first visitor is oriented before the chrome arrives: the flow bar, the O nav and Mya's dock wait ---- */
+.weo-flowbar-wrap,[aria-label="Floating O navigation"],div:has(> [aria-label="Floating O navigation"]),div:has(> [aria-label="Open Mya's panel"]),.weo-viewswitch{transition:opacity .7s var(--ease-settle)}
+html[data-weo-fresh] .weo-flowbar-wrap,html[data-weo-fresh] [aria-label="Floating O navigation"],html[data-weo-fresh] div:has(> [aria-label="Floating O navigation"]),html[data-weo-fresh] div:has(> [aria-label="Open Mya's panel"]),html[data-weo-fresh] .weo-viewswitch,html[data-weo-fresh] .weo-nav,html[data-weo-fresh] [aria-label="Search the WeOverse"],html[data-weo-fresh] [aria-label="Notifications"]{opacity:0 !important;pointer-events:none !important;visibility:hidden !important}
+.weo-nav,[aria-label="Search the WeOverse"],[aria-label="Notifications"]{transition:opacity .7s var(--ease-settle)}
+/* ---- the view switch: one pill, top right, over everything but the intros ---- */
+.weo-viewswitch{position:fixed;right:14px;top:14px;z-index:2570;display:inline-flex;align-items:center;gap:7px;min-height:34px;padding:0 13px 0 10px;border-radius:999px;font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--text-dim);background:var(--glass);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);box-shadow:var(--nm-sm),inset 0 0 0 1px var(--glass-brd);transition:color .2s}
+.weo-viewswitch::before{content:"";width:8px;height:13px;border-radius:2px;box-shadow:inset 0 0 0 1.5px currentColor}
+.weo-viewswitch:hover{color:var(--o-violet)}
+html[data-weo-intro] .weo-viewswitch{visibility:hidden}
+/* ---- v3: quiet heroes + the spine ---- */
+@keyframes weo3-pulse{0%,100%{opacity:.18}50%{opacity:.6}}
+@keyframes weo3-pulse-hi{0%,100%{opacity:.72}50%{opacity:1}}
+/* the flow bar folds on demand now (each capsule has its own toggle), so width never hides what the user opened: the text shrinks with ellipsis; the back label goes first, and only under 900px */
+@media (max-width:900px){.weo-flowbar-back-label{display:none !important}.weo-flowbar-back{padding:0 10px !important}}
+@media (max-width:1240px){.weo-flowbar-text{flex:1 1 120px !important;min-width:120px !important}}
+@media (max-width:640px){.weo-flowbar-min-label{display:none !important}}
+/* narrow windows: single columns, the flow bar keeps only the O-path and the verb, heroes lose their art */
+@media (max-width:640px){.weo-flowbar>div{padding:6px !important;gap:6px !important}.weo-flowbar-text{display:none !important}.weo-hero-art,.weo-hero [data-hero-stats]{display:none !important}.weo-make-grid,.weo-fork,.weo-snap-grid{grid-template-columns:minmax(0,1fr) !important}#root h1{font-size:clamp(22px,7vw,30px) !important}}
+/* figures are critical content: never dimmed below readable — the lift on hover is the hint, not opacity */
+.weo-hero [data-hero-stats]{opacity:.94;transition:opacity .36s var(--ease-portal)}
+.weo-hero:hover [data-hero-stats],.weo-hero:focus-within [data-hero-stats]{opacity:1}
+/* the O nav's scrim, nudged to sit under the ring exactly (direct edit) */
+div:has(> [aria-label="Floating O navigation"]) > div:first-child{left:-12px;top:4px}
+[aria-label="Floating O navigation"]:hover svg path,[aria-label="Floating O navigation"]:hover svg circle{pointer-events:auto !important}
+
+/* pages: a soft cross-fade between the section pages where the browser supports it */
+@view-transition{navigation:auto}
+
+/* floating controls stop at the footer's top edge (--foot-lift is set by the App as the footer scrolls in) */
+.weo-flowbar-wrap,div:has(> [aria-label="Floating O navigation"]),div:has(> [aria-label="Open Mya's panel"]){translate:0 calc(-1 * var(--foot-lift, 0px))}
+
+/* create: fields read as fields (a hairline at rest); required-and-empty fields go red and shake on Preflight */
+:root{--weo-field-line:color-mix(in srgb, var(--text) 9%, transparent);--weo-req:#FF5A2C}
+.weo-req-miss > .weo-modwell{outline:1.5px solid var(--weo-req);outline-offset:-1.5px}
+.weo-shake{animation:weo-shake .5s cubic-bezier(.36,.07,.19,.97) both}
+@keyframes weo-shake{10%,90%{transform:translateX(-2px)}20%,80%{transform:translateX(4px)}30%,50%,70%{transform:translateX(-7px)}40%,60%{transform:translateX(7px)}}
+@media (prefers-reduced-motion: reduce){.weo-shake{animation:none}}
+
+/* preflight: checklist · card · receipt — the card drops under the checklist on narrower screens */
+@media (max-width:1280px) and (min-width:1081px){.weo-snap-grid[style*="300px 320px"]{grid-template-columns:minmax(0,1fr) 300px !important}.weo-snap-grid[style*="300px 320px"]>:nth-child(3){grid-column:2}}
+
+/* settings: the section rail becomes a scrolling row on narrow screens */
+@media (max-width:900px){.weo-settings-grid{grid-template-columns:minmax(0,1fr) !important}.weo-settings-nav{position:static !important;flex-direction:row !important;overflow-x:auto}}

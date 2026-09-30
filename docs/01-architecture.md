@@ -25,7 +25,7 @@ v2-redesign-app/
 ├─ docs/                     all development docs (start at docs/README.md)
 ├─ skills/                 project skills (module-delivery, design-port, api-integration, browser-test)
 ├─ public/                   static files served as-is (videos, Mya clips, logo webm)
-├─ scripts/                  repo scripts (api:types, asset sync, parity screenshots)
+├─ scripts/                  api-types.mjs (npm run api:types), ds2tsx.mjs (DS bundle → TSX converter)
 └─ src/
    ├─ main.tsx               entry: providers + router
    ├─ app/
@@ -33,15 +33,19 @@ v2-redesign-app/
    │  ├─ routes.ts           typed route builders: routes.weo(id) → "/weos/:id"
    │  ├─ providers.tsx       QueryClient, auth, theme, toasts
    │  └─ AppLayout.tsx       shell + <Outlet/> + global overlays
-   ├─ design-system/         ported DS bundle — pure, no data fetching
-   │  ├─ tokens/             colors.css, typography.css, spacing.css, effects.css, governance.css, world.css (verbatim from design)
-   │  ├─ primitives/         Button, OButton, OMark, Orb, Avatar, Chip, Badge, Tabs, Toggle, Input, Card, Progress, Tooltip, Spinner, EmptyState, Alert …
-   │  ├─ data/               ISRRing, StatGrid, OPower, ValueLadder
-   │  ├─ surfaces/           WeOCard, PassportIcon
-   │  ├─ exchange/           CommitReview, FeeDisclosure, FlowReceipt
-   │  ├─ navigation/         RingNav, OPortal, PortalJump
-   │  ├─ marks/              WeOverseLettering, WeODrawnO, DrawnMark, icons (ICO/SICO set)
-   │  └─ index.ts            public barrel
+   ├─ design-system/         ported DS bundle — pure, no data fetching; folders mirror the bundle's groups
+   │  ├─ tokens/             colors, typography, spacing, effects, governance, world, fonts (verbatim) + index.css
+   │  ├─ core/               Button, OButton, OMark, OPortal (+O_SECTION_ICONS), Orb
+   │  ├─ data/               Avatar(+Group), Badge, Chip, ISRRing (+isrStage), StatGrid
+   │  ├─ exchange/           CommitReview, FeeDisclosure, FlowReceipt, OPower (+stages), ValueLadder
+   │  ├─ feedback/           Alert, EmptyState, Progress, Skeleton, Spinner, Tooltip
+   │  ├─ forms/              Input, Toggle
+   │  ├─ motion/             PortalJump
+   │  ├─ navigation/         RingNav, Tabs
+   │  ├─ surfaces/           Card, WeOCard (+PassportIcon, useQrDataUrl)
+   │  ├─ marks/              marks.tsx (WeOverseLettering, WeOLettering, WeODrawnO, DrawnMark), icons.tsx (ICO, SICO, Icon)
+   │  ├─ types.ts            Tone, StyleVars
+   │  └─ index.ts            public barrel — import from '@/design-system'
    ├─ components/            shared composites used by ≥2 features (from design src/components)
    │  ├─ shell/              TopBar, SplitShell, SectionSwitch, QuickJump, WalletMenu, IdSheet, MyaDock, Footer, PathBar, FlowBar
    │  ├─ hero/               SectionHero, HeroStat, DirChip, ViewBar
@@ -61,8 +65,10 @@ v2-redesign-app/
    │     ├─ model/           adapters: backend DTO → view model
    │     └─ __tests__/
    ├─ api/
-   │  ├─ client.ts           fetch wrapper: base URL, bearer, envelope unwrap, refresh-on-401, ApiError
-   │  ├─ auth.ts             PKCE login, token storage, refresh, logout
+   │  ├─ client.ts           fetch wrapper: base URL, bearer, envelope unwrap, single-flight refresh-on-401, ApiError
+   │  ├─ tokens.ts           access token in memory, refresh token in localStorage, dev token seed
+   │  ├─ auth.ts             PKCE authorize URL, callback exchange, logout
+   │  ├─ queryClient.ts      TanStack defaults (no 4xx retries, 429 backoff)
    │  ├─ queryKeys.ts        one factory for every query key
    │  └─ generated/schema.d.ts   openapi-typescript output — never hand-edit
    ├─ stores/                zustand: ui.ts (sheets, toasts, dock), prefs.ts (mirrors uiPreferences), mya.ts
@@ -131,13 +137,14 @@ Page → feature hook (useDiscoverFeed) → api/client (fetch + bearer)
 - Refresh: on a 401 the client calls `POST /api/frontend/auth/new_access_token` once, retries the request, and logs out if that fails. Logout: `POST /api/frontend/auth/logout`.
 - Storage: access token in memory; refresh token in `localStorage` (the backend is bearer-only, no cookies).
 - Dev/testing: a backend script mints an access token for the seeded Mya user (`VITE_DEV_ACCESS_TOKEN` in `.env.local`) so tests never depend on the IdP. The dev token path is compiled out of production builds.
-- Frontend env (all in `.env.local`, never committed — the repo is public): `VITE_API_BASE_URL`, `VITE_AUTH_SERVER`, `VITE_O_CLIENT_ID`, `VITE_OAUTH_REDIRECT_URI`, `VITE_DEV_ACCESS_TOKEN`. `.env.example` lists names only. Values come from the previous frontend build (auth keys) and the backend `.env`.
+- Frontend env (all in `.env.local`, never committed — the repo is public), named like the previous WeO frontend build: `VITE_API_URL` (backend host; client appends `/api`), `VITE_WALLET_URL` (IdP, `https://wallet.ocono.me`), `VITE_OAUTH_AUTHORIZE_PATH`, `VITE_OAUTH_CLIENT_ID`, `VITE_OAUTH_REDIRECT_URI`, `VITE_OAUTH_SCOPE` (`profile`), `VITE_ENV`, `VITE_DEV_ACCESS_TOKEN`. `.env.example` lists names only.
+- The previous build shipped AWS keys as `VITE_AWS_*` — anything `VITE_` is bundled into public JS, so this app never takes cloud credentials; uploads go through the backend (gap G-12).
 
 ## Styling
 
 1. `design-system/tokens/*.css` are copied **verbatim** from `css/ds/tokens/`. Never edit a token value in a component; add a token if needed and note it in `decisions.md`.
 2. `styles/global.css` ports `css/app.css`: reset, `#atmo`/`#dots` layers, `html[data-theme|data-nav|data-motion|data-weo-*]` rules, keyframes, breakpoints.
-3. Component styles: CSS Module next to the component. The design uses inline `style={{…}}` objects; static declarations move to the module, **dynamic values** (tone colour, progress %, positions) are passed as CSS custom properties: `style={{'--tone': tone}}` and used as `var(--tone)` in the module.
+3. Component styles (from `src/components/` upward): CSS Module next to the component. The `src/design-system/` layer keeps the DS bundle's typed inline style objects (D-015). The design uses inline `style={{…}}` objects; static declarations move to the module, **dynamic values** (tone colour, progress %, positions) are passed as CSS custom properties: `style={{'--tone': tone}}` and used as `var(--tone)` in the module.
 4. Fonts: the design loads none — system `Helvetica Neue` stack via `--font-sans`. Keep it.
 5. Themes: `data-theme="dark"` on `<html>`; light is default.
 

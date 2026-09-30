@@ -5,7 +5,7 @@ Twelve build modules after setup. Each is delivered with the workflow in `04-mod
 | # | Module | Design pages / parts | Backend work (summary) | Depends on | Status |
 |---|---|---|---|---|---|
 | M00 | Setup & docs | — | CLAUDE.md drift fixes, redesign docs, skills | — | ✅ done |
-| M01 | Foundation | tokens, global CSS, DS primitives, marks/icons, API client, auth (PKCE + dev token), router skeleton, test tooling | dev-token script, `.env.example` completeness | M00 | ⏳ next |
+| M01 | Foundation | tokens, global CSS, DS primitives, marks/icons, API client, auth (PKCE + dev token), router skeleton, test tooling | dev-token script, `.env.example` completeness | M00 | ⏳ in progress |
 | M02 | App shell | TopBar, split Shell, SectionSwitch, QuickJump/RingNav, WalletMenu + ID sheet, Mya dock, footer + SettingsBody, PathBar, toasts/ack, ExternalGate, flow bar (stub) | nav-summary + preferences (exist); Mya → chatbot | M01 | |
 | M03 | Shared WeO & list kit | SectionHero, ViewBar/view prefs, Scene, Rows, SectionHead/Mark, Fold/Rail, IconSegs, WeoTile/StallTile/WeoView, CircleRecord/Oi/Chip, PersonOi/Spark/StandChip, Snapshot chart/panel, Pip, OWalletPanel, `cardModel` | none (verify WeO projection fields vs `WEO.MISSING`) | M02 | |
 | M04 | Discover · WeO · Collect flow | discover, weo, CollectSheet/CardFlow | discovery gaps (watch, circleIds, trend) | M03 | |

@@ -34,7 +34,7 @@ src/stores · src/lib · src/styles · src/test
 - A component used by one feature lives in the feature; used by two → `src/components/`.
 - DS and shared components are pure (props in, no fetching). Pages/features fetch through hooks.
 - Components receive **view models**, never raw DTOs; adapters live in `features/*/model/` (WeO cards: `lib/cardModel.ts`).
-- Tokens only (`var(--…)`); dynamic values through CSS custom properties.
+- Tokens only (`var(--…)`); dynamic values through CSS custom properties. Exception: `src/design-system/` keeps the DS bundle's typed inline styles (D-015) — don't restyle it, extend it.
 - Conventions: `docs/08-conventions.md`.
 
 ## 4. Commands

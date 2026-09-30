@@ -1,0 +1,36 @@
+/* ============================================================
+   WeO · Governance tokens — the controlled-risk doctrine as CSS.
+   From the O Interaction Protocol v1.1 (docs/O_INTERACTION_PROTOCOL.md).
+   These are advisory/semantic tokens: they give the three creative-
+   freedom zones real values (accent + label) so specimens, tools, and
+   money surfaces can badge themselves and stay consistent. They do NOT
+   restyle components on their own.
+   ============================================================ */
+
+:root {
+  /* ---- Creative-freedom zones (§1 controlled-risk doctrine) ---- */
+  --zone-high:   #22C55E;   /* HIGH   — take genuine risks (orientation, motion, reveal) */
+  --zone-guided: #3A95F2;   /* GUIDED — recombine primitives, don't invent meanings */
+  --zone-low:    #FF5A2C;   /* LOW    — price, consent, value movement: conservative & explicit */
+  --zone-high-soft:   color-mix(in srgb, var(--zone-high) 14%, transparent);
+  --zone-guided-soft: color-mix(in srgb, var(--zone-guided) 14%, transparent);
+  --zone-low-soft:    color-mix(in srgb, var(--zone-low) 14%, transparent);
+
+  /* ---- The money layer (§8) — value buckets kept mentally separate ---- */
+  --val-available: #22C55E;  /* spendable now */
+  --val-protected: #3A95F2;  /* held / escrow-protected */
+  --val-pending:   #F7B21F;  /* in-flight, not yet settled */
+  --val-locked:    #97a1b6;  /* committed / time-locked, not spendable */
+
+  /* ---- 70 / 20 / 10 expression model (§1) ---- */
+  --expr-canon: 70;   /* @kind other */ /* canonical grammar */
+  --expr-adapt: 20;   /* @kind other */ /* contextual adaptation */
+  --expr-risk:  10;   /* @kind other */ /* deliberate surprise */
+
+  /* ---- O nav fan hard limit (§5) ---- */
+  --fan-max-items: 7; /* @kind other */
+}
+
+[data-theme="dark"] {
+  --val-locked: #5f6982;
+}
