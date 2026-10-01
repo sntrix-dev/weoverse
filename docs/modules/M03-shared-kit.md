@@ -26,7 +26,7 @@ How the design's globals became props: `app.openWeo` → `WeoHandlers.onOpen`; `
 
 | Component | Goes to | Why |
 |---|---|---|
-| `OWalletPanel`, `MockOsSheet`, `MoveOsSheet` | M09 | wallet data and flows; only the wallet/passport pages use them |
+| `OWalletPanel`, `MockOsSheet`, `MoveOsSheet` | M05 (was M09, D-038) | built with the Community hub's Wallet row |
 | `OProfileStage`, `OProfileHub`, `HubNode` | M09 | the profile hub needs passport data |
 | `HeroPortalToggle` / hero portal | M11 | belongs to the section intros (with the "Intro" chip, see `SectionHero`) |
 | `WeoShowcase` | M04 | one page uses it (Discover) |

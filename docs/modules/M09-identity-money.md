@@ -9,7 +9,7 @@
 | Path | Design | Blocks |
 |---|---|---|
 | `/passport` (`#isr`, `#tier`, `#graph`) | `passport.jsx` | SectionHero (name; handle · #weoId · joined; PublicPageButton, settings gear; `PassportBalance`; stats ISR/Tier/Circles; foot `OProfileHub` with What moved it / Your tier / Improve / Your graph + Edit profile) · **01 Standing** (Spark, moves, never-counts/appeal, ValueLadder) · **02 Your tier** (ladder + advantage example) · **03 Your graph** (Circled by / You back / Vouched). Sheets: IsrImprove, EditProfile, TierLadder, PassportSettings, PublicProfile |
-| `/wallet` | `wallet.jsx` | lead + `OProfileHub` (Your wallet / Your passport) + MoneyRows · **02 Four buckets** (ValueLadder, StatGrid) · **03 Ecosystem** · **04 Rates** (RateDial ×2, activity) · **05 Apps and plans** · **06 The record** (ledger). `OWalletPanel`: Move Os (`MoveOsSheet`), How Os work |
+| `/wallet` | `wallet.jsx` | lead + `OProfileHub` (Your wallet / Your passport) + MoneyRows · **02 Four buckets** (ValueLadder, StatGrid) · **03 Ecosystem** · **04 Rates** (RateDial ×2, activity) · **05 Apps and plans** · **06 The record** (ledger). `OWalletPanel`: Move Os (`MoveOsSheet`), How Os work — already built in M05 (`components/wallet/OWalletPanel.tsx`, D-038) |
 | `/settings` (`#account` … `#danger`) | `settings.jsx` | sticky scroll-spy nav · Account · Sign-in & security · Privacy · Notifications (7×3 grid, digest, quiet hours) · Wallet & payments · Appearance · Connected apps · Your data · Help & legal · Deactivate/delete |
 
 Drop per D-006: profile "Where you are", Calendar "events you're going to".
