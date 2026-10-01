@@ -216,7 +216,15 @@ function termsOf(w: WeoCardDto, f: WeoFormat, os: number, prog: Progress, ms: nu
   const closes = { k: f === 'Hunt' ? 'Ends in' : 'Closes', v: shortLeft(ms) };
   const price = { k: PRICE_LABEL[f], v: `O ${osFmt(os)}` };
   if (f === 'Hunt') return [price, { k: 'Entries', v: `${prog.left} left` }, closes];
-  if (f === 'Pool') return [price, { k: 'Left', v: `${prog.left} of ${prog.total}` }, closes];
+  if (f === 'Pool')
+    return [
+      price,
+      // a pool without an edition size has nothing "left" to count — say how funded it is
+      prog.total > 0
+        ? { k: 'Left', v: `${prog.left} of ${prog.total}` }
+        : { k: 'Funded', v: `${Math.round(prog.pct * 100)}%` },
+      closes,
+    ];
   if (f === 'Listing' && w.weoType === 'regular')
     return [
       price,

@@ -152,3 +152,11 @@ describe('cardModel', () => {
     expect(shortLeft(null)).toBe('open');
   });
 });
+
+describe('a pool without an edition size', () => {
+  it('says how funded it is instead of "0 of 0"', () => {
+    const w = poolWeo();
+    const c = cardModel({ ...w, weoverse: { ...w.weoverse!, editionSize: 0 } }, 'discover', FIXTURE_NOW);
+    expect(c.terms[1]).toEqual({ k: 'Funded', v: `${Math.round(w.percentFunded * 100)}%` });
+  });
+});

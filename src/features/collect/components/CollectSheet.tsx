@@ -43,8 +43,9 @@ function dialFor(q: CollectQuote): DialRange {
     min,
     max,
     step,
-    lo: pledge ? min : Math.round(max * 0.75),
-    hi: pledge ? min : Math.round(max * 0.95),
+    // a pledge always holds: the whole range reads "Very likely"
+    lo: pledge ? min - 2 : Math.round(max * 0.75),
+    hi: pledge ? min - 1 : Math.round(max * 0.95),
   };
 }
 
