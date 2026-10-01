@@ -82,7 +82,13 @@ export const CIRCLE_ICONS: Record<string, ReactElement> = {
 
 const VIOLET = '#D946EF';
 
-export function CircleChip({ c, size }: { c: Pick<CircleCardModel, 'toneHex' | 'icon' | 'bestType'>; size?: number }) {
+export function CircleChip({
+  c,
+  size,
+}: {
+  c: Pick<CircleCardModel, 'toneHex' | 'icon' | 'bestType'>;
+  size?: number;
+}) {
   const tone = c.toneHex || VIOLET;
   return (
     <span
@@ -209,17 +215,39 @@ export function CircleRecord({
     >
       <CircleOi c={c} hot={hov} coded={coded} />
       <div style={{ minWidth: 0, flex: 1 }}>
-        <h3 style={{ margin: 0, fontSize: 15.5, fontWeight: 700, letterSpacing: '-.015em', color: 'var(--text)' }}>
+        <h3
+          style={{
+            margin: 0,
+            fontSize: 15.5,
+            fontWeight: 700,
+            letterSpacing: '-.015em',
+            color: 'var(--text)',
+          }}
+        >
           {c.name}
         </h3>
-        <p style={{ margin: '3px 0 0', fontSize: 11.5, color: 'var(--text-faint)', fontVariantNumeric: 'tabular-nums' }}>
+        <p
+          style={{
+            margin: '3px 0 0',
+            fontSize: 11.5,
+            color: 'var(--text-faint)',
+            fontVariantNumeric: 'tabular-nums',
+          }}
+        >
           {compact(c.members)} members
         </p>
       </div>
       {joined && (
         <span
           title="Joined"
-          style={{ alignSelf: 'flex-start', flex: '0 0 auto', width: 8, height: 8, borderRadius: '50%', background: tone }}
+          style={{
+            alignSelf: 'flex-start',
+            flex: '0 0 auto',
+            width: 8,
+            height: 8,
+            borderRadius: '50%',
+            background: tone,
+          }}
         />
       )}
     </div>

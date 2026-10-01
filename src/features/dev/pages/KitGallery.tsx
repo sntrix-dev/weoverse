@@ -37,8 +37,25 @@ const h: WeoHandlers = {
 };
 
 const circles: CircleCardModel[] = [
-  { id: 'c1', name: 'Loop makers', members: 1240, toneHex: '#22C55E', icon: 'pool', desire: 72, img: IMGS[0], bestType: 'Pool' },
-  { id: 'c2', name: 'Night hunters', members: 318, toneHex: '#F7C62B', icon: 'hunt', desire: 38, bestType: 'Hunt' },
+  {
+    id: 'c1',
+    name: 'Loop makers',
+    members: 1240,
+    toneHex: '#22C55E',
+    icon: 'pool',
+    desire: 72,
+    img: IMGS[0],
+    bestType: 'Pool',
+  },
+  {
+    id: 'c2',
+    name: 'Night hunters',
+    members: 318,
+    toneHex: '#F7C62B',
+    icon: 'hunt',
+    desire: 38,
+    bestType: 'Hunt',
+  },
 ];
 
 const row = (id: string, name: string, value: string, delta: string, tone: string, extra: object = {}) => ({
@@ -65,12 +82,29 @@ const boards: Record<string, Board> = {
   creators: {
     label: 'Who moved the most',
     metric: 'ISR',
-    rows: [row('p1', 'Lena V.', '82', '+4', '#3A95F2', { avatar: AVATAR, isr: 82 }), row('p2', 'Mira K.', '76', '+2', '#D946EF')],
+    rows: [
+      row('p1', 'Lena V.', '82', '+4', '#3A95F2', { avatar: AVATAR, isr: 82 }),
+      row('p2', 'Mira K.', '76', '+2', '#D946EF'),
+    ],
   },
 };
 const pulse: Record<string, Pulse> = {
-  collected: { label: 'Flow', note: '7 days', headline: 'O 31,980', delta: '+6%', tone: '#3A95F2', series: [4, 6, 5, 8, 7, 9, 11] },
-  creators: { label: 'Creators', note: 'active', headline: '214', delta: '+12', tone: '#D946EF', series: [3, 3, 4, 6, 5, 7, 8] },
+  collected: {
+    label: 'Flow',
+    note: '7 days',
+    headline: 'O 31,980',
+    delta: '+6%',
+    tone: '#3A95F2',
+    series: [4, 6, 5, 8, 7, 9, 11],
+  },
+  creators: {
+    label: 'Creators',
+    note: 'active',
+    headline: '214',
+    delta: '+12',
+    tone: '#D946EF',
+    series: [3, 3, 4, 6, 5, 7, 8],
+  },
 };
 
 export function KitGallery() {
@@ -97,7 +131,11 @@ export function KitGallery() {
       </section>
 
       <section className={styles.section}>
-        <SectionHead eyebrow="02 — Section head" title="Layout bits" note="Pips, stat strip, Os text and the timer." />
+        <SectionHead
+          eyebrow="02 — Section head"
+          title="Layout bits"
+          note="Pips, stat strip, Os text and the timer."
+        />
         <div className={styles.row}>
           <Pip tone="var(--o-green)">Pool</Pip>
           <Pip tone="var(--o-gold)">Hunt</Pip>
@@ -114,7 +152,13 @@ export function KitGallery() {
 
       <section className={styles.section}>
         <h2 className={styles.sectionTitle}>WeoView (cardModel over the fixtures)</h2>
-        <WeoView id="dev-kit" list={weos} h={h} head={(segs) => <div className={styles.row}>{segs}</div>} />
+        <WeoView
+          id="dev-kit"
+          list={weos}
+          h={h}
+          me={{ avatarUrl: AVATAR, isr: 82 }}
+          head={(segs) => <div className={styles.row}>{segs}</div>}
+        />
       </section>
 
       <section className={styles.section}>
@@ -133,7 +177,14 @@ export function KitGallery() {
             <CircleChip key={c.id} c={c} />
           ))}
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(280px,1fr))', gap: 16, marginTop: 16 }}>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fill,minmax(280px,1fr))',
+            gap: 16,
+            marginTop: 16,
+          }}
+        >
           {circles.map((c, i) => (
             <CircleRecord key={c.id} c={c} joined={i === 0} onOpen={() => toast(`Open ${c.name}`)} />
           ))}
@@ -156,7 +207,11 @@ export function KitGallery() {
             Next stage
           </Button>
         </div>
-        {first && <p style={{ margin: '12px 0 0', fontSize: 12, color: 'var(--text-dim)' }}>First fixture: {first.name} · {first.priceLabel} O {first.priceOs}</p>}
+        {first && (
+          <p style={{ margin: '12px 0 0', fontSize: 12, color: 'var(--text-dim)' }}>
+            First fixture: {first.name} · {first.priceLabel} O {first.priceOs}
+          </p>
+        )}
       </section>
 
       <section className={styles.section}>

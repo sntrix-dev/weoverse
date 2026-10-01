@@ -22,7 +22,9 @@ const creator = (over: Partial<WeoCardDto['creator']> = {}): WeoCardDto['creator
   ...over,
 });
 
-const weoverse = (over: Partial<NonNullable<WeoCardDto['weoverse']>> = {}): NonNullable<WeoCardDto['weoverse']> => ({
+const weoverse = (
+  over: Partial<NonNullable<WeoCardDto['weoverse']>> = {},
+): NonNullable<WeoCardDto['weoverse']> => ({
   publicId: 'WEO-77CA10',
   points: ['50 unique seeds', 'Remixable stems included'],
   rarityNote: '',
@@ -113,7 +115,13 @@ export const poolWeo = (over: Partial<CrowdfundWeoDto> = {}): CrowdfundWeoDto =>
     categoryName: 'Community',
     isResellable: false,
     closesAt: at(6 * H + 14 * 60000 + 22000),
-    weoverse: weoverse({ publicId: 'WEO-4417AC', editionSize: 200, priceOs: 2400, priceUsd: 24.24, isCollected: true }),
+    weoverse: weoverse({
+      publicId: 'WEO-4417AC',
+      editionSize: 200,
+      priceOs: 2400,
+      priceUsd: 24.24,
+      isCollected: true,
+    }),
   }),
   weoType: 'crowdfund',
   goal: { amount: 12000, currency: 'O' },
@@ -134,7 +142,13 @@ export const huntWeo = (over: Partial<LotteryWeoDto> = {}): LotteryWeoDto => ({
     categoryName: 'Creating',
     isResellable: false,
     closesAt: at(41 * H + 59 * 60000 + 54000),
-    weoverse: weoverse({ publicId: 'WEO-88B21D', editionSize: 100, priceOs: 600, priceUsd: 6.06, trendPct: 14 }),
+    weoverse: weoverse({
+      publicId: 'WEO-88B21D',
+      editionSize: 100,
+      priceOs: 600,
+      priceUsd: 6.06,
+      trendPct: 14,
+    }),
   }),
   weoType: 'lottery',
   ticket: { price: 600, totalTickets: 100, bundles: [1, 5, 10], perUserLimit: 10 },

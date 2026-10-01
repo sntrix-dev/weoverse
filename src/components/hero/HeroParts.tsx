@@ -23,7 +23,11 @@ export function HeroStat({ s, tone }: { s: HeroStatItem; tone: string }) {
   const raw = String(s.value ?? '');
   const os = s.os || /^O\s/.test(raw) || /^\+\s?O\s/.test(raw);
   const sign = os ? (raw.match(/^[+−-]/) || [''])[0] : '';
-  const fig = os ? raw.replace(/^[+−-]\s*/, '').replace(/^O\s*/, '') : typeof s.value === 'string' || typeof s.value === 'number' ? raw : s.value;
+  const fig = os
+    ? raw.replace(/^[+−-]\s*/, '').replace(/^O\s*/, '')
+    : typeof s.value === 'string' || typeof s.value === 'number'
+      ? raw
+      : s.value;
   const Tag: ElementType = s.onClick ? 'button' : 'span';
   return (
     <Tag
@@ -196,7 +200,9 @@ export function DirChip({
         {icon ? (
           svg(icon, 16, 'currentColor', 1.8)
         ) : (
-          <span style={{ fontSize: 11.5, fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>{d.count ?? ''}</span>
+          <span style={{ fontSize: 11.5, fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>
+            {d.count ?? ''}
+          </span>
         )}
       </span>
       {named && <span style={{ whiteSpace: 'nowrap' }}>{d.label}</span>}
@@ -237,7 +243,15 @@ export const withTabIcons = (tabs: (string | TabItem)[]): TabItem[] =>
     return {
       ...it,
       label: (
-        <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6, minWidth: 0 }}>
+        <span
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 6,
+            minWidth: 0,
+          }}
+        >
           {svg(hit[1], 14, 'currentColor', 1.8)}
           <span style={{ whiteSpace: 'nowrap' }}>{text}</span>
         </span>
@@ -280,7 +294,9 @@ export function PriorityRow({ p, i, tone }: { p: Priority; i: number; tone: stri
         background: hov ? tone : 'color-mix(in srgb, var(--surface) 52%, transparent)',
         backdropFilter: hov ? 'none' : 'blur(16px)',
         WebkitBackdropFilter: hov ? 'none' : 'blur(16px)',
-        boxShadow: hov ? `0 14px 30px -12px color-mix(in srgb, ${tone} 70%, transparent)` : 'inset 0 0 0 1px var(--glass-brd)',
+        boxShadow: hov
+          ? `0 14px 30px -12px color-mix(in srgb, ${tone} 70%, transparent)`
+          : 'inset 0 0 0 1px var(--glass-brd)',
         transform: hov ? 'translateY(-3px)' : 'none',
         transition: 'background .26s, box-shadow .26s, transform .26s var(--ease-portal)',
       }}

@@ -1,7 +1,8 @@
 import { bidWeo, dropWeo, FIXTURE_NOW, huntWeo, listingWeo, poolWeo } from '@/test/fixtures/weos';
 import { cardModel, formatOf, hhmmss, shortLeft } from '../cardModel';
 
-const m = (w: Parameters<typeof cardModel>[0], ctx?: Parameters<typeof cardModel>[1]) => cardModel(w, ctx, FIXTURE_NOW);
+const m = (w: Parameters<typeof cardModel>[0], ctx?: Parameters<typeof cardModel>[1]) =>
+  cardModel(w, ctx, FIXTURE_NOW);
 
 describe('cardModel', () => {
   it('projects three weoTypes onto five formats', () => {
@@ -92,7 +93,13 @@ describe('cardModel', () => {
 
   it('Hunt: entries and published rules', () => {
     const c = m(huntWeo());
-    expect(c).toMatchObject({ type: 'Hunt', cta: 'Join the hunt', os: 600, edition: '100 entries', rarity: 'Rules published' });
+    expect(c).toMatchObject({
+      type: 'Hunt',
+      cta: 'Join the hunt',
+      os: 600,
+      edition: '100 entries',
+      rarity: 'Rules published',
+    });
     expect(c.terms).toEqual([
       { k: 'Entry', v: 'O 600' },
       { k: 'Entries', v: '20 left' },
@@ -127,7 +134,12 @@ describe('cardModel', () => {
   });
 
   it('creator view model', () => {
-    expect(m(dropWeo()).creator).toMatchObject({ handle: 'lenav', isr: 89, tradeCount: 51, joined: 'Feb 2024' });
+    expect(m(dropWeo()).creator).toMatchObject({
+      handle: 'lenav',
+      isr: 89,
+      tradeCount: 51,
+      joined: 'Feb 2024',
+    });
   });
 
   it('clock helpers', () => {

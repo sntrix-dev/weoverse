@@ -64,7 +64,13 @@ export function NoteBody({
   width?: number | string;
 }) {
   return (
-    <div style={{ display: 'grid', gridTemplateRows: show ? '1fr' : '0fr', transition: 'grid-template-rows .42s var(--ease-portal)' }}>
+    <div
+      style={{
+        display: 'grid',
+        gridTemplateRows: show ? '1fr' : '0fr',
+        transition: 'grid-template-rows .42s var(--ease-portal)',
+      }}
+    >
       <p
         style={{
           margin: 0,

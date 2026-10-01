@@ -68,7 +68,19 @@ export interface WeoViewProps {
 }
 
 /** design: screens-hub.jsx WeoView — the group itself: switch + body, one grammar wherever WeOs are shown. */
-export function WeoView({ id, list, h, options, initial, tone, tile, head, empty, me, advPct }: WeoViewProps) {
+export function WeoView({
+  id,
+  list,
+  h,
+  options,
+  initial,
+  tone,
+  tile,
+  head,
+  empty,
+  me,
+  advPct,
+}: WeoViewProps) {
   const opts = options || WEO_VIEWS;
   const [view, setView] = useWeoView(id, opts, initial);
   const segs = <IconSegs items={opts} value={view} onChange={setView} tone={tone} />;
@@ -101,7 +113,8 @@ export function WeoView({ id, list, h, options, initial, tone, tile, head, empty
     <div
       style={{
         display: 'grid',
-        gridTemplateColumns: tile === 'stall' ? 'repeat(auto-fill,minmax(250px,1fr))' : 'repeat(auto-fit, 272px)',
+        gridTemplateColumns:
+          tile === 'stall' ? 'repeat(auto-fill,minmax(250px,1fr))' : 'repeat(auto-fit, 272px)',
         justifyContent: 'center',
         gap: '18px 16px',
       }}

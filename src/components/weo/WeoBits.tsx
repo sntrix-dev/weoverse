@@ -55,7 +55,15 @@ export function WeoPriceAtRest({
   align?: 'center' | 'flex-start' | 'flex-end';
 }) {
   return (
-    <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'baseline', justifyContent: align || 'center', gap: 9 }}>
+    <div
+      style={{
+        display: 'flex',
+        flexWrap: 'wrap',
+        alignItems: 'baseline',
+        justifyContent: align || 'center',
+        gap: 9,
+      }}
+    >
       <span
         style={{
           display: 'inline-flex',
@@ -136,7 +144,15 @@ export function StallTile({ w, onOpen }: { w: WeoCardModel; onOpen: (w: WeoCardM
         transition: 'transform .24s var(--ease-portal), box-shadow .28s',
       }}
     >
-      <span style={{ position: 'relative', display: 'block', height: 146, background: 'var(--surface-2)', overflow: 'hidden' }}>
+      <span
+        style={{
+          position: 'relative',
+          display: 'block',
+          height: 146,
+          background: 'var(--surface-2)',
+          overflow: 'hidden',
+        }}
+      >
         {w.img && (
           <img
             src={w.img}
@@ -165,7 +181,9 @@ export function StallTile({ w, onOpen }: { w: WeoCardModel; onOpen: (w: WeoCardM
             letterSpacing: '.08em',
             textTransform: 'uppercase',
             color: hov ? '#fff' : 'var(--text)',
-            background: hov ? `color-mix(in srgb, ${tone} 82%, #000)` : 'color-mix(in srgb, var(--surface) 82%, transparent)',
+            background: hov
+              ? `color-mix(in srgb, ${tone} 82%, #000)`
+              : 'color-mix(in srgb, var(--surface) 82%, transparent)',
             backdropFilter: 'blur(8px)',
             transition: 'background .28s, color .28s',
           }}
@@ -206,7 +224,15 @@ export function StallTile({ w, onOpen }: { w: WeoCardModel; onOpen: (w: WeoCardM
           >
             <OMark size={12} /> {osFmt(w.os)}
           </span>
-          <span style={{ fontSize: 10, fontWeight: 400, letterSpacing: '.06em', textTransform: 'uppercase', color: 'var(--text-faint)' }}>
+          <span
+            style={{
+              fontSize: 10,
+              fontWeight: 400,
+              letterSpacing: '.06em',
+              textTransform: 'uppercase',
+              color: 'var(--text-faint)',
+            }}
+          >
             {w.priceLabel}
           </span>
         </span>
@@ -223,7 +249,9 @@ export function StallTile({ w, onOpen }: { w: WeoCardModel; onOpen: (w: WeoCardM
         >
           <span>{w.rarity}</span>
           {w.activeNow > 0 && (
-            <span style={{ color: hov ? tone : 'var(--text-faint)', fontWeight: 500, transition: 'color .24s' }}>
+            <span
+              style={{ color: hov ? tone : 'var(--text-faint)', fontWeight: 500, transition: 'color .24s' }}
+            >
               {w.activeNow} here now
             </span>
           )}

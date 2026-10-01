@@ -79,7 +79,17 @@ export function WeoTile({
 }
 
 /** design: screens-hub.jsx MyWeoCard — the card, its price at rest, its verbs on approach. */
-export function MyWeoCard({ w, h, i = 0, advPct }: { w: WeoCardModel; h: WeoHandlers; i?: number; advPct?: number }) {
+export function MyWeoCard({
+  w,
+  h,
+  i = 0,
+  advPct,
+}: {
+  w: WeoCardModel;
+  h: WeoHandlers;
+  i?: number;
+  advPct?: number;
+}) {
   const [hov, setHov] = useState(false);
   return (
     <div
@@ -216,9 +226,23 @@ export function WeoOrbitView({ list, h, me }: { list: WeoCardModel[]; h: WeoHand
         overflow: 'hidden',
       }}
     >
-      <div style={{ position: 'absolute', left: '50%', top: '50%', width: R * 2, height: R * 2, marginLeft: -R, marginTop: -R }}>
-        <div style={{ position: 'absolute', inset: 0, borderRadius: '50%', border: '1px dashed var(--border)' }} />
-        <div style={{ position: 'absolute', inset: 46, borderRadius: '50%', border: '1px solid var(--border)' }} />
+      <div
+        style={{
+          position: 'absolute',
+          left: '50%',
+          top: '50%',
+          width: R * 2,
+          height: R * 2,
+          marginLeft: -R,
+          marginTop: -R,
+        }}
+      >
+        <div
+          style={{ position: 'absolute', inset: 0, borderRadius: '50%', border: '1px dashed var(--border)' }}
+        />
+        <div
+          style={{ position: 'absolute', inset: 46, borderRadius: '50%', border: '1px solid var(--border)' }}
+        />
         <div style={{ position: 'absolute', inset: 0, animation: 'weo-orbit 38s linear infinite' }}>
           {items.map((w, i) => (
             <div
@@ -230,7 +254,9 @@ export function WeoOrbitView({ list, h, me }: { list: WeoCardModel[]; h: WeoHand
                 transform: `rotate(${(i / items.length) * 360}deg) translateY(-${R}px)`,
               }}
             >
-              <div style={{ animation: 'weo-orbit-rev 38s linear infinite', marginLeft: -39, marginTop: -39 }}>
+              <div
+                style={{ animation: 'weo-orbit-rev 38s linear infinite', marginLeft: -39, marginTop: -39 }}
+              >
                 <button
                   type="button"
                   onClick={() => tap(w)}
@@ -238,7 +264,15 @@ export function WeoOrbitView({ list, h, me }: { list: WeoCardModel[]; h: WeoHand
                   aria-label={`${w.name} · ${w.type}`}
                   style={{ border: 'none', background: 'transparent', padding: 0, cursor: 'pointer' }}
                 >
-                  <Orb size={78} fill="image" src={w.img ?? undefined} ring ringColor={w.hex} matcap breathe />
+                  <Orb
+                    size={78}
+                    fill="image"
+                    src={w.img ?? undefined}
+                    ring
+                    ringColor={w.hex}
+                    matcap
+                    breathe
+                  />
                 </button>
               </div>
             </div>
@@ -262,7 +296,9 @@ export function WeoOrbitView({ list, h, me }: { list: WeoCardModel[]; h: WeoHand
                 inset: 18,
                 borderRadius: '50%',
                 overflow: 'hidden',
-                background: me.avatarUrl ? `url('${me.avatarUrl}') center/cover, var(--surface)` : 'var(--surface)',
+                background: me.avatarUrl
+                  ? `url('${me.avatarUrl}') center/cover, var(--surface)`
+                  : 'var(--surface)',
                 boxShadow: 'inset 0 0 0 1px var(--border)',
               }}
             />
@@ -313,7 +349,8 @@ export function WeoList({ list, h }: { list: WeoCardModel[]; h: WeoHandlers }) {
             gap: 16,
             flexWrap: 'wrap',
             padding: '14px 18px',
-            background: hovId === w.id ? 'color-mix(in srgb, var(--o-violet) 4%, var(--surface))' : 'var(--surface)',
+            background:
+              hovId === w.id ? 'color-mix(in srgb, var(--o-violet) 4%, var(--surface))' : 'var(--surface)',
             transition: 'background .26s',
             animation: `weo-cardin .44s var(--ease-settle) ${i * 0.06}s both`,
           }}
@@ -329,7 +366,15 @@ export function WeoList({ list, h }: { list: WeoCardModel[]; h: WeoHandlers }) {
             style={{ flex: '0 0 auto' }}
           />
           <div style={{ minWidth: 0, flex: '1 1 200px' }}>
-            <h3 style={{ margin: 0, fontSize: 15, fontWeight: 700, letterSpacing: '-.01em', color: 'var(--text)' }}>
+            <h3
+              style={{
+                margin: 0,
+                fontSize: 15,
+                fontWeight: 700,
+                letterSpacing: '-.01em',
+                color: 'var(--text)',
+              }}
+            >
               {w.name}
             </h3>
             <p style={{ margin: '2px 0 0', fontSize: 11.5, color: 'var(--text-faint)' }}>
@@ -339,7 +384,16 @@ export function WeoList({ list, h }: { list: WeoCardModel[]; h: WeoHandlers }) {
           <div style={{ display: 'flex', gap: 18, flex: '0 0 auto' }}>
             {w.terms.slice(0, 2).map((t) => (
               <span key={t.k} style={{ display: 'flex', flexDirection: 'column' }}>
-                <span style={{ fontSize: 13.5, fontWeight: 700, color: 'var(--text)', fontVariantNumeric: 'tabular-nums' }}>{t.v}</span>
+                <span
+                  style={{
+                    fontSize: 13.5,
+                    fontWeight: 700,
+                    color: 'var(--text)',
+                    fontVariantNumeric: 'tabular-nums',
+                  }}
+                >
+                  {t.v}
+                </span>
                 <span style={{ fontSize: 10, color: 'var(--text-faint)' }}>{t.k}</span>
               </span>
             ))}
@@ -358,7 +412,15 @@ export function WeoList({ list, h }: { list: WeoCardModel[]; h: WeoHandlers }) {
           >
             <OMark size={13} /> {osFmt(w.os)}
           </span>
-          <div style={{ flex: '0 0 auto', marginLeft: 'auto', width: 236, display: 'flex', justifyContent: 'flex-end' }}>
+          <div
+            style={{
+              flex: '0 0 auto',
+              marginLeft: 'auto',
+              width: 236,
+              display: 'flex',
+              justifyContent: 'flex-end',
+            }}
+          >
             <WeoActions w={w} h={h} show={hovId === w.id} />
           </div>
         </div>

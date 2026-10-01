@@ -18,7 +18,13 @@ export function Rows({ rows, initial }: { rows: RowBlock[]; initial?: string | n
   const cur = rows.find((r) => r.id === open) || null;
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 190px), 1fr))', gap: 12 }}>
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 190px), 1fr))',
+          gap: 12,
+        }}
+      >
         {rows.map((r) => {
           const on = open === r.id;
           const t = r.tone || 'var(--o-blue)';
@@ -43,7 +49,9 @@ export function Rows({ rows, initial }: { rows: RowBlock[]; initial?: string | n
                 textAlign: 'left',
                 font: 'inherit',
                 background: on ? `color-mix(in srgb, ${t} 9%, var(--surface))` : 'var(--surface)',
-                boxShadow: on ? `var(--nm-raised), inset 0 0 0 1.5px ${t}` : 'var(--nm-raised), inset 0 0 0 1px var(--border)',
+                boxShadow: on
+                  ? `var(--nm-raised), inset 0 0 0 1.5px ${t}`
+                  : 'var(--nm-raised), inset 0 0 0 1px var(--border)',
                 transition: 'box-shadow .24s, background .24s, transform .24s var(--ease-portal)',
               }}
               onMouseEnter={(e) => {
@@ -80,7 +88,9 @@ export function Rows({ rows, initial }: { rows: RowBlock[]; initial?: string | n
                   </span>
                 )}
               </span>
-              <span style={{ marginTop: 'auto', display: 'flex', alignItems: 'center', gap: 6, width: '100%' }}>
+              <span
+                style={{ marginTop: 'auto', display: 'flex', alignItems: 'center', gap: 6, width: '100%' }}
+              >
                 <span
                   style={{
                     minWidth: 0,
@@ -130,8 +140,19 @@ export function Rows({ rows, initial }: { rows: RowBlock[]; initial?: string | n
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
-            <span style={{ width: 8, height: 8, borderRadius: '50%', background: cur.tone || 'var(--o-blue)' }} />
-            <span style={{ flex: 1, minWidth: 0, fontSize: 13, fontWeight: 700, letterSpacing: '-.014em', color: 'var(--text)' }}>
+            <span
+              style={{ width: 8, height: 8, borderRadius: '50%', background: cur.tone || 'var(--o-blue)' }}
+            />
+            <span
+              style={{
+                flex: 1,
+                minWidth: 0,
+                fontSize: 13,
+                fontWeight: 700,
+                letterSpacing: '-.014em',
+                color: 'var(--text)',
+              }}
+            >
               {cur.title}
             </span>
             <button

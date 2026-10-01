@@ -94,12 +94,30 @@ export function RailHead({
       <div style={{ minWidth: 240, flex: 1 }}>
         <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
           <span style={{ width: 7, height: 7, borderRadius: '50%', background: t, flex: '0 0 auto' }} />
-          <h2 style={{ margin: 0, fontSize: 'clamp(19px,2.2vw,24px)', fontWeight: 700, letterSpacing: '-.028em', color: 'var(--text)' }}>
+          <h2
+            style={{
+              margin: 0,
+              fontSize: 'clamp(19px,2.2vw,24px)',
+              fontWeight: 700,
+              letterSpacing: '-.028em',
+              color: 'var(--text)',
+            }}
+          >
             {title}
           </h2>
         </span>
         {note && (
-          <p style={{ margin: '5px 0 0', maxWidth: '64ch', fontSize: 12.5, lineHeight: 1.5, color: 'var(--text-dim)' }}>{note}</p>
+          <p
+            style={{
+              margin: '5px 0 0',
+              maxWidth: '64ch',
+              fontSize: 12.5,
+              lineHeight: 1.5,
+              color: 'var(--text-dim)',
+            }}
+          >
+            {note}
+          </p>
         )}
       </div>
       <div style={{ flex: '0 0 auto', display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 8 }}>
@@ -161,7 +179,15 @@ export function Fold({
           transition: 'background .24s, box-shadow .24s, margin .24s',
         }}
       >
-        <span style={{ width: 7, height: 7, borderRadius: '50%', flex: '0 0 auto', background: tone || 'var(--o-blue)' }} />
+        <span
+          style={{
+            width: 7,
+            height: 7,
+            borderRadius: '50%',
+            flex: '0 0 auto',
+            background: tone || 'var(--o-blue)',
+          }}
+        />
         <span
           style={{
             minWidth: 0,
@@ -178,7 +204,16 @@ export function Fold({
           {title}
         </span>
         {count != null && (
-          <span style={{ fontSize: 11.5, fontWeight: 600, color: 'var(--text-faint)', fontVariantNumeric: 'tabular-nums' }}>{count}</span>
+          <span
+            style={{
+              fontSize: 11.5,
+              fontWeight: 600,
+              color: 'var(--text-faint)',
+              fontVariantNumeric: 'tabular-nums',
+            }}
+          >
+            {count}
+          </span>
         )}
         <span
           style={{
@@ -192,7 +227,13 @@ export function Fold({
           {svg(<polyline points="6 9 12 15 18 9" />, 14, 'currentColor', 2.2)}
         </span>
       </button>
-      <div style={{ display: 'grid', gridTemplateRows: open ? '1fr' : '0fr', transition: 'grid-template-rows .44s var(--ease-portal)' }}>
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateRows: open ? '1fr' : '0fr',
+          transition: 'grid-template-rows .44s var(--ease-portal)',
+        }}
+      >
         <div style={{ overflow: open ? 'visible' : 'hidden', minHeight: 0, minWidth: 0 }}>{children}</div>
       </div>
     </div>

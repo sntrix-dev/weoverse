@@ -5,10 +5,20 @@ import { ISRRing, OMark } from '@/design-system';
 export function Spark({ values, tone, h, w }: { values: number[]; tone: string; h?: number; w?: number }) {
   const H = h || 34;
   const W = w || 100;
-  if (values.length < 2) return <svg viewBox={`0 0 ${W} ${H}`} style={{ display: 'block', width: '100%', height: H }} aria-hidden="true" />;
+  if (values.length < 2)
+    return (
+      <svg
+        viewBox={`0 0 ${W} ${H}`}
+        style={{ display: 'block', width: '100%', height: H }}
+        aria-hidden="true"
+      />
+    );
   const min = Math.min(...values) - 2;
   const max = Math.max(...values) + 2;
-  const pts = values.map((v, i) => ({ x: (i / (values.length - 1)) * W, y: H - ((v - min) / (max - min)) * H }));
+  const pts = values.map((v, i) => ({
+    x: (i / (values.length - 1)) * W,
+    y: H - ((v - min) / (max - min)) * H,
+  }));
   const d = pts.map((p, i) => `${i ? 'L' : 'M'}${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ');
   const lastY = pts[pts.length - 1]?.y ?? H;
   return (
@@ -19,14 +29,29 @@ export function Spark({ values, tone, h, w }: { values: number[]; tone: string; 
       style={{ display: 'block', width: '100%', height: H, overflow: 'visible' }}
     >
       <path d={`${d} L${W},${H} L0,${H} Z`} fill={tone} opacity=".1" />
-      <path d={d} fill="none" stroke={tone} strokeWidth="1.6" strokeLinecap="round" vectorEffect="non-scaling-stroke" />
+      <path
+        d={d}
+        fill="none"
+        stroke={tone}
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        vectorEffect="non-scaling-stroke"
+      />
       <circle cx={W} cy={lastY} r="2.2" fill={tone} />
     </svg>
   );
 }
 
 /** design: screens-network.jsx PersonOi — a person as an O: the ISR band is the ring, the face the core. */
-export function PersonOi({ p, size, hot }: { p: { isr: number; avatar?: string | null }; size?: number; hot?: boolean }) {
+export function PersonOi({
+  p,
+  size,
+  hot,
+}: {
+  p: { isr: number; avatar?: string | null };
+  size?: number;
+  hot?: boolean;
+}) {
   const S = size || 104;
   return (
     <span style={{ position: 'relative', display: 'block', width: S, height: S, flex: '0 0 auto' }}>
@@ -135,7 +160,11 @@ export function OAvatarOrb({
           transition: 'box-shadow .2s',
         }}
       >
-        <b style={{ fontSize: 14, fontWeight: 700, color: 'var(--text)', fontVariantNumeric: 'tabular-nums' }}>{isr}</b>
+        <b
+          style={{ fontSize: 14, fontWeight: 700, color: 'var(--text)', fontVariantNumeric: 'tabular-nums' }}
+        >
+          {isr}
+        </b>
         <span
           style={{
             fontSize: 9,
@@ -176,7 +205,9 @@ export function OAvatarOrb({
     </span>
   );
   if (!onOpen) return body;
-  const tierNote = tier ? ` · Tier ${tier.n}${adv != null ? ` · ${Math.round(adv * 100)}% advantage` : ''}` : '';
+  const tierNote = tier
+    ? ` · Tier ${tier.n}${adv != null ? ` · ${Math.round(adv * 100)}% advantage` : ''}`
+    : '';
   return (
     <button
       type="button"

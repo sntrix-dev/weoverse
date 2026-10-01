@@ -14,7 +14,15 @@ import { ALL_FIXTURE_WEOS, FIXTURE_NOW, huntWeo } from '@/test/fixtures/weos';
 const models = () => ALL_FIXTURE_WEOS().map((w) => cardModel(w, 'discover', FIXTURE_NOW));
 
 describe('circle kit', () => {
-  const c = { id: 'c1', name: 'Loop makers', members: 1240, toneHex: '#22C55E', icon: 'pool', desire: 72, bestType: 'Pool' };
+  const c = {
+    id: 'c1',
+    name: 'Loop makers',
+    members: 1240,
+    toneHex: '#22C55E',
+    icon: 'pool',
+    desire: 72,
+    bestType: 'Pool',
+  };
 
   it('CircleRecord shows the name, compact members and the joined dot; Enter opens', () => {
     const onOpen = vi.fn();
@@ -90,7 +98,9 @@ describe('SnapshotPanel', () => {
 
   it('podium reads 02 · 01 · 03, the rest continue from 04, and a pick reports the row', () => {
     const onPick = vi.fn();
-    render(<SnapshotPanel boards={boards} pulse={pulse} board="collected" onBoard={() => {}} onPick={onPick} />);
+    render(
+      <SnapshotPanel boards={boards} pulse={pulse} board="collected" onBoard={() => {}} onPick={onPick} />,
+    );
     expect(screen.getByRole('heading', { name: 'Where the Os flowed' })).toBeInTheDocument();
     const names = screen.getAllByText(/^Row /).map((el) => el.textContent);
     expect(names).toEqual(['Row B', 'Row A', 'Row C', 'Row D', 'Row E']);
@@ -158,7 +168,7 @@ describe('WeO views', () => {
   });
 
   it('an empty group says so', () => {
-    render(<WeoView id="t2" list={[]} h={{ onOpen: () => {}}} />);
+    render(<WeoView id="t2" list={[]} h={{ onOpen: () => {} }} />);
     expect(screen.getByText('Nothing here yet.')).toBeInTheDocument();
   });
 });

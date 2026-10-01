@@ -197,8 +197,13 @@ function rarityOf(w: WeoCardDto, prog: Progress): string {
   const note = w.weoverse?.rarityNote;
   if (note) return note;
   if (w.weoType === 'crowdfund') return `${Math.round(prog.pct * 100)}% funded`;
-  if (w.weoType === 'lottery') return w.draw.mechanism === 'provably_fair_rng' ? 'Rules published' : 'Draw pending';
-  return w.status === 'sold_out' || prog.left === 0 ? 'Sold out' : w.isAlmostGone ? 'Almost gone' : 'Available';
+  if (w.weoType === 'lottery')
+    return w.draw.mechanism === 'provably_fair_rng' ? 'Rules published' : 'Draw pending';
+  return w.status === 'sold_out' || prog.left === 0
+    ? 'Sold out'
+    : w.isAlmostGone
+      ? 'Almost gone'
+      : 'Available';
 }
 
 const osFmt = (n: number) => n.toLocaleString('en-US');
@@ -226,7 +231,11 @@ const monthYear = (iso: string | null | undefined) => {
 
 /* ============ cardModel — the only bridge from API to interface ============ */
 
-export function cardModel(w: WeoCardDto, context: CardContext = 'discover', now: number = Date.now()): WeoCardModel {
+export function cardModel(
+  w: WeoCardDto,
+  context: CardContext = 'discover',
+  now: number = Date.now(),
+): WeoCardModel {
   const ctx: CardContext = ACTIONS[context] ? context : 'discover';
   const f = formatOf(w);
   const x = w.weoverse;
@@ -237,7 +246,11 @@ export function cardModel(w: WeoCardDto, context: CardContext = 'discover', now:
   const tone = FORMAT_TONE[f];
   const circles = (x?.circles ?? []).map((c) => ({ id: String(c.id), name: c.name, slug: c.slug }));
   const urgent =
-    w.weoType === 'crowdfund' ? w.isClosingSoon : w.weoType === 'lottery' ? w.isAlmostSoldOut : w.isAlmostGone;
+    w.weoType === 'crowdfund'
+      ? w.isClosingSoon
+      : w.weoType === 'lottery'
+        ? w.isAlmostSoldOut
+        : w.isAlmostGone;
   return {
     id: String(w._id),
     weoId: x?.publicId ?? null,

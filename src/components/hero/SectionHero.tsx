@@ -156,7 +156,11 @@ export function SectionHero({
     >
       {ground && (
         <span aria-hidden="true" style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
-          <img src={ground} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.5 }} />
+          <img
+            src={ground}
+            alt=""
+            style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.5 }}
+          />
           <span
             style={{
               position: 'absolute',
@@ -178,10 +182,20 @@ export function SectionHero({
         <span
           aria-hidden="true"
           className="weo-hero-bloom"
-          style={{ background: `radial-gradient(circle, color-mix(in srgb, ${t} 34%, transparent), transparent 68%)` }}
+          style={{
+            background: `radial-gradient(circle, color-mix(in srgb, ${t} 34%, transparent), transparent 68%)`,
+          }}
         />
       )}
-      <div style={{ position: 'relative', display: 'flex', flexWrap: 'wrap', alignItems: 'stretch', gap: 'clamp(12px,1.6vw,20px)' }}>
+      <div
+        style={{
+          position: 'relative',
+          display: 'flex',
+          flexWrap: 'wrap',
+          alignItems: 'stretch',
+          gap: 'clamp(12px,1.6vw,20px)',
+        }}
+      >
         <div style={{ flex: '1 1 320px', minWidth: 0, display: 'flex', flexDirection: 'column' }}>
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: 9 }}>
             {icon && (
@@ -212,7 +226,16 @@ export function SectionHero({
             {/* the why is contextual, not persistent: the dot invites, the note arrives */}
             {lede && <NoteDot show={note.show} onClick={note.toggle} label={`What ${title} is`} />}
           </span>
-          <h1 style={{ margin: '10px 0 0', fontSize: 'clamp(25px,3.1vw,38px)', color: 'var(--text)', textWrap: 'pretty' }}>{title}</h1>
+          <h1
+            style={{
+              margin: '10px 0 0',
+              fontSize: 'clamp(25px,3.1vw,38px)',
+              color: 'var(--text)',
+              textWrap: 'pretty',
+            }}
+          >
+            {title}
+          </h1>
           {sub && <div style={{ marginTop: 7 }}>{sub}</div>}
           {lede && <NoteBody note={lede} show={note.show} size={13} width={56} />}
         </div>
@@ -274,10 +297,20 @@ export function SectionHero({
               }}
             >
               {shownDir.map((d) => (
-                <DirChip key={d.id || d.label} d={d} tone={t} active={!!d.id && d.id === here} onClick={() => go(d)} />
+                <DirChip
+                  key={d.id || d.label}
+                  d={d}
+                  tone={t}
+                  active={!!d.id && d.id === here}
+                  onClick={() => go(d)}
+                />
               ))}
               {restDir.length > 0 && (
-                <span style={{ position: 'relative' }} onClick={(e) => e.stopPropagation()} role="presentation">
+                <span
+                  style={{ position: 'relative' }}
+                  onClick={(e) => e.stopPropagation()}
+                  role="presentation"
+                >
                   <button
                     ref={moreBtn}
                     type="button"
@@ -286,7 +319,11 @@ export function SectionHero({
                       const h = Math.min(restDir.length * 44 + 12, window.innerHeight * 0.6);
                       const below = r.bottom + 8;
                       const flip = below + h > window.innerHeight - 12;
-                      setMoreAt({ right: Math.max(12, window.innerWidth - r.right), top: flip ? Math.max(12, r.top - 8 - h) : below, h });
+                      setMoreAt({
+                        right: Math.max(12, window.innerWidth - r.right),
+                        top: flip ? Math.max(12, r.top - 8 - h) : below,
+                        h,
+                      });
                       setMore((m) => !m);
                     }}
                     aria-expanded={more}
@@ -405,7 +442,13 @@ export function SectionHero({
                                 {d.label}
                               </span>
                               {d.count != null && (
-                                <span style={{ fontSize: 11, color: 'var(--text-faint)', fontVariantNumeric: 'tabular-nums' }}>
+                                <span
+                                  style={{
+                                    fontSize: 11,
+                                    color: 'var(--text-faint)',
+                                    fontVariantNumeric: 'tabular-nums',
+                                  }}
+                                >
                                   {d.count}
                                 </span>
                               )}
@@ -419,7 +462,9 @@ export function SectionHero({
               )}
               {actions}
               {/* the view controls belong with the other controls — never a band of their own */}
-              {(filters || filterSummary) && <ViewBar bare tone={t} filters={filters} summary={filterSummary} />}
+              {(filters || filterSummary) && (
+                <ViewBar bare tone={t} filters={filters} summary={filterSummary} />
+              )}
               {hasMore && (
                 <button
                   type="button"
@@ -491,7 +536,12 @@ export function SectionHero({
                     }}
                   />
                   <span
-                    style={{ position: 'absolute', inset: 0, pointerEvents: 'none', boxShadow: 'inset 0 1px 0 rgba(255,255,255,.34)' }}
+                    style={{
+                      position: 'absolute',
+                      inset: 0,
+                      pointerEvents: 'none',
+                      boxShadow: 'inset 0 1px 0 rgba(255,255,255,.34)',
+                    }}
                   />
                 </>
               ) : (
@@ -591,7 +641,13 @@ export function SectionHero({
                   Worth your attention
                 </span>
               </p>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(min(100%,270px),1fr))', gap: 10 }}>
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit,minmax(min(100%,270px),1fr))',
+                  gap: 10,
+                }}
+              >
                 {priorities.map((p, i) => (
                   <PriorityRow key={p.label} p={p} i={i} tone={t} />
                 ))}

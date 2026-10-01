@@ -80,7 +80,16 @@ export function LeaderFace({ row, size, focus }: { row: BoardRow; size: number; 
   }
   if (row.img)
     return (
-      <Orb size={size} fill="image" src={row.img} ring ringColor={row.tone} matcap breathe={focus} style={{ flex: '0 0 auto' }} />
+      <Orb
+        size={size}
+        fill="image"
+        src={row.img}
+        ring
+        ringColor={row.tone}
+        matcap
+        breathe={focus}
+        style={{ flex: '0 0 auto' }}
+      />
     );
   return (
     <div
@@ -155,7 +164,11 @@ export function Podium({ rows, onPick }: { rows: BoardRow[]; onPick: (row: Board
             >
               {row.name}
             </span>
-            <span style={{ fontSize: 10.5, color: 'var(--text-faint)', textAlign: 'center', lineHeight: 1.25 }}>{row.sub}</span>
+            <span
+              style={{ fontSize: 10.5, color: 'var(--text-faint)', textAlign: 'center', lineHeight: 1.25 }}
+            >
+              {row.sub}
+            </span>
             <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 6, marginTop: 2 }}>
               <span
                 style={{
@@ -300,9 +313,21 @@ export function SnapshotChart({
 }
 
 /** design: SnapshotPanel's default rail ("What wins where", `HUB.CONTEXTS`) as its own part. */
-export function WhatWinsRail({ contexts }: { contexts: { context: string; type: string; rate: number; tone: string }[] }) {
+export function WhatWinsRail({
+  contexts,
+}: {
+  contexts: { context: string; type: string; rate: number; tone: string }[];
+}) {
   return (
-    <div style={{ borderRadius: 24, padding: 18, background: 'var(--surface-2)', boxShadow: 'var(--nm-inset)', minWidth: 0 }}>
+    <div
+      style={{
+        borderRadius: 24,
+        padding: 18,
+        background: 'var(--surface-2)',
+        boxShadow: 'var(--nm-inset)',
+        minWidth: 0,
+      }}
+    >
       <p
         style={{
           margin: 0,
@@ -321,7 +346,9 @@ export function WhatWinsRail({ contexts }: { contexts: { context: string; type: 
           <div key={c.context}>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
               <span style={{ fontSize: 12.5, fontWeight: 600, color: 'var(--text)' }}>{c.context}</span>
-              <span style={{ marginLeft: 'auto', fontSize: 11, fontWeight: 700, color: c.tone }}>{c.type}</span>
+              <span style={{ marginLeft: 'auto', fontSize: 11, fontWeight: 700, color: c.tone }}>
+                {c.type}
+              </span>
               <span
                 style={{
                   fontSize: 12,
@@ -345,7 +372,9 @@ export function WhatWinsRail({ contexts }: { contexts: { context: string; type: 
                 overflow: 'hidden',
               }}
             >
-              <div style={{ width: `${c.rate * 100}%`, height: '100%', borderRadius: 999, background: c.tone }} />
+              <div
+                style={{ width: `${c.rate * 100}%`, height: '100%', borderRadius: 999, background: c.tone }}
+              />
             </div>
           </div>
         ))}
@@ -388,7 +417,15 @@ export function SnapshotPanel({
         boxShadow: 'var(--nm-raised), inset 0 0 0 1px var(--border)',
       }}
     >
-      <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-end', gap: 16, justifyContent: 'space-between' }}>
+      <div
+        style={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          alignItems: 'flex-end',
+          gap: 16,
+          justifyContent: 'space-between',
+        }}
+      >
         <div>
           <SectionMark n={1} label={eyebrow || 'Snapshot · 7d'} rule={false} />
           <h2
@@ -406,7 +443,13 @@ export function SnapshotPanel({
       </div>
 
       <div style={{ marginTop: 18 }}>
-        <SnapshotChart pulse={pulse} keys={keys} value={cur} onChange={onBoard} onOpenSection={onOpenSection} />
+        <SnapshotChart
+          pulse={pulse}
+          keys={keys}
+          value={cur}
+          onChange={onBoard}
+          onOpenSection={onOpenSection}
+        />
       </div>
 
       <div
@@ -423,7 +466,15 @@ export function SnapshotPanel({
       >
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12, minWidth: 0 }}>
           <Podium rows={board.rows} onPick={onPick} />
-          <div style={{ display: 'grid', gap: 1, borderRadius: 20, overflow: 'hidden', background: 'var(--border)' }}>
+          <div
+            style={{
+              display: 'grid',
+              gap: 1,
+              borderRadius: 20,
+              overflow: 'hidden',
+              background: 'var(--border)',
+            }}
+          >
             {rest.map((row, i) => (
               <button
                 type="button"
@@ -468,12 +519,23 @@ export function SnapshotPanel({
                   >
                     {row.name}
                   </span>
-                  <span style={{ display: 'block', fontSize: 10.5, color: 'var(--text-faint)' }}>{row.sub}</span>
+                  <span style={{ display: 'block', fontSize: 10.5, color: 'var(--text-faint)' }}>
+                    {row.sub}
+                  </span>
                 </span>
-                <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--text)', fontVariantNumeric: 'tabular-nums' }}>
+                <span
+                  style={{
+                    fontSize: 14,
+                    fontWeight: 700,
+                    color: 'var(--text)',
+                    fontVariantNumeric: 'tabular-nums',
+                  }}
+                >
                   <OsText value={row.value} />
                 </span>
-                <span style={{ fontSize: 10.5, fontWeight: 700, color: row.tone, width: 74, textAlign: 'right' }}>
+                <span
+                  style={{ fontSize: 10.5, fontWeight: 700, color: row.tone, width: 74, textAlign: 'right' }}
+                >
                   {row.delta}
                 </span>
               </button>

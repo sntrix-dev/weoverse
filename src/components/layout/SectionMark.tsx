@@ -211,7 +211,8 @@ export function IconSegs<V extends string>({
               fontWeight: on ? 700 : 500,
               color: on ? '#fff' : hot ? t : 'var(--text-faint)',
               background: on ? t : hot ? `color-mix(in srgb, ${t} 9%, transparent)` : 'transparent',
-              transition: 'background .26s, color .24s, gap .32s var(--ease-portal), padding .32s var(--ease-portal)',
+              transition:
+                'background .26s, color .24s, gap .32s var(--ease-portal), padding .32s var(--ease-portal)',
             }}
           >
             {svg(icons[it.value], 17, 'currentColor', 1.7)}

@@ -24,9 +24,20 @@ export function Pip({ tone, children }: { tone: string; children?: ReactNode }) 
 }
 
 /** design: screens-holdings.jsx StatStrip — a row of figures with their label and note. */
-export function StatStrip({ items }: { items: { k: string; v: ReactNode; note?: ReactNode; tone?: string }[] }) {
+export function StatStrip({
+  items,
+}: {
+  items: { k: string; v: ReactNode; note?: ReactNode; tone?: string }[];
+}) {
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(160px,1fr))', gap: 12, marginTop: 22 }}>
+    <div
+      style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit,minmax(160px,1fr))',
+        gap: 12,
+        marginTop: 22,
+      }}
+    >
       {items.map((s, i) => (
         <div
           key={s.k}

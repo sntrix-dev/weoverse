@@ -30,7 +30,10 @@ export function StageRing({
   const n = 5;
   const gapDeg = 9;
   const seg = 360 / n - gapDeg;
-  const p = (a: number) => [R + r * Math.cos(((a - 90) * Math.PI) / 180), R + r * Math.sin(((a - 90) * Math.PI) / 180)];
+  const p = (a: number) => [
+    R + r * Math.cos(((a - 90) * Math.PI) / 180),
+    R + r * Math.sin(((a - 90) * Math.PI) / 180),
+  ];
   const arc = (a0: number, a1: number) => {
     const [x0, y0] = p(a0);
     const [x1, y1] = p(a1);
@@ -38,7 +41,13 @@ export function StageRing({
   };
   return (
     <span style={{ position: 'relative', display: 'grid', placeItems: 'center', width: S, height: S }}>
-      <svg width={S} height={S} viewBox={`0 0 ${S} ${S}`} style={{ position: 'absolute', inset: 0 }} aria-hidden="true">
+      <svg
+        width={S}
+        height={S}
+        viewBox={`0 0 ${S} ${S}`}
+        style={{ position: 'absolute', inset: 0 }}
+        aria-hidden="true"
+      >
         {Array.from({ length: n }).map((_, i) => {
           const a0 = i * (360 / n) + gapDeg / 2;
           const a1 = a0 + seg;
@@ -47,8 +56,16 @@ export function StageRing({
           const f = cur ? Math.max(0, Math.min(1, fill || 0)) : 0;
           return (
             <g key={i}>
-              <path d={arc(a0, a1)} fill="none" stroke="var(--surface-3)" strokeWidth={b} strokeLinecap="round" />
-              {done && <path d={arc(a0, a1)} fill="none" stroke={tone} strokeWidth={b} strokeLinecap="round" />}
+              <path
+                d={arc(a0, a1)}
+                fill="none"
+                stroke="var(--surface-3)"
+                strokeWidth={b}
+                strokeLinecap="round"
+              />
+              {done && (
+                <path d={arc(a0, a1)} fill="none" stroke={tone} strokeWidth={b} strokeLinecap="round" />
+              )}
               {cur && f > 0 && (
                 <path
                   d={arc(a0, a0 + seg * f)}

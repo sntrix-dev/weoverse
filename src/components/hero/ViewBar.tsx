@@ -29,12 +29,34 @@ export function useViewPrefs() {
 }
 
 /** design: view-prefs.jsx PrefRow */
-export function PrefRow({ label, note, children }: { label: ReactNode; note?: ReactNode; children?: ReactNode }) {
+export function PrefRow({
+  label,
+  note,
+  children,
+}: {
+  label: ReactNode;
+  note?: ReactNode;
+  children?: ReactNode;
+}) {
   return (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 14, minHeight: 44 }}>
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        gap: 14,
+        minHeight: 44,
+      }}
+    >
       <span style={{ minWidth: 0 }}>
-        <span style={{ display: 'block', fontSize: 12.5, fontWeight: 600, color: 'var(--text)' }}>{label}</span>
-        {note && <span style={{ display: 'block', marginTop: 1, fontSize: 10.5, color: 'var(--text-faint)' }}>{note}</span>}
+        <span style={{ display: 'block', fontSize: 12.5, fontWeight: 600, color: 'var(--text)' }}>
+          {label}
+        </span>
+        {note && (
+          <span style={{ display: 'block', marginTop: 1, fontSize: 10.5, color: 'var(--text-faint)' }}>
+            {note}
+          </span>
+        )}
       </span>
       <span style={{ flex: '0 0 auto' }}>{children}</span>
     </div>
@@ -66,7 +88,14 @@ export function PrefSeg<V extends string>({
     <span
       role="radiogroup"
       aria-label={label}
-      style={{ display: 'flex', gap: 2, padding: 3, borderRadius: 999, background: 'var(--surface-2)', boxShadow: 'var(--nm-inset)' }}
+      style={{
+        display: 'flex',
+        gap: 2,
+        padding: 3,
+        borderRadius: 999,
+        background: 'var(--surface-2)',
+        boxShadow: 'var(--nm-inset)',
+      }}
     >
       {options.map((o) => {
         const on = value === o.value;
@@ -147,13 +176,21 @@ export function ViewPanel({ tone, at }: { tone?: string; at: DOMRect | null }) {
         fontWeight: on ? 700 : 500,
         color: on ? '#fff' : 'var(--text-faint)',
         background: on ? chipTone : 'var(--surface-2)',
-        boxShadow: on ? `0 6px 14px -6px color-mix(in srgb, ${chipTone} 80%, transparent)` : 'var(--nm-inset)',
+        boxShadow: on
+          ? `0 6px 14px -6px color-mix(in srgb, ${chipTone} 80%, transparent)`
+          : 'var(--nm-inset)',
         transition: 'background .22s, color .22s, box-shadow .22s',
       }}
     >
       <span
         aria-hidden="true"
-        style={{ width: 6, height: 6, borderRadius: '50%', background: on ? '#fff' : 'var(--text-faint)', opacity: on ? 1 : 0.5 }}
+        style={{
+          width: 6,
+          height: 6,
+          borderRadius: '50%',
+          background: on ? '#fff' : 'var(--text-faint)',
+          opacity: on ? 1 : 0.5,
+        }}
       />
       {label}
     </button>
@@ -183,22 +220,42 @@ export function ViewPanel({ tone, at }: { tone?: string; at: DOMRect | null }) {
     </div>
   );
   const reads = [
-    ['Density', p.density, (v: string) => set({ density: v as UiPreferences['density'] }), [
-      { value: 'roomy', label: 'Roomy' },
-      { value: 'compact', label: 'Compact' },
-    ]],
-    ['Imagery', p.media, (v: string) => set({ media: v as UiPreferences['media'] }), [
-      { value: 'rich', label: 'Rich' },
-      { value: 'quiet', label: 'Quiet' },
-    ]],
-    ['Motion', p.motion, (v: string) => set({ motion: v as UiPreferences['motion'] }), [
-      { value: 'full', label: 'Full' },
-      { value: 'calm', label: 'Calm' },
-    ]],
-    ['Values', p.valueDisplay, (v: string) => set({ valueDisplay: v as UiPreferences['valueDisplay'] }), [
-      { value: 'os', label: 'Os' },
-      { value: 'both', label: 'Os + $' },
-    ]],
+    [
+      'Density',
+      p.density,
+      (v: string) => set({ density: v as UiPreferences['density'] }),
+      [
+        { value: 'roomy', label: 'Roomy' },
+        { value: 'compact', label: 'Compact' },
+      ],
+    ],
+    [
+      'Imagery',
+      p.media,
+      (v: string) => set({ media: v as UiPreferences['media'] }),
+      [
+        { value: 'rich', label: 'Rich' },
+        { value: 'quiet', label: 'Quiet' },
+      ],
+    ],
+    [
+      'Motion',
+      p.motion,
+      (v: string) => set({ motion: v as UiPreferences['motion'] }),
+      [
+        { value: 'full', label: 'Full' },
+        { value: 'calm', label: 'Calm' },
+      ],
+    ],
+    [
+      'Values',
+      p.valueDisplay,
+      (v: string) => set({ valueDisplay: v as UiPreferences['valueDisplay'] }),
+      [
+        { value: 'os', label: 'Os' },
+        { value: 'both', label: 'Os + $' },
+      ],
+    ],
   ] as const;
   return (
     <div
@@ -227,7 +284,9 @@ export function ViewPanel({ tone, at }: { tone?: string; at: DOMRect | null }) {
       {group(
         'Formats in your feed',
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-          {FORMATS.map((fm) => chip(fm, !p.mutedFormats.includes(fm), formatHex(fm) || t, () => toggle('mutedFormats', fm), fm))}
+          {FORMATS.map((fm) =>
+            chip(fm, !p.mutedFormats.includes(fm), formatHex(fm) || t, () => toggle('mutedFormats', fm), fm),
+          )}
         </div>,
       )}
       {kinds.length > 0 &&
@@ -235,7 +294,13 @@ export function ViewPanel({ tone, at }: { tone?: string; at: DOMRect | null }) {
           'Kinds of post',
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
             {kinds.map((k) =>
-              chip(k.label, !p.mutedKinds.includes(k.k), FEED_KIND[k.k].color || t, () => toggle('mutedKinds', k.k), k.k),
+              chip(
+                k.label,
+                !p.mutedKinds.includes(k.k),
+                FEED_KIND[k.k].color || t,
+                () => toggle('mutedKinds', k.k),
+                k.k,
+              ),
             )}
           </div>,
         )}
@@ -250,7 +315,15 @@ export function ViewPanel({ tone, at }: { tone?: string; at: DOMRect | null }) {
           ))}
         </div>,
       )}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, padding: '2px 4px' }}>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: 10,
+          padding: '2px 4px',
+        }}
+      >
         <button
           type="button"
           onClick={() => set(VIEW_DEFAULTS)}
@@ -303,7 +376,8 @@ export function ViewBar({
     };
     const away = (e: MouseEvent) => {
       const target = e.target as Element;
-      if (wrap.current && !wrap.current.contains(target) && !target.closest?.('[data-view-panel]')) setOpen(false);
+      if (wrap.current && !wrap.current.contains(target) && !target.closest?.('[data-view-panel]'))
+        setOpen(false);
     };
     const esc = (e: KeyboardEvent) => {
       if (e.key === 'Escape') setOpen(false);
