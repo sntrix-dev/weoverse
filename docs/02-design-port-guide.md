@@ -74,3 +74,6 @@ States the design does not draw but a real app needs (loading, error, empty, una
 | 8 | `HUB.CIRCLE_META` referenced but never defined | derive from circles API |
 | 9 | location copy (profile "Where you are", Calendar "events you're going to") | drop; product is fully digital |
 | 10 | `NoteBody` reads a numeric `width` as px, so the hero lede (`width={56}`) renders 56 px wide — one word per line | ✅ M03: a number is a width in `ch` (56ch), the measure the copy was written for |
+| 11 | `Progress` gets `tone="gold" / "green" / "violet"` on the WeO page, which the DS paints as CSS named colours | ✅ M04: `var(--o-gold)` / `var(--o-green)` / `var(--o-violet)` |
+| 12 | `weo-model` `shortLeft` prints "closed" for a WeO with no close time at all | ✅ M04: no clock reads "open" |
+| 13 | A Pool with no edition size reads "Left 0 of 0"; the WeO page repeats a Listing's Resale row | ✅ M04: "Funded n%"; Resale row only when the terms lack it |

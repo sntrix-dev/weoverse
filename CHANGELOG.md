@@ -2,6 +2,13 @@
 
 All notable changes per module. Newest first.
 
+## M04 — Discover · WeO · Collect (2026-10-01)
+
+- Discover: hero with live figures, the stage, the feed (cover + editorial / cards / list), closing / moving / creators-you-circle rails, who is trading, circles, interests and the whole floor with lenses and search.
+- The WeO's own page: card, price, key terms, the act, progress, creator, circles, what you get.
+- The collect flow: card → terms → review → receipt, priced by the backend quote; Hunt bundles, Pool pledges and Bid offers on the dial.
+- Backend (`redesign/m04-discover`): collect quote in Os with the exact POST body, feed prices in Os, list cards know holdings and circles, creators' seven-day trace.
+
 ## Auth fixes (2026-10-01, after M03)
 
 - O-Wallet authorize path is `/api/oauth/authorize`; `state` is 43 characters (the wallet requires ≥ 32).

@@ -425,6 +425,8 @@ Swagger also documents `POST /frontend/otp` and `POST /frontend/login/verify`. *
 
 List rows are `WeoCardView` (`projectWeoToCardView`, `src/modules/weo/weo.projection.ts`): common fields + a `weoverse` block (`publicId`, `editionSize`, `isCollected`, `circles`, `activeNow`, `trendPct`, `points`, `rarityNote`, …) + the kind's data. Price units differ per kind — regular `price.amount` is USD, lottery `ticket.price` and crowdfund `contribution.minimum` are Os — so since redesign M03 the card states `weoverse.priceOs` / `priceUsd`, and crowdfund rows carry `contribution{minimum,maximum}`.
 
+Since redesign M04 list rows also carry the viewer's `weoverse.isCollected` and each WeO's `weoverse.circles` (batched); the collect quote (`GET /weos/:id/collect/quote`) prices every kind in Os and returns `payload`, the exact body for `POST /weos/:id/collect`; `/feed` items carry `format`; `/creators` rows carry `trace7d`.
+
 ### 5.5 Collect, likes, views, ratings, resell, draw, rehearsals, installments and negotiation
 
 | Method | Path | Auth | Controller | Purpose |

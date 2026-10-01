@@ -56,14 +56,15 @@ Backend: `weo-3.0`, local base URL **`http://localhost:3002/api`**. Full endpoin
 | M02 | Bell badge | `GET /frontend/notifications/unread-count` | exists |
 | M02 | Mya dock | `POST /chatbot/ask` (`/ask/stream` SSE) | exists |
 | M03 | Every WeO card (kit, via `lib/cardModel.ts`) | `WeoCardView` rows — `weoverse.priceOs/priceUsd`, crowdfund `contribution` (added M03) | adapter + fixtures; fetched from M04 |
-| M04 | Discover hero stats | `GET /frontend/weos/discovery-snapshot` | exists |
-| M04 | Browse by interest | `GET /frontend/weos/interests` | exists |
-| M04 | Feed | `GET /frontend/feed` | exists |
-| M04 | Floor / closing / moving | `GET /frontend/weos?sort=recent|trending|ending_soon&weoType&categoryId&search&minPrice&maxPrice&feed=following` | exists |
-| M04 | Search | `GET /frontend/search`, `GET /frontend/weos/search` | exists |
-| M04 | WeO detail | `GET /frontend/weos/:id`, `/collectors`, `/ratings` | exists |
-| M04 | Collect flow | `GET /frontend/weos/:id/collect/quote`, `POST /frontend/weos/:id/collect` | exists |
-| M04 | Like | `POST/DELETE /frontend/weos/:id/like` | exists |
+| M04 | Discover hero stats | `GET /frontend/weos/discovery-snapshot` | wired (`features/discover/api/discover.ts`) |
+| M04 | Browse by interest | `GET /frontend/weos/interests` | wired |
+| M04 | Feed | `GET /frontend/feed?limit=24` | wired (`model/feed.ts` maps legacy hrefs) |
+| M04 | Rails / floor / search | `GET /frontend/weos?sort=recent\|trending\|ending_soon&status=active&feed=following&search&limit` | wired (`features/weo/api/weos.ts`) |
+| M04 | Who is trading | `GET /frontend/creators?sort=isr&limit=12` | wired (`trace7d` added M04) |
+| M04 | Circles behind the floor | `GET /frontend/community/circles?filter=all` | wired |
+| M04 | WeO detail | `GET /frontend/weos/:id` | wired; `/collectors`, `/ratings` not used yet |
+| M04 | Collect flow | `GET /frontend/weos/:id/collect/quote` → `POST /frontend/weos/:id/collect` (`quote.payload`) | wired (`features/collect/api/collect.ts`) |
+| M04 | Like | `POST/DELETE /frontend/weos/:id/like` | hook ready (`useLikeWeo`); no surface in the design's M04 screens |
 | M05 | Circles, members, WeOs, join/leave/mute | `/frontend/community/circles*` | exists |
 | M05 | Threads, answers, votes, replies, accept | `/frontend/community/threads*`, `/community/answers/*` | exists |
 | M05 | Stories, pulse, contributors, my standing, search | `/frontend/community/stories`, `/community/snapshot/*`, `/community/search` | exists |
