@@ -50,7 +50,7 @@ Everything later modules stand on. No product screen yet except `/login`, `/call
 |---|---|
 | `VITE_API_URL` | `http://localhost:3002` (remote dev: `https://dev.weo.ai`) |
 | `VITE_WALLET_URL` | `https://wallet.ocono.me` (= backend `AUTH_SERVER`) |
-| `VITE_OAUTH_AUTHORIZE_PATH` | `/oauth/authorize` — **unverified** (IdP not reachable from the Linux workspace); confirm in Chrome |
+| `VITE_OAUTH_AUTHORIZE_PATH` | `/api/oauth/authorize` — confirmed 2026-10-01 (D-029); `/oauth/authorize` is a 404 on O-Wallet |
 | `VITE_OAUTH_CLIENT_ID` | backend `.env` `O_CLIENT_ID` (local `.env.local` only) |
 | `VITE_OAUTH_REDIRECT_URI` | `http://localhost:5173/callback` (= backend `O_REDIRECT_URI`) |
 | `VITE_OAUTH_SCOPE` | `profile` |

@@ -4,7 +4,8 @@ const trimSlash = (s: string) => s.replace(/\/+$/, '');
 export const env = {
   apiUrl: trimSlash(import.meta.env.VITE_API_URL || 'http://localhost:3002'),
   walletUrl: trimSlash(import.meta.env.VITE_WALLET_URL || ''),
-  authorizePath: import.meta.env.VITE_OAUTH_AUTHORIZE_PATH || '/oauth/authorize',
+  // O-Wallet serves its authorize endpoint under /api (it redirects to /api/oauth/login)
+  authorizePath: import.meta.env.VITE_OAUTH_AUTHORIZE_PATH || '/api/oauth/authorize',
   clientId: import.meta.env.VITE_OAUTH_CLIENT_ID || '',
   redirectUri: import.meta.env.VITE_OAUTH_REDIRECT_URI || `${window.location.origin}/callback`,
   scope: import.meta.env.VITE_OAUTH_SCOPE || 'profile',

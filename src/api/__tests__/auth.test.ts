@@ -20,7 +20,9 @@ describe('PKCE', () => {
     expect(u.searchParams.get('code_challenge_method')).toBe('S256');
     expect(u.searchParams.get('scope')).toBe('profile');
     expect(u.searchParams.get('redirect_uri')).toMatch(/\/callback$/);
+    expect(u.pathname).toBe('/api/oauth/authorize');
     expect(u.searchParams.get('state')).toBe(sessionStorage.getItem('weo.auth.pkce.state'));
+    expect(u.searchParams.get('state')?.length).toBeGreaterThanOrEqual(32);
     const verifier = sessionStorage.getItem('weo.auth.pkce.verifier');
     expect(verifier).toBeTruthy();
     await expect(codeChallenge(verifier ?? '')).resolves.toBe(u.searchParams.get('code_challenge'));

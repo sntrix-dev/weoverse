@@ -31,7 +31,8 @@ export async function buildAuthorizeUrl(returnTo = '/'): Promise<string> {
   if (!env.walletUrl || !env.clientId)
     throw new Error('OAuth is not configured (VITE_WALLET_URL / VITE_OAUTH_CLIENT_ID)');
   const verifier = randomString();
-  const state = randomString(16);
+  // O-Wallet rejects a state shorter than 32 characters; 32 bytes → 43 base64url chars
+  const state = randomString(32);
   sessionStorage.setItem(VERIFIER_KEY, verifier);
   sessionStorage.setItem(STATE_KEY, state);
   sessionStorage.setItem(RETURN_KEY, returnTo);
