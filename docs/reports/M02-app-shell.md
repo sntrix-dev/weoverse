@@ -39,7 +39,7 @@
 | `POST /chatbot/ask` | 200 `{answer, sessionId, degraded}` | 200 `degraded: true` (the local RAG service isn't initialised — no OpenAI key / vector store on the Mac); the dock fell back to the FAQ / "I don't have that one yet" | ✅ (fallback path) |
 | `POST /frontend/email-subscription/subscribe` | 201 / 400 already | not sent live — would add a test address to the shared Atlas DB; both paths covered by MSW tests | ⏭ |
 | Log out (dev-token session) | `/login`, toast, prefs reset | ✅ (no `/auth/logout` call because a dev-token session holds no refresh token — by design) | ✅ |
-| M01 carry-over: IdP sign-in → `/callback` → verify | tokens stored | authorize URL opens `wallet.ocono.me/oauth/authorize` with the right parameters; the extension may not read that domain and the sign-in needs Surya's credentials — not completed yet (no refresh token stored) | ⏳ open |
+| M01 carry-over: IdP sign-in → `/callback` → verify | tokens stored | first try 404 (`/oauth/authorize` was a guess; fixed to `/api/oauth/authorize` + 43-char state, D-029). 2026-10-01: Surya signed in → `/callback` → verify → tokens stored; refresh rotated (200) and nav-summary answered as Surya S K (`@surya_s_k`, ISR 100, 1,703 Os, participant) | ✅ |
 
 ## 3. Browser — parity (Chrome, 1440 wide, design `/design/discover.html` vs app `/discover`)
 
@@ -69,7 +69,7 @@ Test data restored afterwards: Mya's `theme`, `navDock`, `flowBar`, `flowBarTool
 
 ## 6. Open issues & follow-ups
 
-- **O-Wallet sign-in round trip** (M01 carry-over): needs Surya to sign in on `wallet.ocono.me`; carried to M03's browser pass.
+- ~~O-Wallet sign-in round trip~~ — done 2026-10-01 after the authorize-path fix (D-029); the dev token now yields to a real session on reload (D-031).
 - Local chatbot isn't initialised (OpenAI key / FAISS store on the Mac) — the app's fallback works; real answers once the backend's AI config is set.
 - Gaps shown as absent: tier advantage % (G-23, Q-6), O Power (G-24), wallet buckets (G-25), Verified (G-26).
 - Q-7 (dock default), Q-8 (social handles).

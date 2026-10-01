@@ -6,7 +6,7 @@
 
 ## Carried over from M01
 
-- ✅ refresh/logout client paths and dev token on nav-summary verified live. ⏳ The IdP sign-in round trip still needs a human sign-in — carried to M03.
+- ✅ refresh/logout client paths and dev token on nav-summary verified live. ✅ IdP sign-in round trip completed 2026-10-01 (after D-029).
 - Original item: run the live auth checks at the start of this module's browser pass: IdP sign-in → `/callback` → `POST /frontend/auth/verify`; refresh via `new_access_token`; logout; the `.env.local` dev token on `GET /frontend/users/me/nav-summary`.
 
 ## Scope

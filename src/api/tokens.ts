@@ -4,13 +4,14 @@ import { env } from '@/lib/env';
  * Token storage. The backend is bearer-only (no cookies):
  *  - access token (15 min) lives in memory only;
  *  - refresh token (30 days) lives in localStorage so a reload keeps the session.
- * In dev, VITE_DEV_ACCESS_TOKEN seeds the access token so the app works without the IdP.
+ * In dev, VITE_DEV_ACCESS_TOKEN seeds the access token so the app works without the IdP —
+ * but only when no real session is stored: a signed-in person stays themselves across reloads
+ * (the first request refreshes from their refresh token) instead of turning back into the dev user.
  */
 const REFRESH_KEY = 'weo.auth.refresh';
 
 type Listener = () => void;
 
-let accessToken: string | null = env.devAccessToken || null;
 const listeners = new Set<Listener>();
 
 const safeStorage = {
@@ -30,6 +31,8 @@ const safeStorage = {
     }
   },
 };
+
+let accessToken: string | null = (!safeStorage.get(REFRESH_KEY) && env.devAccessToken) || null;
 
 export const tokens = {
   getAccess: () => accessToken,

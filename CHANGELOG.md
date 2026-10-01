@@ -5,6 +5,7 @@ All notable changes per module. Newest first.
 ## Auth fixes (2026-10-01, after M03)
 
 - O-Wallet authorize path is `/api/oauth/authorize`; `state` is 43 characters (the wallet requires ≥ 32).
+- First real O-Wallet sign-in verified end to end; the dev token no longer replaces a signed-in person on reload.
 - From the previous build's O-Wallet logic: "Continue with Google" through the O-Wallet, and log out also ends the O-Wallet session (D-030).
 
 ## M03 — Shared WeO & list kit (2026-10-01)
