@@ -7,6 +7,7 @@ import { QuickJump } from '@/components/shell/QuickJump';
 import { SplitShell } from '@/components/shell/SplitShell';
 import { TopBar, type ShellNavProps } from '@/components/shell/TopBar';
 import { CollectHost } from '@/features/collect/components/CollectHost';
+import { CommunityHost } from '@/features/community/components/modals/CommunityHost';
 import { useNavSummary } from '@/features/shell/api/navSummary';
 import { useLogout } from '@/features/shell/useLogout';
 import { usePref, usePrefs } from '@/stores/prefs';
@@ -135,6 +136,7 @@ export function AppLayout() {
         />
       )}
       <CollectHost />
+      <CommunityHost />
     </>
   );
 }

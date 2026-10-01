@@ -60,6 +60,7 @@ export function WeoPage() {
 
   const tone = w.hex;
   const collect = () => (w.live ? openCollect(w.id) : toast(`${w.name} has closed`));
+  const ask = () => h.onPush?.(w);
   const row = (k: string, v: string, i: number) => (
     <div
       key={k}
@@ -102,7 +103,7 @@ export function WeoPage() {
         eyebrow={w.weoId ? `${w.type} · # ${w.weoId}` : w.type}
         title={w.name}
         lede={w.points[0] || 'One WeO, its terms at rest and its passport attached.'}
-        feature={<WeoPriceFeature w={w} tone={tone} />}
+        feature={<WeoPriceFeature w={w} tone={tone} onAsk={ask} />}
         stats={[
           { value: String(w.collectors), label: 'Collectors' },
           { value: w.edition || '—', label: 'Edition' },
@@ -114,6 +115,7 @@ export function WeoPage() {
             note: w.live ? 'Review, then a receipt' : 'This one has closed',
             onClick: collect,
           },
+          { label: 'Ask its Circle', note: w.circles[0]?.name ?? 'Post it as a thread', onClick: ask },
         ]}
         directory={[
           { id: 'weo-card', label: 'The card' },

@@ -23,9 +23,6 @@ describe('routing', () => {
   it.each([
     ['/collect', 'M06'],
     ['/exchange', 'M06'],
-    ['/community', 'M05'],
-    ['/community/circles/c1', 'M05'],
-    ['/community/threads/t1', 'M05'],
     ['/creators/mya', 'M08'],
     ['/requests/rq-1', 'M08'],
     ['/passport', 'M09'],

@@ -9,6 +9,19 @@ import {
   quoteFor,
   snapshotFixture,
 } from '../fixtures/discover';
+import {
+  circleDetailFixture,
+  circleWeosFixture,
+  contributorsFixture,
+  draftsFixture,
+  membersFixture,
+  myWeosFixture,
+  pulseFixture,
+  storiesFixture,
+  threadDetailFixture,
+  threadFixture,
+  walletFixture,
+} from '../fixtures/community';
 
 /** Wraps data in the backend envelope (weo-3.0 ResponseHandler.success). */
 export const ok = <T>(data: T, message = 'OK') => HttpResponse.json({ success: true, message, data });
@@ -45,6 +58,24 @@ export const handlers = [
     const n = (k: string) => (q.get(k) != null ? Number(q.get(k)) : undefined);
     return ok(quoteFor(w, { amount: n('amount'), bundle: n('bundle') }));
   }),
+  // M05 reads — the community and the wallet row
+  http.get(url('/frontend/community/circles/:id'), ({ params }) => ok(circleDetailFixture({ id: String(params.id) }))),
+  http.get(url('/frontend/community/circles/:id/members'), () =>
+    ok({ items: membersFixture, pagination: { total: 2, page: 1, limit: 24, totalPages: 1 } }),
+  ),
+  http.get(url('/frontend/community/circles/:id/weos'), () => {
+    const items = circleWeosFixture();
+    return ok({ items, pagination: { total: items.length, page: 1, limit: 24, totalPages: 1 } });
+  }),
+  http.get(url('/frontend/community/discussions'), () => ok({ items: [threadFixture()], nextBefore: null })),
+  http.get(url('/frontend/community/threads/:id'), ({ params }) => ok(threadDetailFixture({ id: String(params.id) }))),
+  http.get(url('/frontend/community/stories'), () => ok({ items: storiesFixture, nextBefore: null, total: 2 })),
+  http.get(url('/frontend/community/snapshot/contributors'), () => ok(contributorsFixture)),
+  http.get(url('/frontend/community/snapshot/pulse'), () => ok(pulseFixture)),
+  http.get(url('/frontend/community/my-weos'), () => ok({ items: myWeosFixture, nextBefore: null })),
+  http.get(url('/frontend/me/drafts'), () => ok({ items: draftsFixture, total: 1 })),
+  http.get(url('/frontend/me/collections'), () => ok({ items: [], pagination: { total: 0, page: 1, limit: 3, totalPages: 0 } })),
+  http.get(url('/frontend/wallet/overview'), () => ok(walletFixture)),
   http.get(url('/frontend/weos/:id'), ({ params }) => {
     const w = liveWeos().find((x) => x._id === params.id);
     return w ? ok(w) : fail(404, 'WeO not found');

@@ -1586,12 +1586,12 @@ export interface paths {
         /**
          * Caller's own WeOs surfaced inside the Community Hub
          * @description Cross-kind list (regular / crowdfund / lottery) of the caller's
-         *     non-deleted WeOs. Used by the FE Hub page to render small
+         *     WeOs (every status but `blocked`). Used by the FE Hub page to render small
          *     "Push to Hub" cards.
          *
          *     Filters:
          *       * `pushedFilter`:
-         *           - `all` (default) — every non-deleted WeO of the caller
+         *           - `all` (default) — every WeO of the caller except blocked ones
          *           - `pushed` — only those with `pushedToHubAt !== null`
          *           - `not-pushed` — only those with `pushedToHubAt === null`
          *       * `type` (optional) — narrow to one WeO kind
@@ -2784,9 +2784,9 @@ export interface paths {
         put?: never;
         /**
          * Follow another user
-         * @description Creates a `Follow` row from the caller to `userId`. The unique
-         *     `(followerId, followingId)` index makes the operation idempotent —
-         *     re-calling on an existing follow simply succeeds.
+         * @description Creates a `Follow` row from the caller to `userId`. Following someone
+         *     you already follow is a `409` (it used to surface the unique index's
+         *     duplicate-key error as a `500`).
          */
         post: operations["followUser"];
         delete?: never;
@@ -8478,6 +8478,20 @@ export interface components {
             /** @description Net votes across their in-window answers. Can be negative. */
             votesReceived: number;
             isYou: boolean;
+            /** @description Their own short bio (trimmed). `null` when they have not written one. */
+            bio: string | null;
+            /** @description WeOs they have made (any status but blocked). */
+            weoCount: number;
+            /**
+             * @description What they make most — `Pool`, `Hunt`, or a listing's category name
+             *     (`Digital arts`). `null` when they have made nothing categorised.
+             * @example Pool
+             */
+            focus: string | null;
+            /** @description Circles they belong to. */
+            circleCount: number;
+            /** @description Whether the caller follows them. Always `false` for a guest. */
+            isFollowing: boolean;
         };
         CommunityContributors: {
             meta: components["schemas"]["SnapshotWindowMeta"];
@@ -13950,6 +13964,19 @@ export interface components {
             acceptedAnswerId: string | null;
             /** Format: date-time */
             createdAt: string | null;
+            /**
+             * @description The attached WeO's face — its title and first image — so a feed
+             *     row shows what the question is about without a read per row.
+             *     Sent by `GET /community/discussions` only (absent elsewhere);
+             *     `null` when nothing is attached or the WeO is blocked.
+             */
+            attachedWeoFace?: null | {
+                id: string;
+                /** @example Tide Pool */
+                title: string;
+                /** @example https://cdn.example/tide.jpg */
+                cover: string | null;
+            };
         };
         /**
          * @description WeO attached to a discussion thread via `thread.attachedWeoId`.
@@ -14061,6 +14088,14 @@ export interface components {
          *     feeds back into `GET /community/threads?before=` to page the tail.
          */
         CommunityCircleDetailView: components["schemas"]["CommunityCircleCardView"] & {
+            /**
+             * @description Share of the WeOs posted into this circle (attached to its
+             *     threads) that someone collected in the last seven days — the
+             *     design's "collect-through here". `null` when nothing has been
+             *     posted here: an empty room has no rate, not a 0% one.
+             * @example 0.333
+             */
+            collectThrough7d: number | null;
             /**
              * @description Tags actually in use across this circle's threads from
              *     the last 30 days, most-used first, capped at 8.
@@ -17751,7 +17786,8 @@ export interface operations {
                      *             "createdAt": "2026-06-18T09:24:00.000Z"
                      *           }
                      *         ],
-                     *         "threadsNextBefore": "2026-06-18T09:24:00.000Z"
+                     *         "threadsNextBefore": "2026-06-18T09:24:00.000Z",
+                     *         "collectThrough7d": 0.333
                      *       }
                      *     }
                      */
@@ -20084,7 +20120,34 @@ export interface operations {
                     "application/json": components["schemas"]["NullDataResponse"];
                 };
             };
+            /** @description Malformed `userId`, or the caller's own id. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
             401: components["responses"]["Unauthorized"];
+            /** @description No such account, or it was deleted. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Already following this user. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
             500: components["responses"]["ServerError"];
         };
     };
@@ -20116,7 +20179,25 @@ export interface operations {
                     "application/json": components["schemas"]["NullDataResponse"];
                 };
             };
+            /** @description Malformed `userId`. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
             401: components["responses"]["Unauthorized"];
+            /** @description Not following this user. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
             500: components["responses"]["ServerError"];
         };
     };

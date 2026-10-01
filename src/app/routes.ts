@@ -35,7 +35,8 @@ export const routes = {
   home: () => '/',
   login: (next?: string) => (next ? `/login?next=${enc(next)}` : '/login'),
   callback: () => '/callback',
-  create: () => '/create',
+  /** `draft` opens a saved draft in the composer (M07) */
+  create: (draft?: string) => (draft ? `/create?draft=${enc(draft)}` : '/create'),
   discover: (q?: string) => (q ? `/discover?q=${enc(q)}` : '/discover'),
   collected: () => '/collect',
   listed: () => '/exchange',

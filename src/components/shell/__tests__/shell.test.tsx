@@ -259,7 +259,8 @@ describe('footer', () => {
     await user.click(
       within(screen.getByRole('navigation', { name: 'Community' })).getByRole('button', { name: 'Circles' }),
     );
-    expect(router.state.location.pathname).toBe('/community/circles');
+    // a built page loads its chunk first
+    await waitFor(() => expect(router.state.location.pathname).toBe('/community/circles'));
   });
 
   it('subscribes to signals from the O', async () => {
