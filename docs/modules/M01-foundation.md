@@ -2,7 +2,7 @@
 
 | Status | FE branch | BE branch | Report |
 |---|---|---|---|
-| ⏳ testing | `feat/m01-foundation` | `redesign/m01-foundation` | `reports/M01-foundation.md` |
+| ✅ done 2026-10-01 — see report | `feat/m01-foundation` | `redesign/m01-foundation` | `reports/M01-foundation.md` |
 
 ## Scope
 
@@ -64,6 +64,13 @@ Not carried over: `VITE_AWS_*` (D-014), `VITE_USE_MOCK_OFFERS`, Didit KYC (serve
 - `/dev/ds` renders every ported DS component; each matches the design bundle's own rendering at 1440 and 390, light and dark.
 - Login round-trip works against the IdP (or is blocked only by Q-1, noted in the report); dev token works; 401 → refresh → retry works (MSW test).
 - `npm run typecheck|lint|test|build` green; `api:types` generates from a running backend.
+
+## Outcome
+
+- 28 DS components ported and typed; DOM parity with the design bundle 64/64 cases (report §3).
+- API client, OAuth PKCE, dev token, every route with a placeholder, `/dev/ds` gallery.
+- Backend: `npm run dev:token`, `.env.example`, auth Swagger fixed (`redesign/m01-foundation` @ 04bced6).
+- Carried to M02: live IdP round trip + dev token against a running backend (report §6).
 
 ## Definition of done
 

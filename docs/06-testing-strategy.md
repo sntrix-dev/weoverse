@@ -41,9 +41,9 @@ brew services start mongodb-community     # or: mongod --config /opt/homebrew/et
 cd ~/Documents/projects/weoverse/weo-3.0 && npm run dev                  # :3002, Swagger /api/docs
 # Terminal 3 — frontend
 cd ~/Documents/projects/weoverse/v2-redesign-app && npm run dev          # :5173
-# Terminal 4 — design reference
-cd ~/Documents/projects/weoverse/redesign/project/"WeOverse v3 - HTML" && npm run serve   # :8000
 ```
+
+The design reference needs no extra server: the frontend dev server serves it at **`http://localhost:5173/design/`** (`index.html` → `create.html`, `discover.html`, …; D-019).
 
 At each module's test step Claude asks the user to start these (or, with permission, uses computer use to open Terminal and run them).
 
@@ -51,7 +51,7 @@ Seed data: `npm run seed` (config, categories), `npm run seed:mya`, `npm run see
 
 ### Browser checklist per screen
 
-1. **Parity:** open design `http://localhost:8000/<file>.html` and app `http://localhost:5173/<path>` in two tabs, same window size. Compare at **1440×900** and **390×844**, **light** and **dark**. Screenshot both; note differences (layout, spacing, type, colour, copy, motion).
+1. **Parity:** open design `http://localhost:5173/design/<file>.html` and app `http://localhost:5173/<path>` in two tabs, same window size. For components, prefer the **DOM parity harness** (render the same props with the design's `window.WeODesignSystem_edbb0f` and the app's `@/design-system`, compare normalised HTML via localStorage — see `reports/M01-foundation.md` §3). Compare at **1440×900** and **390×844**, **light** and **dark**. Screenshot both; note differences (layout, spacing, type, colour, copy, motion).
 2. **Interactions:** every action listed in the module spec's acceptance criteria; confirm the UI updates and the change persists after reload.
 3. **Network:** `read_network_requests` — expected endpoints, 2xx, no duplicate storms (remember the 70 req/min limit), no calls to unsplash/b-cdn placeholders.
 4. **Console:** `read_console_messages` — zero errors, zero React warnings.

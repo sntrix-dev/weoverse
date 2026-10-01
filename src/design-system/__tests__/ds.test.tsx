@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { DsGalleryPage } from '@/features/dev/pages/DsGalleryPage';
-import { Button, Chip, isrStage, oPowerStage, Tabs, Toggle, WeOCard } from '..';
+import { Button, Chip, isrStage, OPortal, oPowerStage, RingNav, Tabs, Toggle, WeOCard } from '..';
 
 describe('design system', () => {
   it('renders every ported component without React warnings', () => {
@@ -56,6 +56,17 @@ describe('design system', () => {
     // the label pill is pointer-events:none; the click lands on the orb wrapper it sits in
     fireEvent.click(screen.getByText('Collect it'));
     expect(onEngage).toHaveBeenCalled();
+  });
+
+  it('keeps typographic characters in attributes (no literal \\u escapes from the bundle conversion)', () => {
+    render(
+      <>
+        <OPortal size={120} />
+        <RingNav device="mobile" items={[{ key: 'a', label: 'A' }]} />
+      </>,
+    );
+    expect(screen.getByRole('button', { name: /^O portal — hover an edge/ })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Return to the O toggle — home' })).toBeInTheDocument();
   });
 
   it('ISR stages read Depleted → Pristine', () => {

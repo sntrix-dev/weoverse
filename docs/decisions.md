@@ -4,6 +4,8 @@ Newest first. Each entry: date · decision · why · who decided. Open questions
 
 | # | Date | Decision | Why | By |
 |---|---|---|---|---|
+| D-020 | 2026-10-01 | The design's `@view-transition{navigation:auto}` is not ported: it targets the design's one-HTML-file-per-page build and only threw aborted-transition errors in the SPA. Route transitions return with the M02 shell (arrival). | M01-B4 | Claude |
+| D-019 | 2026-10-01 | The Vite dev server serves the read-only design folder at `/design/` (dev-only middleware in `vite.config.ts`, `DESIGN_DIR` to override). Design and app share one origin, so Chrome can compare them side by side and the DS parity harness can share results through localStorage. No separate design server needed. | Surya asked to use the design's `index.html`; the Chrome extension can't open `file://`. | Surya / Claude |
 | D-018 | 2026-10-01 | Tooling pins: TypeScript 5.9.3 (openapi-typescript 7 peers on TS 5), ESLint 9.39 (eslint-plugin-jsx-a11y has no ESLint 10 support yet), React 19.3, React Router 8.4, Vite 8.3, Vitest 5, MSW 3. Exact versions, no `^`. | Latest that satisfy every peer range. | Claude |
 | D-017 | 2026-10-01 | The design has **no sign-in screen**. `/login` and `/callback` are composed from DS primitives in the design's language (glass Card, drawn WeOverse lettering, violet Button, route wash). | Real OAuth needs a start and a return page. | Claude |
 | D-016 | 2026-10-01 | Design-system lint exceptions: jsx-a11y interaction rules and three react-hooks rules are warnings (not errors) inside `src/design-system/` only, because they flag the design's own behaviour (clickable divs, render-time ref reads). Worked off in M12. | Keep the port faithful now, fix a11y deliberately later. | Claude |

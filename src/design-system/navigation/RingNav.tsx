@@ -342,7 +342,7 @@ export function RingNav({
       )}
       <button
         onClick={goHome}
-        aria-label="Return to the O toggle \u2014 home"
+        aria-label="Return to the O toggle — home"
         style={{
           position: 'absolute',
           left: cx,

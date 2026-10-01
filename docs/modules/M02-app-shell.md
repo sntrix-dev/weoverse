@@ -4,6 +4,10 @@
 |---|---|---|---|
 | planned | `feat/m02-app-shell` | `redesign/m02-app-shell` | `reports/M02-app-shell.md` |
 
+## Carried over from M01
+
+- Run the live auth checks at the start of this module's browser pass: IdP sign-in → `/callback` → `POST /frontend/auth/verify`; refresh via `new_access_token`; logout; the `.env.local` dev token on `GET /frontend/users/me/nav-summary`.
+
 ## Scope
 
 The chrome around every page (design `src/app.jsx`, `chrome.jsx`, `shell.jsx`, `screens-footer.jsx`, `screens-more.jsx`, `screens-circle.jsx`, `arrival.jsx` AckRipple).

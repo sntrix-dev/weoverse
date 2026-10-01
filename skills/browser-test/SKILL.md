@@ -16,7 +16,7 @@ The Linux workspace can't reach the Mac's localhost, so the servers run on the M
 | MongoDB | `brew services start mongodb-community` | `localhost:27017` |
 | Backend | `cd ~/Documents/projects/weoverse/weo-3.0 && git switch redesign/mNN-<slug> && npm run dev` | `http://localhost:3002/api/docs` |
 | Frontend | `cd ~/Documents/projects/weoverse/v2-redesign-app && git switch feat/mNN-<slug> && npm run dev` | `http://localhost:5173` |
-| Design | `cd ~/Documents/projects/weoverse/redesign/project/"WeOverse v3 - HTML" && npm run serve` | `http://localhost:8000` |
+| Design | served by the frontend dev server (dev-only middleware) | `http://localhost:5173/design/` |
 
 Dev token: `npm run dev:token` in `weo-3.0` → put in `.env.local` as `VITE_DEV_ACCESS_TOKEN` (or log in through the IdP).
 
@@ -27,7 +27,7 @@ Dev token: `npm run dev:token` in `weo-3.0` → put in `.env.local` as `VITE_DEV
 
 ## 3. Per screen in scope
 
-1. **Parity** — `resize_window` 1440×900: screenshot design tab and app tab; compare structure, spacing, type, colour, copy, icons, motion. Repeat at 390×844. Toggle dark (`data-theme="dark"` / app setting) and repeat. Log each difference as a bug (Medium unless trivial).
+1. **Parity** — components: run the DOM parity harness (same props through the design's `window.WeODesignSystem_edbb0f` in a `/design/*.html` tab and through `@/design-system` in the app tab, compare normalised HTML via localStorage; method in `docs/reports/M01-foundation.md` §3). Screens: `resize_window` 1440×900: screenshot design tab and app tab; compare structure, spacing, type, colour, copy, icons, motion. Repeat at 390×844. Toggle dark (`data-theme="dark"` / app setting) and repeat. Log each difference as a bug (Medium unless trivial).
 2. **Interactions** — run every acceptance criterion from the module spec; reload to confirm persistence.
 3. **Network** — `read_network_requests`: expected endpoints, 2xx, no request storms, no third-party placeholder hosts.
 4. **Console** — `read_console_messages` with pattern `error|warn|Warning`: must be empty.

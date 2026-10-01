@@ -201,7 +201,9 @@ div:has(> [aria-label="Floating O navigation"]) > div:first-child{left:-12px;top
 [aria-label="Floating O navigation"]:hover svg path,[aria-label="Floating O navigation"]:hover svg circle{pointer-events:auto !important}
 
 /* pages: a soft cross-fade between the section pages where the browser supports it */
-@view-transition{navigation:auto}
+/* design: `@view-transition{navigation:auto}` cross-fades between its one-HTML-file-per-page
+   documents. The app is a single document, so the at-rule only produced aborted-transition
+   exceptions on reloads (M01-B4); in-app route transitions arrive with the shell in M02. */
 
 /* floating controls stop at the footer's top edge (--foot-lift is set by the App as the footer scrolls in) */
 .weo-flowbar-wrap,div:has(> [aria-label="Floating O navigation"]),div:has(> [aria-label="Open Mya's panel"]){translate:0 calc(-1 * var(--foot-lift, 0px))}

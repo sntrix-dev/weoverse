@@ -51,7 +51,8 @@ function propsToAttrs(p) {
       if (t.isObjectProperty(prop) && !prop.computed) {
         const key = t.isIdentifier(prop.key) ? prop.key.name : prop.key.value;
         let v = prop.value;
-        if (t.isStringLiteral(v) && !/["\\\n]/.test(v.value))
+        // JSX attribute strings do not process escapes, so non-ASCII text stays an expression
+        if (t.isStringLiteral(v) && !/["\\\n]/.test(v.value) && !/[^\x20-\x7E]/.test(v.value))
           return t.jsxAttribute(t.jsxIdentifier(String(key)), t.stringLiteral(v.value));
         if (t.isBooleanLiteral(v, { value: true })) return t.jsxAttribute(t.jsxIdentifier(String(key)), null);
         return t.jsxAttribute(t.jsxIdentifier(String(key)), t.jsxExpressionContainer(v));

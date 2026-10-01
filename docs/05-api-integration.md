@@ -34,7 +34,7 @@ Backend: `weo-3.0`, local base URL **`http://localhost:3002/api`**. Full endpoin
 
 ## Types
 
-`npm run api:types` → `openapi-typescript http://localhost:3002/api/docs.json -o src/api/generated/schema.d.ts`. Feature code imports DTO types from there (`components['schemas']['WeoCardView']`). Swagger is partly stale for older endpoints (see inventory §6); when the live response disagrees with Swagger, fix the YAML in the backend module's branch — the code wins.
+`npm run api:types` → `openapi-typescript http://localhost:3002/api/docs.json -o src/api/generated/schema.d.ts`. Without a running backend: `npx ts-node src/docs/swagger/build-cli.ts 2>/dev/null | grep -v '^◇' > /tmp/openapi.json` in `weo-3.0`, then `npm run api:types -- /tmp/openapi.json`. Feature code imports DTO types from there (`components['schemas']['WeoCardView']`). Swagger is partly stale for older endpoints (see inventory §6); when the live response disagrees with Swagger, fix the YAML in the backend module's branch — the code wins.
 
 ## Conventions
 
@@ -48,8 +48,8 @@ Backend: `weo-3.0`, local base URL **`http://localhost:3002/api`**. Full endpoin
 
 | Module | Screen / block | Method + path | Status |
 |---|---|---|---|
-| M01 | Login | `POST /frontend/auth/verify` | exists |
-| M01 | Token refresh / logout | `POST /frontend/auth/new_access_token`, `POST /frontend/auth/logout` | exists |
+| M01 | Login | `POST /frontend/auth/verify` | wired (`api/auth.ts`); live round trip → M02 |
+| M01 | Token refresh / logout | `POST /frontend/auth/new_access_token`, `POST /frontend/auth/logout` | wired (`api/client.ts` single-flight refresh, `api/auth.ts` logout); Swagger fixed in M01 |
 | M02 | Shell (avatar, balance, tier, counts, prefs) | `GET /frontend/users/me/nav-summary` | exists |
 | M02 | UI preferences | `GET/PATCH /frontend/users/me/preferences` | exists |
 | M02 | Bell badge | `GET /frontend/notifications/unread-count` | exists |

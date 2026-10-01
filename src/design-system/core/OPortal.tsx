@@ -329,7 +329,7 @@ export function OPortal({
     <div
       ref={ref}
       role="button"
-      aria-label="O portal \u2014 hover an edge to preview a section, tap to jump"
+      aria-label="O portal — hover an edge to preview a section, tap to jump"
       onMouseEnter={() => {
         setHover(true);
         setPhase('interest');
