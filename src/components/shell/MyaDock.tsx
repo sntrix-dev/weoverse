@@ -10,6 +10,9 @@ import { SettingsBody, type SettingsBodyProps } from './SettingsBody';
 import { useDockPlace } from './useDockPlace';
 import s from './MyaDock.module.css';
 
+/** design: chrome.jsx useDockPlace default — `b: 96` rests the orb above the flow bar's band */
+export const DOCK_REST = { r: 22, b: 96 } as const;
+
 /** in the chat she is alive — a looping clip, poster-backed so it never flashes empty */
 function Live({ poster }: { poster: string }) {
   return (
@@ -44,7 +47,9 @@ export function MyaDock({ settings }: { settings: SettingsBodyProps }) {
   const myaHidden = usePref('myaHidden');
   const navMode = usePref('navMode');
   const railOpen = usePref('railOpen');
-  const saved = usePref('dockPosition');
+  const stored = usePref('dockPosition');
+  // the backend default (22, 22) means "never placed": rest above the flow bar like the design (D-023)
+  const saved = stored.r === 22 && stored.b === 22 ? DOCK_REST : stored;
   const { thinking, feed, draft } = useMya();
   const { pos, onDown, moved } = useDockPlace(
     shell,
