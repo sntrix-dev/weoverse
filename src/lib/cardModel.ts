@@ -186,9 +186,13 @@ export function hhmmss(ms: number | null): string | null {
   return `${pad(Math.floor(s / 3600))}:${pad(Math.floor((s % 3600) / 60))}:${pad(s % 60)}`;
 }
 
-/** ms → "6h" / "2d" / "closed" */
+/**
+ * ms → "6h" / "2d" / "closed"; no close time at all → "open". (design weo-model printed
+ * "closed" for a WeO without a clock — design-port guide §5 #12.)
+ */
 export function shortLeft(ms: number | null): string {
-  if (ms == null || ms <= 0) return 'closed';
+  if (ms == null) return 'open';
+  if (ms <= 0) return 'closed';
   const h = ms / H;
   return h < 24 ? `${Math.round(h)}h` : `${Math.round(h / 24)}d`;
 }

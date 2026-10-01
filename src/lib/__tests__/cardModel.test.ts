@@ -30,7 +30,9 @@ describe('cardModel', () => {
       left: 100,
       total: 160,
       timer: null,
-      endsIn: 'closed',
+      // no close time: an open listing, not a closed one
+      endsIn: 'open',
+      live: true,
       trend: null,
       weoId: 'WEO-1290EE',
     });
@@ -147,5 +149,6 @@ describe('cardModel', () => {
     expect(hhmmss(3_723_000)).toBe('01:02:03');
     expect(shortLeft(3 * 864e5)).toBe('3d');
     expect(shortLeft(0)).toBe('closed');
+    expect(shortLeft(null)).toBe('open');
   });
 });
