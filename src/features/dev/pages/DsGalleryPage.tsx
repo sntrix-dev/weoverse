@@ -39,6 +39,7 @@ import {
   WeOverseLettering,
 } from '@/design-system';
 import styles from './DsGalleryPage.module.css';
+import { KitGallery } from './KitGallery';
 
 const IMG = '/brand/orb-market.png';
 
@@ -350,6 +351,7 @@ export function DsGalleryPage() {
           />
         </div>
       </section>
+      <KitGallery />
     </main>
   );
 }

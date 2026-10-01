@@ -13392,6 +13392,11 @@ export interface components {
             creator: components["schemas"]["WeoCreatorView"];
             /** @example 19 */
             favoritesCount: number;
+            /**
+             * @description Whether the caller has liked this WeO. `false` for an unauthenticated read.
+             * @example false
+             */
+            isLiked: boolean;
             /** @example 1 */
             viewsCount: number;
             /** @example 45 */
@@ -13408,14 +13413,14 @@ export interface components {
              *     parameter's description.
              * @example 12
              */
-            activeNow?: number;
+            activeNow: number;
             /**
              * @description The interface's own fields, kept in one namespace so the seam
              *     stays visible: everything beside it describes the WeO as the
              *     marketplace stores it; this describes it as the interface needs
              *     it. Answers the design's port-contract checklist one-for-one.
              */
-            weoverse?: {
+            weoverse: {
                 /**
                  * @description The passport number, printed on the card and the detail page.
                  *     Minted once on create from an alphabet with no O/0 or I/1 —
@@ -13475,7 +13480,7 @@ export interface components {
                  *     Carries NAMES, not bare ids: the card renders these as chips,
                  *     and a chip has to say which room it opens.
                  */
-                circles?: {
+                circles: {
                     id: components["schemas"]["ObjectId"];
                     /** @example Pool Creators */
                     name: string;
@@ -13495,9 +13500,33 @@ export interface components {
                  * @example 8
                  */
                 trendPct: number | null;
+                /**
+                 * @description The ONE price the card shows, in Os, whatever the kind stores
+                 *     (redesign M03). The kinds keep their figure in different units:
+                 *     a regular WeO's `price.amount` is US dollars (collect charges it
+                 *     × `usdAgainstO`), a lottery's `ticket.price` and a crowdfund's
+                 *     `contribution.minimum` are already Os. Regular
+                 *     `round(price.amount × 99)`; lottery `ticket.price`; crowdfund
+                 *     `contribution.minimum` (the pledge unit).
+                 * @example 2400
+                 */
+                priceOs: number;
+                /**
+                 * @description `priceOs` in US dollars at the same rate — the reading aid for the Os + $ view preference.
+                 * @example 24.24
+                 */
+                priceUsd: number;
             };
-            /** @example 4.5 */
-            rating: number;
+            /**
+             * @description "How's the WeO?" average. `0` when `reviewsCount === 0`.
+             * @example 4.5
+             */
+            avgWeoRating: number;
+            /**
+             * @description "How was your experience?" average.
+             * @example 4.7
+             */
+            avgExperienceRating: number;
             /** @example 12 */
             reviewsCount: number;
             /**
@@ -13528,7 +13557,7 @@ export interface components {
              *     list can never disagree.
              * @example 2026-12-31T23:59:59.000Z
              */
-            closesAt?: string;
+            closesAt: string | null;
             /** Format: date-time */
             createdAt: string;
             /** Format: date-time */
@@ -13543,7 +13572,10 @@ export interface components {
             /** @enum {string} */
             type: "normal" | "requested" | "resold";
             price: {
-                /** @example 5 */
+                /**
+                 * @description US dollars — collect charges `amount × usdAgainstO` Os. Cards should read `weoverse.priceOs`.
+                 * @example 5
+                 */
                 amount: number;
                 /** @example 0 */
                 priceSplit: number;
@@ -13594,6 +13626,18 @@ export interface components {
              * @example 3
              */
             noOfInstallments: number;
+            /** @description The immediate previous holder's Offer when this one is a resale; `null` for an original. */
+            parentOfferId?: string | null;
+            /** @description The original creator's Offer. Equals `_id` for an original. */
+            rootOfferId?: string;
+            /** @description Append-only ownership history, oldest first. Empty for an original. */
+            lineage?: {
+                ownerId: components["schemas"]["ObjectId"];
+                offerId: components["schemas"]["ObjectId"];
+                /** Format: date-time */
+                soldAt: string;
+                soldFor: number;
+            }[];
         };
         CrowdfundCardData: {
             /**
@@ -13601,6 +13645,13 @@ export interface components {
              * @enum {string}
              */
             weoType: "crowdfund";
+            /** @description The pledge bounds in Os (redesign M03). The minimum is the Pool card's price. */
+            contribution: {
+                /** @example 2400 */
+                minimum: number;
+                /** @example null */
+                maximum: number | null;
+            };
             goal: {
                 /** @example 8800 */
                 amount: number;

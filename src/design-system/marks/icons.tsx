@@ -168,3 +168,10 @@ export function Icon({ children, size = 18, stroke = 'currentColor', sw = 1.6 }:
     </svg>
   );
 }
+
+/** design: chrome.jsx `svg(children, size, stroke, sw)` as a function, for ports that call it inline. */
+export const svg = (children: ReactNode, size = 18, stroke = 'currentColor', sw = 1.6) => (
+  <Icon size={size} stroke={stroke} sw={sw}>
+    {children}
+  </Icon>
+);
