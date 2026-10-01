@@ -1,7 +1,15 @@
 import { http } from 'msw';
 import { fail, ok, url } from '@/test/msw/handlers';
 import { server } from '@/test/msw/server';
-import { buildAuthorizeUrl, CallbackError, codeChallenge, completeLogin, logout } from '../auth';
+import {
+  buildAuthorizeUrl,
+  buildGoogleSignInUrl,
+  CallbackError,
+  codeChallenge,
+  completeLogin,
+  endWalletSession,
+  logout,
+} from '../auth';
 import { tokens } from '../tokens';
 
 afterEach(() => tokens.clear());
@@ -70,5 +78,59 @@ describe('logout', () => {
     server.use(http.post(url('/frontend/auth/logout'), () => fail(500, 'boom')));
     await expect(logout()).rejects.toBeTruthy();
     expect(tokens.hasSession()).toBe(false);
+  });
+});
+
+describe('Google through the O-Wallet', () => {
+  it("builds the wallet's social URL with PKCE and our callback as the client return", async () => {
+    const u = new URL(await buildGoogleSignInUrl('/collect'));
+    expect(u.pathname).toBe('/api/auth/social/google');
+    expect(u.searchParams.get('redirect_uri')).toBe(`${u.origin}/api/auth/social/google/callback`);
+    expect(u.searchParams.get('client_redirect_uri')).toMatch(/\/callback$/);
+    expect(u.searchParams.get('scope')).toBe('user');
+    expect(u.searchParams.get('code_challenge_method')).toBe('S256');
+    expect(u.searchParams.has('state')).toBe(false);
+    const verifier = sessionStorage.getItem('weo.auth.pkce.verifier') ?? '';
+    await expect(codeChallenge(verifier)).resolves.toBe(u.searchParams.get('code_challenge'));
+  });
+
+  it('accepts the stateless return of the Google flow and exchanges the code', async () => {
+    await buildGoogleSignInUrl('/collect');
+    server.use(
+      http.post(url('/frontend/auth/verify'), () =>
+        ok({ accessToken: 'g-acc', refreshToken: 'g-ref', user: { _id: 'u2', fullName: 'Ana' } }),
+      ),
+    );
+    const res = await completeLogin('?code=google-code');
+    expect(res.returnTo).toBe('/collect');
+    expect(tokens.getRefresh()).toBe('g-ref');
+  });
+
+  it('still refuses a stateless return after the authorize flow', async () => {
+    await buildAuthorizeUrl('/');
+    await expect(completeLogin('?code=abc')).rejects.toBeInstanceOf(CallbackError);
+  });
+});
+
+describe('endWalletSession', () => {
+  it("opens the wallet's logout with our origin as the way back, and closes it within a second", () => {
+    vi.useFakeTimers();
+    const popup = { closed: false, close: vi.fn(), location: {} } as unknown as Window;
+    const open = vi.spyOn(window, 'open').mockReturnValue(popup);
+    endWalletSession();
+    const [target] = open.mock.calls[0] ?? [];
+    const u = new URL(String(target));
+    expect(u.pathname).toBe('/api/oauth/logout');
+    expect(u.searchParams.get('redirect_uri')).toBe(window.location.origin);
+    vi.advanceTimersByTime(1000);
+    expect(popup.close).toHaveBeenCalled();
+    open.mockRestore();
+    vi.useRealTimers();
+  });
+
+  it('a blocked popup is not an error', () => {
+    const open = vi.spyOn(window, 'open').mockReturnValue(null);
+    expect(() => endWalletSession()).not.toThrow();
+    open.mockRestore();
   });
 });

@@ -145,9 +145,10 @@ describe('passport dropdown', () => {
     expect(within(sheet).getByText('Available')).toBeInTheDocument();
   });
 
-  it('logs out for real: revokes, clears and lands on sign-in', async () => {
+  it('logs out for real: ends the O-Wallet session, revokes, clears and lands on sign-in', async () => {
     const user = userEvent.setup();
     const revoked = vi.fn();
+    const open = vi.spyOn(window, 'open').mockReturnValue(null);
     server.use(
       http.post(url('/frontend/auth/logout'), async ({ request }) => {
         revoked(await request.json());
@@ -159,6 +160,7 @@ describe('passport dropdown', () => {
     await user.click(await screen.findByRole('button', { name: 'Log out' }));
     await waitFor(() => expect(router.state.location.pathname).toBe('/login'));
     expect(revoked).toHaveBeenCalledWith({ refresh_token: 'ref' });
+    expect(String(open.mock.calls[0]?.[0])).toMatch(/\/api\/oauth\/logout\?redirect_uri=/);
     expect(tokens.hasSession()).toBe(false);
     expect(await screen.findByText('Signed out — see you at the O')).toBeInTheDocument();
   });

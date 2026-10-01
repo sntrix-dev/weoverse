@@ -2,6 +2,11 @@
 
 All notable changes per module. Newest first.
 
+## Auth fixes (2026-10-01, after M03)
+
+- O-Wallet authorize path is `/api/oauth/authorize`; `state` is 43 characters (the wallet requires ≥ 32).
+- From the previous build's O-Wallet logic: "Continue with Google" through the O-Wallet, and log out also ends the O-Wallet session (D-030).
+
 ## M03 — Shared WeO & list kit (2026-10-01)
 
 - `cardModel`: one typed adapter from the backend WeO card to every card, row and board (format, tone, price, timer, edition, terms…), with fixtures for all five formats.

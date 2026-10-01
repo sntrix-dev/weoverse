@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Navigate, useSearchParams } from 'react-router';
-import { buildAuthorizeUrl } from '@/api/auth';
+import { buildAuthorizeUrl, buildGoogleSignInUrl } from '@/api/auth';
 import { routes } from '@/app/routes';
 import { useHasSession } from '@/app/session';
 import { Alert, Button, Card, WeOverseLettering } from '@/design-system';
@@ -12,20 +12,22 @@ export function LoginPage() {
   const [params] = useSearchParams();
   const next = params.get('next') || routes.create();
   const hasSession = useHasSession();
-  const [busy, setBusy] = useState(false);
+  const [busy, setBusy] = useState<null | 'owallet' | 'google'>(null);
   const [error, setError] = useState<string | null>(null);
 
   if (hasSession) return <Navigate to={next} replace />;
 
   const configured = Boolean(env.walletUrl && env.clientId);
 
-  const start = async () => {
-    setBusy(true);
+  const start = async (flow: 'owallet' | 'google') => {
+    setBusy(flow);
     setError(null);
     try {
-      window.location.assign(await buildAuthorizeUrl(next));
+      window.location.assign(
+        await (flow === 'google' ? buildGoogleSignInUrl(next) : buildAuthorizeUrl(next)),
+      );
     } catch {
-      setBusy(false);
+      setBusy(null);
       setError('Could not start sign-in. Try again.');
     }
   };
@@ -46,8 +48,24 @@ export function LoginPage() {
           </Alert>
         )}
         <div className={styles.actions}>
-          <Button tone="violet" size="lg" dot selected={!busy} disabled={!configured || busy} onClick={start}>
-            {busy ? 'Opening your O-Wallet…' : 'Continue with O-Wallet'}
+          <Button
+            tone="violet"
+            size="lg"
+            dot
+            selected={!busy}
+            disabled={!configured || !!busy}
+            onClick={() => void start('owallet')}
+          >
+            {busy === 'owallet' ? 'Opening your O-Wallet…' : 'Continue with O-Wallet'}
+          </Button>
+          <Button
+            tone="violet"
+            variant="ghost"
+            size="lg"
+            disabled={!configured || !!busy}
+            onClick={() => void start('google')}
+          >
+            {busy === 'google' ? 'Opening Google…' : 'Continue with Google'}
           </Button>
         </div>
         <p className={styles.fine}>You’ll sign in on wallet.ocono.me and come straight back.</p>

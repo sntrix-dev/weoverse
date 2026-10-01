@@ -49,6 +49,7 @@ Backend: `weo-3.0`, local base URL **`http://localhost:3002/api`**. Full endpoin
 | Module | Screen / block | Method + path | Status |
 |---|---|---|---|
 | M01 | Login | `POST /frontend/auth/verify` | wired (`api/auth.ts`); live round trip → M02 |
+| M01 | O-Wallet (IdP, not our API) | `{wallet}/api/oauth/authorize` (PKCE), `{wallet}/api/auth/social/google` (Google via the wallet), `{wallet}/api/oauth/logout` (end the wallet session) | wired (`api/auth.ts`, D-029/D-030) |
 | M01 | Token refresh / logout | `POST /frontend/auth/new_access_token`, `POST /frontend/auth/logout` | wired (`api/client.ts` single-flight refresh, `api/auth.ts` logout); Swagger fixed in M01 |
 | M02 | Shell (avatar, balance, tier, counts, prefs) | `GET /frontend/users/me/nav-summary` | exists |
 | M02 | UI preferences | `GET/PATCH /frontend/users/me/preferences` | exists |

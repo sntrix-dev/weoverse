@@ -11,6 +11,8 @@ import { tokens } from './tokens';
 const VERIFIER_KEY = 'weo.auth.pkce.verifier';
 const STATE_KEY = 'weo.auth.pkce.state';
 const RETURN_KEY = 'weo.auth.return';
+/** which O-Wallet flow started the round trip: `owallet` (authorize) or `google` (social) */
+const FLOW_KEY = 'weo.auth.flow';
 
 const base64url = (bytes: Uint8Array) =>
   btoa(String.fromCharCode(...bytes))
@@ -36,6 +38,7 @@ export async function buildAuthorizeUrl(returnTo = '/'): Promise<string> {
   sessionStorage.setItem(VERIFIER_KEY, verifier);
   sessionStorage.setItem(STATE_KEY, state);
   sessionStorage.setItem(RETURN_KEY, returnTo);
+  sessionStorage.setItem(FLOW_KEY, 'owallet');
   const url = new URL(`${env.walletUrl}${env.authorizePath}`);
   url.search = new URLSearchParams({
     response_type: 'code',
@@ -43,6 +46,33 @@ export async function buildAuthorizeUrl(returnTo = '/'): Promise<string> {
     redirect_uri: env.redirectUri,
     scope: env.scope,
     state,
+    code_challenge: await codeChallenge(verifier),
+    code_challenge_method: 'S256',
+  }).toString();
+  return url.toString();
+}
+
+/**
+ * Google, through the O-Wallet (from the previous WeO build): a full-page redirect into the
+ * wallet's own social endpoint. Google returns to the wallet, the wallet returns to our
+ * `client_redirect_uri` (/callback) with a code for the same PKCE exchange. The wallet takes
+ * no `state` on this route, so the callback accepts a missing one only for this flow.
+ */
+export async function buildGoogleSignInUrl(returnTo = '/'): Promise<string> {
+  if (!env.walletUrl || !env.clientId)
+    throw new Error('OAuth is not configured (VITE_WALLET_URL / VITE_OAUTH_CLIENT_ID)');
+  const verifier = randomString();
+  sessionStorage.setItem(VERIFIER_KEY, verifier);
+  sessionStorage.removeItem(STATE_KEY);
+  sessionStorage.setItem(RETURN_KEY, returnTo);
+  sessionStorage.setItem(FLOW_KEY, 'google');
+  const url = new URL(`${env.walletUrl}/api/auth/social/google`);
+  url.search = new URLSearchParams({
+    client_id: env.clientId,
+    redirect_uri: `${env.walletUrl}/api/auth/social/google/callback`,
+    response_type: 'code',
+    scope: 'user',
+    client_redirect_uri: env.redirectUri,
     code_challenge: await codeChallenge(verifier),
     code_challenge_method: 'S256',
   }).toString();
@@ -68,12 +98,15 @@ export async function completeLogin(
   const expected = sessionStorage.getItem(STATE_KEY);
   const verifier = sessionStorage.getItem(VERIFIER_KEY);
   const returnTo = sessionStorage.getItem(RETURN_KEY) || '/';
+  const flow = sessionStorage.getItem(FLOW_KEY);
   sessionStorage.removeItem(STATE_KEY);
   sessionStorage.removeItem(VERIFIER_KEY);
   sessionStorage.removeItem(RETURN_KEY);
+  sessionStorage.removeItem(FLOW_KEY);
   if (!code) throw new CallbackError('The sign-in response had no code.');
-  if (!verifier || !expected || state !== expected)
-    throw new CallbackError('This sign-in link has expired. Start again.');
+  // the authorize flow must echo our state; the Google flow sends none (and must not invent one)
+  const stateOk = flow === 'google' ? !state : !!expected && state === expected;
+  if (!verifier || !stateOk) throw new CallbackError('This sign-in link has expired. Start again.');
 
   const data = await api.post<VerifyResponse>(
     '/frontend/auth/verify',
@@ -82,6 +115,45 @@ export async function completeLogin(
   );
   tokens.set(data.accessToken, data.refreshToken);
   return { returnTo, user: data.user };
+}
+
+/**
+ * End the O-Wallet's own session too (from the previous WeO build). Identity lives in two
+ * places — our tokens and a session cookie on the wallet's origin; clearing only ours leaves
+ * the person signed in there, and "Continue with O-Wallet" would walk them straight back in.
+ * Another origin can only clear its cookies from a window of its own, so the wallet's logout
+ * opens in a tiny popup that closes itself once it is back on our origin, when the person
+ * closes it, or after a second. Call it synchronously from the click, before any await, or
+ * the popup blocker stops it. A blocked popup is not a reason to stay signed in here.
+ */
+export function endWalletSession(): void {
+  if (!env.walletUrl) return;
+  const target = `${env.walletUrl}/api/oauth/logout?redirect_uri=${encodeURIComponent(window.location.origin)}`;
+  let popup: Window | null = null;
+  try {
+    popup = window.open(target, 'weo-owallet-logout', 'width=1,height=1,left=0,top=0');
+  } catch {
+    popup = null;
+  }
+  if (!popup) return;
+  const close = () => {
+    window.clearInterval(timer);
+    window.clearTimeout(cap);
+    try {
+      if (!popup?.closed) popup?.close();
+    } catch {
+      /* cross-origin at the moment of closing — it closes itself */
+    }
+  };
+  const timer = window.setInterval(() => {
+    try {
+      // reading location throws while the popup is still on the wallet's origin
+      if (popup?.closed || popup?.location.origin === window.location.origin) close();
+    } catch {
+      /* still on the wallet */
+    }
+  }, 100);
+  const cap = window.setTimeout(close, 1000);
 }
 
 export async function logout(): Promise<void> {
