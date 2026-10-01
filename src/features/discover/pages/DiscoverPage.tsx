@@ -104,7 +104,9 @@ export function DiscoverPage() {
   const circlesQ = useCircles();
   const interestsQ = useInterests();
 
-  const stage = useModels(stageQ.data, muted);
+  const stageAll = useModels(stageQ.data, muted);
+  // design: the stage holds what is live — an active WeO past its own close time is not
+  const stage = useMemo(() => stageAll.filter((w) => w.live), [stageAll]);
   const ending = useModels(endingQ.data, muted);
   const moving = useModels(movingQ.data, muted);
   const followed = useModels(followedQ.data, muted);

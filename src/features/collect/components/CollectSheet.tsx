@@ -172,9 +172,15 @@ export function CollectSheet({ weoId }: { weoId: string }) {
         {q.bundles.map((b) => (
           <Chip
             key={b}
+            role="button"
+            tabIndex={0}
+            aria-pressed={q.bundle === b}
             selected={q.bundle === b}
             tone={tone}
             onClick={() => setBundle(b)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') setBundle(b);
+            }}
             style={{ cursor: 'pointer' }}
           >
             {entries(b)}

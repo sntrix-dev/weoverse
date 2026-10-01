@@ -97,7 +97,7 @@ describe('collect flow', () => {
     const { user, dialog } = await openSheet('weo-5', 'Studio Gear Hunt');
     await user.click(within(dialog).getByRole('button', { name: 'Join the hunt' }));
     const entries = within(dialog).getByRole('group', { name: 'Entries' });
-    await user.click(within(entries).getByText('5 entries'));
+    await user.click(within(entries).getByRole('button', { name: '5 entries' }));
     await waitFor(() => expect(asked).toContain('5'));
     await waitFor(() => expect(within(dialog).getAllByText('3,000').length).toBeGreaterThan(0));
   });

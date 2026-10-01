@@ -273,8 +273,13 @@ export function WeoPage() {
                 {w.circles.map((c) => (
                   <Chip
                     key={c.id}
+                    role="link"
+                    tabIndex={0}
                     tone="var(--o-violet)"
                     onClick={() => void navigate(routes.circle(c.id))}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') void navigate(routes.circle(c.id));
+                    }}
                     style={{ cursor: 'pointer' }}
                   >
                     {c.name}
