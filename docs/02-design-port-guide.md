@@ -68,8 +68,9 @@ States the design does not draw but a real app needs (loading, error, empty, una
 | 2 | `passport?id=isr` ignored | `/passport#isr` scrolls to Standing |
 | 3 | Holdings/listings pass their own ids to `openWeo`, falling back to `WEOS[0]` | use `weoId` from collections/listings DTOs |
 | 4 | Community "Mine" filter uses `authorId === 'mem-1'` | compare with the signed-in user id |
-| 5 | O peg: `weo-model` ×99 vs `wv-data` 100 Os = $1 | follow the backend OConfig (`usdAgainstO`) — one helper in `lib/os.ts` |
+| 5 | O peg: `weo-model` ×99 vs `wv-data` 100 Os = $1 | ✅ M03: the backend states the card price (`weoverse.priceOs` / `priceUsd`, from `usdAgainstO`); the frontend never applies a peg |
 | 6 | Contact setting `'off'` vs `'none'` | backend enum `anyone|circles|off` |
 | 7 | Tracking page uses `followed` instead of `tracked` | real tracking API (M08) |
 | 8 | `HUB.CIRCLE_META` referenced but never defined | derive from circles API |
 | 9 | location copy (profile "Where you are", Calendar "events you're going to") | drop; product is fully digital |
+| 10 | `NoteBody` reads a numeric `width` as px, so the hero lede (`width={56}`) renders 56 px wide — one word per line | ✅ M03: a number is a width in `ch` (56ch), the measure the copy was written for |

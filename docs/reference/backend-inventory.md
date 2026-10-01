@@ -423,6 +423,8 @@ Swagger also documents `POST /frontend/otp` and `POST /frontend/login/verify`. *
 
 `GET /weos` filters: `weoType`, `page`, `limit`, `search`, `categoryId`, `creatorId`, `status`, `sort` (`recent | trending | ending_soon`), `feed=following`, `minPrice`, `maxPrice`.
 
+List rows are `WeoCardView` (`projectWeoToCardView`, `src/modules/weo/weo.projection.ts`): common fields + a `weoverse` block (`publicId`, `editionSize`, `isCollected`, `circles`, `activeNow`, `trendPct`, `points`, `rarityNote`, …) + the kind's data. Price units differ per kind — regular `price.amount` is USD, lottery `ticket.price` and crowdfund `contribution.minimum` are Os — so since redesign M03 the card states `weoverse.priceOs` / `priceUsd`, and crowdfund rows carry `contribution{minimum,maximum}`.
+
 ### 5.5 Collect, likes, views, ratings, resell, draw, rehearsals, installments and negotiation
 
 | Method | Path | Auth | Controller | Purpose |

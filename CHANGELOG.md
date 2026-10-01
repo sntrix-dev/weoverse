@@ -2,6 +2,15 @@
 
 All notable changes per module. Newest first.
 
+## M03 — Shared WeO & list kit (2026-10-01)
+
+- `cardModel`: one typed adapter from the backend WeO card to every card, row and board (format, tone, price, timer, edition, terms…), with fixtures for all five formats.
+- Section hero (stats, priorities, directory chips, view controls), view preferences panel, Scene, Rows, Rail/Fold, section marks, notes, pips and stat strips.
+- WeO views: cards, carousel, orbit, list, rail — one switch, remembered per group; stall tiles and the shared WeO card props.
+- Circle chip/orb/record, person orb, sparkline, standing chip, avatar orb, stage ring, snapshot chart/panel/podium.
+- `/dev/ds` gallery section for the kit; 25 new tests (109 total).
+- Backend (`redesign/m03-shared-kit`): `weoverse.priceOs/priceUsd` on every card, crowdfund `contribution`, card Swagger fixed.
+
 ## M02 — App shell (2026-10-01)
 
 - Top bar (shrinks on scroll), split nav (left panel + support cluster), section switch with Next pill and an every-section option.

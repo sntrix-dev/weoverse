@@ -54,6 +54,7 @@ Backend: `weo-3.0`, local base URL **`http://localhost:3002/api`**. Full endpoin
 | M02 | UI preferences | `GET/PATCH /frontend/users/me/preferences` | exists |
 | M02 | Bell badge | `GET /frontend/notifications/unread-count` | exists |
 | M02 | Mya dock | `POST /chatbot/ask` (`/ask/stream` SSE) | exists |
+| M03 | Every WeO card (kit, via `lib/cardModel.ts`) | `WeoCardView` rows — `weoverse.priceOs/priceUsd`, crowdfund `contribution` (added M03) | adapter + fixtures; fetched from M04 |
 | M04 | Discover hero stats | `GET /frontend/weos/discovery-snapshot` | exists |
 | M04 | Browse by interest | `GET /frontend/weos/interests` | exists |
 | M04 | Feed | `GET /frontend/feed` | exists |
