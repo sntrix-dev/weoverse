@@ -66,7 +66,7 @@ describe('top bar', () => {
       'YouYou and your standing',
     ]);
     await user.click(within(menu).getByRole('menuitem', { name: /Discover/ }));
-    expect(router.state.location.pathname).toBe('/discover');
+    await waitFor(() => expect(router.state.location.pathname).toBe('/discover'));
   });
 
   it('can show every section in the bar (a saved preference)', async () => {
@@ -85,7 +85,7 @@ describe('top bar', () => {
     const { router } = renderApp('/create');
     await user.click(await screen.findByRole('button', { name: 'Search the WeOverse' }));
     await user.type(screen.getByRole('textbox', { name: 'Search WeOs, circles, creators' }), 'mug{Enter}');
-    expect(router.state.location.pathname).toBe('/discover');
+    await waitFor(() => expect(router.state.location.pathname).toBe('/discover'));
     expect(router.state.location.search).toBe('?q=mug');
   });
 
@@ -103,7 +103,9 @@ describe('top bar', () => {
     expect(document.documentElement.style.getPropertyValue('--shell-left')).toBe('86px');
     await user.click(screen.getAllByRole('button', { name: 'Back to the top bar' })[0]!);
     expect(document.documentElement.getAttribute('data-nav')).toBe('bar');
-    await waitFor(() => expect(bodies.at(-1)).toMatchObject({ navMode: 'bar' }));
+    // the split was saved; coming back is the same optimistic write (batched, 400 ms)
+    expect(bodies).toContainEqual({ navMode: 'split' });
+    expect(usePrefs.getState().prefs.navMode).toBe('bar');
   });
 
   it('opens the wordmark on the home chosen in settings', async () => {
@@ -112,7 +114,7 @@ describe('top bar', () => {
     await screen.findByRole('button', { name: 'Your Os, your tier and your passport' });
     await waitFor(() => expect(usePrefs.getState().prefs.home).toBe('discover'));
     await user.click(screen.getAllByTitle('WeOverse')[0]!);
-    expect(router.state.location.pathname).toBe('/discover');
+    await waitFor(() => expect(router.state.location.pathname).toBe('/discover'));
   });
 
   it('paints the theme the server has saved', async () => {

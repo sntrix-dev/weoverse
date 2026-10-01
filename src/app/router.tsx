@@ -1,3 +1,4 @@
+import type { ComponentType } from 'react';
 import { createBrowserRouter, Navigate, type RouteObject } from 'react-router';
 import { PlannedPage } from '@/components/layout/PlannedPage';
 import { CallbackPage } from '@/features/auth/pages/CallbackPage';
@@ -6,6 +7,22 @@ import { AppLayout, type RouteHandle } from './AppLayout';
 import { RequireAuth } from './RequireAuth';
 import { RootLayout } from './RootLayout';
 import { routes, type RouteName } from './routes';
+
+/**
+ * A built screen, loaded on first visit (each section is its own chunk); `handle.route` drives
+ * the shell (section pill, colour wash, flow bar).
+ */
+const page = (
+  path: string,
+  route: RouteName,
+  load: () => Promise<{ default: ComponentType }>,
+): RouteObject => ({
+  path,
+  handle: { route } satisfies RouteHandle,
+  // shown while a section's chunk loads on a cold start
+  HydrateFallback: () => null,
+  lazy: async () => ({ Component: (await load()).default }),
+});
 
 /** A route whose page lands in a later module renders PlannedPage until then. */
 const planned = (path: string, route: RouteName): RouteObject => ({
@@ -39,7 +56,9 @@ const childRoutes: RouteObject[] = [
       // design: index.html opens on Create
       { index: true, element: <Navigate to={routes.create()} replace /> },
       planned('/create', 'create'),
-      planned('/discover', 'discover'),
+      page('/discover', 'discover', () =>
+        import('@/features/discover/pages/DiscoverPage').then((m) => ({ default: m.DiscoverPage })),
+      ),
       planned('/collect', 'collected'),
       planned('/exchange', 'listed'),
       planned('/community', 'hub'),
@@ -48,7 +67,9 @@ const childRoutes: RouteObject[] = [
       planned('/community/threads/:threadId', 'thread'),
       planned('/community/stewards', 'stewards'),
       planned('/community/stories', 'stories'),
-      planned('/weos/:weoId', 'weo'),
+      page('/weos/:weoId', 'weo', () =>
+        import('@/features/weo/pages/WeoPage').then((m) => ({ default: m.WeoPage })),
+      ),
       planned('/creators', 'creators'),
       planned('/creators/:creatorId', 'creators'),
       planned('/requests', 'requests'),

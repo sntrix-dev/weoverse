@@ -21,13 +21,11 @@ describe('routing', () => {
   });
 
   it.each([
-    ['/discover', 'M04'],
     ['/collect', 'M06'],
     ['/exchange', 'M06'],
     ['/community', 'M05'],
     ['/community/circles/c1', 'M05'],
     ['/community/threads/t1', 'M05'],
-    ['/weos/abc', 'M04'],
     ['/creators/mya', 'M08'],
     ['/requests/rq-1', 'M08'],
     ['/passport', 'M09'],
@@ -38,6 +36,17 @@ describe('routing', () => {
   ])('%s renders its planned screen (%s)', async (path, module) => {
     renderApp(path);
     expect(await planned(module)).toBeInTheDocument();
+  });
+
+  it('/discover is the Discover screen, in the Discover section', async () => {
+    renderApp('/discover');
+    expect(await screen.findByRole('heading', { level: 1, name: 'Discover' })).toBeInTheDocument();
+    expect(document.documentElement.style.getPropertyValue('--focus-tint')).toBe('#3A95F2');
+  });
+
+  it('/weos/:id is the WeO page', async () => {
+    renderApp('/weos/weo-1');
+    expect(await screen.findByRole('heading', { level: 1, name: 'Sunrise Loop' })).toBeInTheDocument();
   });
 
   it('sets the route colour for the design wash and marks the lead section', async () => {

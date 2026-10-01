@@ -2043,6 +2043,36 @@ export interface paths {
         patch: operations["adminRestoreCommunityThread"];
         trace?: never;
     };
+    "/frontend/creators": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * The creators directory — people who have published at least one WeO
+         * @description A directory of people with at least one WeO (derived, not flagged).
+         *     Drives the Discover "Who is trading" rail and the Creators page.
+         *
+         *     `trace7d` is the WeOs each creator posted per day over the last seven
+         *     days, oldest first, zero-filled — the rail draws it as a sparkline.
+         *     `settled7d` sums floor sales that settled to them in seven days
+         *     (top-ups and withdrawals are excluded).
+         *
+         *     Note the paging key is `pages`, not `totalPages`.
+         *
+         *     Backed by `src/modules/user/creators/creators.controller.ts#list`.
+         */
+        get: operations["listCreators"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/frontend/crowdfunds": {
         parameters: {
             query?: never;
@@ -7976,8 +8006,9 @@ export interface components {
             format: "Listing" | "Drop" | "Bid" | "Pool" | "Hunt";
             title: string;
             /**
-             * @description What the listing asks — per unit (regular), per ticket (lottery),
-             *     or the minimum pledge (crowdfund).
+             * @description What the listing asks, **in Os** — per unit (regular, its dollar
+             *     `price.amount` × `usdAgainstO`), per ticket (lottery), or the
+             *     minimum pledge (crowdfund). Every figure in the quote is in Os.
              */
             ask: number;
             /** @description What THIS quote prices, after the caller's proposal is clamped. */
@@ -8018,6 +8049,30 @@ export interface components {
             blockers: components["schemas"]["CollectBlocker"][];
             /** @description `true` only when `blockers` is empty — the one flag the button reads. */
             collectable: boolean;
+            /**
+             * @description The body to POST to `/weos/{id}/collect` to buy exactly what this
+             *     quote priced. The kinds take different inputs in different units
+             *     (a regular `amount` is US dollars per unit), so the quote states the
+             *     body instead of leaving the client to convert. Regular pays in full.
+             */
+            payload: {
+                /**
+                 * @description US dollars per unit
+                 * @example 20
+                 */
+                amount: number;
+                /** @enum {boolean} */
+                isFullyPaid: true;
+            } | {
+                /**
+                 * @description The pledge in Os
+                 * @example 750
+                 */
+                amount: number;
+            } | {
+                /** @example 5 */
+                bundle: number;
+            };
         };
         CollectQuoteResponse: components["schemas"]["BaseResponse"] & {
             data?: components["schemas"]["CollectQuote"];
@@ -9120,6 +9175,12 @@ export interface components {
              * @example 4820
              */
             os?: number | null;
+            /**
+             * @description WeO items only — Bid · Pool · Hunt · Drop · Listing, the card's
+             *     colour. `null` for questions, requests and stories.
+             * @enum {string|null}
+             */
+            format?: "Bid" | "Pool" | "Hunt" | "Drop" | "Listing" | null;
             /**
              * Format: date-time
              * @description ISO close time, or `null`. Coalesced across the three WeO kinds
@@ -14154,6 +14215,40 @@ export interface components {
             /** Format: date-time */
             updatedAt: string | null;
         };
+        CreatorListRow: {
+            id: components["schemas"]["ObjectId"];
+            name: string;
+            /** @description "@lowercase" from the creator name, or empty */
+            handle: string;
+            avatarUrl: string | null;
+            isr: number;
+            formats: string[];
+            /**
+             * @description Their leading format
+             * @enum {string}
+             */
+            format: "Bid" | "Pool" | "Hunt" | "Drop" | "Listing";
+            /** @description The format's colour (hex) */
+            tone: string;
+            /** @description Os from floor sales that settled to them in 7 days */
+            settled7d: number;
+            /** @description WeOs posted per day, oldest first */
+            trace7d: number[];
+            /** @description Distinct people who collected from them */
+            collectors: number;
+            circledBy: number;
+            /** @description The caller circles them */
+            circled: boolean;
+        };
+        CreatorsPage: {
+            items: components["schemas"]["CreatorListRow"][];
+            total: number;
+            page: number;
+            pages: number;
+        };
+        CreatorsPageResponse: components["schemas"]["BaseResponse"] & {
+            data?: components["schemas"]["CreatorsPage"];
+        };
         /**
          * @description The rater (populated from User). v1 has no anonymous ratings, so
          *     this block is always populated when a rating exists.
@@ -18518,6 +18613,72 @@ export interface operations {
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
             500: components["responses"]["ServerError"];
+        };
+    };
+    listCreators: {
+        parameters: {
+            query?: {
+                /** @description Name or handle contains (case-insensitive) */
+                q?: string;
+                /** @description `settled` is accepted and currently sorts like `isr`. */
+                sort?: "isr" | "settled" | "recent";
+                page?: number;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description One page of creators */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "success": true,
+                     *       "message": "Creators retrieved successfully",
+                     *       "data": {
+                     *         "items": [
+                     *           {
+                     *             "id": "651f8c2a3b9c0d12e4567890",
+                     *             "name": "Lena V",
+                     *             "handle": "@lenav",
+                     *             "avatarUrl": null,
+                     *             "isr": 82,
+                     *             "formats": [
+                     *               "regular"
+                     *             ],
+                     *             "format": "Pool",
+                     *             "tone": "#22C55E",
+                     *             "settled7d": 1980,
+                     *             "trace7d": [
+                     *               0,
+                     *               1,
+                     *               0,
+                     *               2,
+                     *               0,
+                     *               0,
+                     *               1
+                     *             ],
+                     *             "collectors": 12,
+                     *             "circledBy": 40,
+                     *             "circled": false
+                     *           }
+                     *         ],
+                     *         "total": 1,
+                     *         "page": 1,
+                     *         "pages": 1
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["CreatorsPageResponse"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
         };
     };
     listCrowdfunds: {

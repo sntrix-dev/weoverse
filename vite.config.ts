@@ -55,6 +55,8 @@ export default defineConfig({
     setupFiles: ['./src/test/setup.ts'],
     css: { modules: { classNameStrategy: 'non-scoped' } },
     include: ['src/**/*.test.{ts,tsx}'],
+    // full-route tests load section chunks lazily; a cold first import can pass 5 s on CI
+    testTimeout: 15_000,
     env: {
       VITE_API_URL: 'http://api.test',
       VITE_WALLET_URL: 'https://wallet.test',

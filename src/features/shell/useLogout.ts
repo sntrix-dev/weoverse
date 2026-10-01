@@ -3,6 +3,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router';
 import { endWalletSession, logout } from '@/api/auth';
 import { routes } from '@/app/routes';
+import { closeFlow } from '@/stores/flow';
 import { resetMya } from '@/stores/mya';
 import { usePrefs } from '@/stores/prefs';
 import { resetUi, toast } from '@/stores/ui';
@@ -20,6 +21,7 @@ export function useLogout() {
       queryClient.clear();
       usePrefs.getState().reset();
       resetMya();
+      closeFlow();
       resetUi();
       void navigate(routes.login(), { replace: true });
       // design copy (WeOverseIdSheet "Log out")

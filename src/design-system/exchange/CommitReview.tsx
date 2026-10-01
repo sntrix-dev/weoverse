@@ -22,6 +22,8 @@ export interface CommitReviewProps {
   onEdit?: () => void;
   onCancel?: () => void;
   busy?: boolean;
+  /** app extension (M04): the quote says this cannot proceed — Confirm is off, its label unchanged */
+  disabled?: boolean;
   style?: CSSProperties;
 }
 
@@ -55,6 +57,7 @@ export function CommitReview({
   onEdit,
   onCancel,
   busy = false,
+  disabled = false,
   style,
 }: CommitReviewProps) {
   const fiat =
@@ -229,19 +232,19 @@ export function CommitReview({
       >
         <button
           onClick={onConfirm}
-          disabled={busy}
+          disabled={busy || disabled}
           style={{
             flex: 1,
             padding: '13px 16px',
             borderRadius: 14,
             border: 'none',
-            cursor: busy ? 'wait' : 'pointer',
+            cursor: busy ? 'wait' : disabled ? 'not-allowed' : 'pointer',
             background: 'var(--status-success)',
             color: '#fff',
             fontWeight: 700,
             fontSize: 14.5,
             boxShadow: 'var(--nm-sm)',
-            opacity: busy ? 0.7 : 1,
+            opacity: busy ? 0.7 : disabled ? 0.5 : 1,
           }}
         >
           {busy ? 'Working…' : confirmLabel}

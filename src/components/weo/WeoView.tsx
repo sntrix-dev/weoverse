@@ -22,22 +22,23 @@ export const RAIL_VIEW: SegItem<WeoViewKind> = { value: 'rail', label: 'Rail' };
  * design: screens-hub.jsx useWeoView — one view control for every group of WeOs; each group
  * remembers its own choice on this device. Its first default is the user's `weoView` pref.
  */
-export function useWeoView(
+export function useWeoView<V extends string = WeoViewKind>(
   id: string,
-  opts: readonly SegItem<WeoViewKind>[],
-  initial?: WeoViewKind,
-): [WeoViewKind, (v: WeoViewKind) => void] {
+  opts: readonly SegItem<V>[],
+  initial?: V,
+): [V, (v: V) => void] {
   const key = `weo.view.${id}`;
-  const [v, setV] = useState<WeoViewKind>(() => {
+  const [v, setV] = useState<V>(() => {
     try {
       const p = localStorage.getItem(key);
-      if (p && opts.some((o) => o.value === p)) return p as WeoViewKind;
+      if (p && opts.some((o) => o.value === p)) return p as V;
     } catch {
       /* ignore */
     }
-    const pref = usePrefs.getState().prefs.weoView;
-    if (!initial && opts.some((o) => o.value === pref)) return pref;
-    return initial || opts[0]?.value || 'cards';
+    const pref = usePrefs.getState().prefs.weoView as string;
+    const fromPref = opts.find((o) => o.value === pref);
+    if (!initial && fromPref) return fromPref.value;
+    return (initial || opts[0]?.value || 'cards') as V;
   });
   return [
     v,

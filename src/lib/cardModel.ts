@@ -290,7 +290,8 @@ export function cardModel(
     total: prog.total,
     timer: hhmmss(ms),
     endsIn: shortLeft(ms),
-    live: w.status === 'active',
+    // open = active AND not past its own close time (a lapsed clock is closed even before a job flips status)
+    live: w.status === 'active' && (ms == null || ms > 0),
     urgent: !!urgent,
     collectors: w.participantsCount,
     watchers: w.viewsCount,
