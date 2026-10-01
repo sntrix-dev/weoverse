@@ -2,11 +2,12 @@
 
 | Status | FE branch | BE branch | Report |
 |---|---|---|---|
-| ⏳ browser pass | `feat/m02-app-shell` | `redesign/m02-app-shell` | `reports/M02-app-shell.md` |
+| ✅ 2026-10-01 | `feat/m02-app-shell` | `redesign/m02-app-shell` | `reports/M02-app-shell.md` |
 
 ## Carried over from M01
 
-- Run the live auth checks at the start of this module's browser pass: IdP sign-in → `/callback` → `POST /frontend/auth/verify`; refresh via `new_access_token`; logout; the `.env.local` dev token on `GET /frontend/users/me/nav-summary`.
+- ✅ refresh/logout client paths and dev token on nav-summary verified live. ⏳ The IdP sign-in round trip still needs a human sign-in — carried to M03.
+- Original item: run the live auth checks at the start of this module's browser pass: IdP sign-in → `/callback` → `POST /frontend/auth/verify`; refresh via `new_access_token`; logout; the `.env.local` dev token on `GET /frontend/users/me/nav-summary`.
 
 ## Scope
 

@@ -6,8 +6,8 @@
 | Frontend | branch `feat/m02-app-shell` (commits in §7) |
 | Backend | branch `redesign/m02-app-shell` @ `7578da1` |
 | Environment (automated) | Linux workspace · Node 22 · jsdom (Vitest) · backend suite in the Cowork VM with the real `.env` |
-| Environment (browser pass) | macOS · Chrome + Claude in Chrome · frontend `npm run dev` :5173 · design at `/design/` |
-| Result | ⏳ in progress — automated checks pass; browser parity (bar, split, light) checked without the backend; the live-data pass waits for the backend to run on the Mac |
+| Environment (browser pass) | macOS · Chrome + Claude in Chrome · frontend `npm run dev` :5173 · backend `redesign/m02-app-shell` :3002 (Atlas DB) · design at `/design/` · dev token (seeded Mya) |
+| Result | ✅ pass with one open item — every automated, live-API and browser check passes; the O-Wallet sign-in round trip (M01 carry-over) still needs a human sign-in on the IdP (§6) |
 
 ## 1. Automated checks
 
@@ -34,22 +34,32 @@
 
 | Endpoint | Expected | Actual | ✅/❌ |
 |---|---|---|---|
-| `GET /frontend/users/me/nav-summary` (dev token) | 200, complete `uiPreferences` | pending backend on the Mac | ⏳ |
-| `PATCH /frontend/users/me/preferences` `{home:"discover"}` | 200, full set | pending | ⏳ |
-| `POST /chatbot/ask` | 200 `{answer, sessionId, degraded}` | pending | ⏳ |
-| `POST /frontend/email-subscription/subscribe` | 201 / 400 already | pending | ⏳ |
-| M01 carry-over: IdP sign-in → `/callback` → verify, refresh, logout | | pending | ⏳ |
+| `GET /frontend/users/me/nav-summary` (dev token) | 200, complete `uiPreferences` | 200; 19 preference keys incl. `home`, `navSections`, `flowBar`, `flowBarTools`; identity Mya, ISR 100, available 0, tier n/a | ✅ |
+| `PATCH /frontend/users/me/preferences` (Dark in the dock) | 200, full set; persists | 200; after clearing the local cache and reloading, the server's `dark` painted | ✅ |
+| `POST /chatbot/ask` | 200 `{answer, sessionId, degraded}` | 200 `degraded: true` (the local RAG service isn't initialised — no OpenAI key / vector store on the Mac); the dock fell back to the FAQ / "I don't have that one yet" | ✅ (fallback path) |
+| `POST /frontend/email-subscription/subscribe` | 201 / 400 already | not sent live — would add a test address to the shared Atlas DB; both paths covered by MSW tests | ⏭ |
+| Log out (dev-token session) | `/login`, toast, prefs reset | ✅ (no `/auth/logout` call because a dev-token session holds no refresh token — by design) | ✅ |
+| M01 carry-over: IdP sign-in → `/callback` → verify | tokens stored | authorize URL opens `wallet.ocono.me/oauth/authorize` with the right parameters; the extension may not read that domain and the sign-in needs Surya's credentials — not completed yet (no refresh token stored) | ⏳ open |
 
 ## 3. Browser — parity (Chrome, 1440 wide, design `/design/discover.html` vs app `/discover`)
 
 | View | Light | Dark | 390 | Notes |
 |---|---|---|---|---|
-| Bar mode | ✅ | ⏳ | ⏳ | top bar, section pill + Next, support row, flow bar capsules, O nav, Mya orb match |
-| Split mode | ✅ | ⏳ | ⏳ | left panel (labels, lit active item with its long label), support cluster match |
+| Bar mode | ✅ | ✅ | ✅ | top bar, section pill + Next, support row, flow bar capsules, O nav, Mya orb match. At 390 the design's own top bar overflows the same way (desktop build; the design links a separate mobile build) |
+| Split mode | ✅ | — | — | left panel (labels, lit active item with its long label), support cluster match |
 
 ## 4. Browser — interactions
 
-⏳ with the backend running.
+| # | Scenario | Expected | Actual | ✅/❌ |
+|---|---|---|---|---|
+| 1 | Open the passport pill | dropdown with live identity, ISR stage, WeO ID, counts | ✅ Mya · @mya · joined Jan 2026 · ISR 100 · PRISTINE | ✅ |
+| 2 | Ask Mya a free question | chatbot call, fallback answer when degraded | ✅ | ✅ |
+| 3 | Dock → Settings → Dark | theme switches, PATCH 200, survives reload from the server | ✅ | ✅ |
+| 4 | Short viewport (700 px) | O nav parks itself in the top bar (pref saved) | ✅ (design behaviour; restored afterwards) | ✅ |
+| 5 | Log out from the dropdown | `/login`, "Signed out — see you at the O" | ✅ | ✅ |
+| 6 | Console | no errors | 0 errors | ✅ |
+
+Test data restored afterwards: Mya's `theme`, `navDock`, `flowBar`, `flowBarTools` reset via PATCH.
 
 ## 5. Bugs
 
@@ -59,11 +69,13 @@
 
 ## 6. Open issues & follow-ups
 
+- **O-Wallet sign-in round trip** (M01 carry-over): needs Surya to sign in on `wallet.ocono.me`; carried to M03's browser pass.
+- Local chatbot isn't initialised (OpenAI key / FAISS store on the Mac) — the app's fallback works; real answers once the backend's AI config is set.
 - Gaps shown as absent: tier advantage % (G-23, Q-6), O Power (G-24), wallet buckets (G-25), Verified (G-26).
 - Q-7 (dock default), Q-8 (social handles).
 
 ## 7. Sign-off
 
-- [ ] All High/Medium fixed and re-tested
-- [ ] Docs updated
-- [ ] Commits pushed
+- [x] All High/Medium fixed and re-tested (M02-B1 re-checked live: orb rests above the flow bar)
+- [x] Docs updated (spec, plan, decisions, changelog, backend log, gaps)
+- [x] Commits pushed (backend `redesign/m02-app-shell`; frontend `feat/m02-app-shell` → `master`, tag `m02-done`)
