@@ -1,0 +1,73 @@
+/* design: screens-circle.jsx PathBar */
+.bar {
+  position: sticky;
+  top: 62px;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: fit-content;
+  max-width: 100%;
+  margin: 0 0 22px;
+  padding: 6px 14px 6px 6px;
+  border-radius: 999px;
+  background: var(--glass);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow:
+    inset 0 0 0 1px var(--glass-brd),
+    var(--nm-sm);
+}
+.back {
+  flex: 0 0 auto;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  color: var(--text-dim);
+  background: var(--surface);
+  box-shadow: var(--nm-sm);
+}
+.dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--o-violet);
+  flex: 0 0 auto;
+  animation: weo-breathe-sm 3.4s var(--ease-standard) infinite;
+}
+.crumbs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+.sep {
+  display: flex;
+  color: var(--text-faint);
+  flex: 0 0 auto;
+}
+.crumb {
+  border: none;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-dim);
+  flex: 0 0 auto;
+}
+.crumb:hover {
+  color: var(--o-violet);
+}
+.current {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 0 0 auto;
+}

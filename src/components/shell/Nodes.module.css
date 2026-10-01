@@ -1,0 +1,98 @@
+/* design: chrome.jsx WeOverseBadge / MakeNode / MyaNode / bell */
+.badge {
+  display: flex;
+  align-items: center;
+  flex: 0 0 auto;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+}
+.wrap {
+  position: relative;
+  flex: 0 0 auto;
+}
+
+.make {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  color: var(--text-dim);
+  background: transparent;
+  box-shadow: inset 0 0 0 1.6px currentColor;
+  transition:
+    background 0.26s,
+    color 0.24s,
+    box-shadow 0.26s;
+}
+.make[data-lit] {
+  color: #fff;
+  background: var(--o-green);
+  box-shadow:
+    0 10px 22px -10px var(--o-green),
+    inset 0 0 0 2px rgba(255, 255, 255, 0.55);
+}
+
+.mya {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  background: transparent;
+  color: var(--text-dim);
+  flex: 0 0 auto;
+  transition: color 0.24s;
+}
+.mya[data-on] {
+  color: var(--o-violet);
+}
+.myaRing {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1px var(--border);
+  transition: box-shadow 0.26s;
+}
+.myaRing[data-on] {
+  box-shadow: 0 0 0 2px var(--o-violet);
+}
+.myaDot {
+  position: absolute;
+  right: 2px;
+  bottom: 2px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--o-violet);
+  box-shadow: 0 0 0 2px var(--surface);
+  animation: weo-breathe-sm 3.4s var(--ease-standard) infinite;
+}
+.myaDot[data-busy] {
+  animation-duration: 1.6s;
+}
+
+.bellDot {
+  position: absolute;
+  top: 7px;
+  right: 8px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--o-violet);
+  animation: weo-breathe-sm 3.4s var(--ease-standard) infinite;
+}
+.divider {
+  width: 1px;
+  height: 22px;
+  background: var(--border);
+  flex: 0 0 auto;
+}

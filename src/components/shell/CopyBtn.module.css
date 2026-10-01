@@ -1,0 +1,17 @@
+/* design: chrome.jsx CopyBtn */
+.btn {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  color: var(--text-dim);
+  background: var(--surface);
+  box-shadow: var(--nm-sm);
+  transition: color 0.2s;
+}
+.btn[data-done] {
+  color: var(--o-green);
+}

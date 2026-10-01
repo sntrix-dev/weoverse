@@ -1,0 +1,64 @@
+/* design: chrome.jsx TopBar */
+.spacer {
+  height: 92px;
+  transition: height 0.32s var(--ease-portal);
+}
+.spacer[data-small] {
+  height: 74px;
+}
+.header {
+  position: fixed;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(1440px, calc(100% - clamp(16px, 2.6vw, 34px)));
+  z-index: 300;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+  backdrop-filter: blur(18px) saturate(1.4);
+  -webkit-backdrop-filter: blur(18px) saturate(1.4);
+  box-shadow:
+    var(--nm-raised),
+    inset 0 1px 0 rgba(255, 255, 255, 0.42),
+    inset 0 0 0 1px var(--glass-brd);
+  transition:
+    top 0.32s var(--ease-portal),
+    box-shadow 0.3s,
+    backdrop-filter 0.3s;
+}
+.header[data-small] {
+  top: 10px;
+  backdrop-filter: blur(24px) saturate(1.4);
+  -webkit-backdrop-filter: blur(24px) saturate(1.4);
+  box-shadow:
+    var(--shadow-card),
+    var(--nm-raised),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    inset 0 0 0 1px var(--glass-brd);
+}
+.inner {
+  height: 66px;
+  padding: 0 clamp(12px, 1.8vw, 20px);
+  display: flex;
+  align-items: center;
+  gap: clamp(8px, 1.2vw, 16px);
+  transition: height 0.32s var(--ease-portal);
+}
+.inner[data-small] {
+  height: 58px;
+}
+.grow {
+  flex: 1;
+}
+.split {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  flex: 0 0 auto;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+  background: transparent;
+  color: var(--text-dim);
+}

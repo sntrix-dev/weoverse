@@ -656,10 +656,53 @@ export interface paths {
         /**
          * Ask the RAG chatbot a question (public)
          * @description Posts a question to the LangChain RAG service (FAISS vector store +
-         *     OpenAI). The response shape bypasses the standard envelope — see
-         *     the `ChatbotAnswerRawResponse` / `ChatbotErrorRawResponse` schemas.
+         *     OpenAI). Mounted at `/api/chatbot` (not under `/frontend`) and public —
+         *     no bearer token; the global rate limit applies.
+         *
+         *     `sessionId` threads a conversation: omit it on the first turn and the
+         *     server mints one (returned in `data.sessionId`); send it back on
+         *     follow-up turns.
+         *
+         *     When the RAG service is not initialised or the chain fails, the
+         *     endpoint still answers **200** with a placeholder sentence in `answer`
+         *     (kept for existing callers) and `degraded: true`. Clients should treat
+         *     a degraded answer as "no answer" and fall back to their own help
+         *     content rather than showing the placeholder.
+         *
+         *     Validated by `CHATBOT_ASK_BODY_SCHEMA`. Backed by
+         *     `src/modules/ai/chatbot/chatbot.controller.ts#askQuestion`.
          */
         post: operations["askChatbot"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/chatbot/ask/stream": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Ask the RAG chatbot, streamed as Server-Sent Events (public)
+         * @description Same body as `/chatbot/ask`. Responds `text/event-stream`:
+         *
+         *     - `event: session` — `data: {"sessionId": "…"}` first, so the client can
+         *       pin the session before the answer starts;
+         *     - unnamed events — `data: {"chunk": "…"}` per token batch;
+         *     - `event: done` — `data: {}` when the answer is complete;
+         *     - `event: error` — `data: {"message": "stream failed"}` if the chain
+         *       fails mid-stream (the stream then closes).
+         *
+         *     Validation errors (422) are answered as a normal JSON envelope before
+         *     any stream starts.
+         */
+        post: operations["askChatbotStream"];
         delete?: never;
         options?: never;
         head?: never;
@@ -4317,9 +4360,10 @@ export interface paths {
          *     inlines these — this exists for the settings panel, which re-reads
          *     after a write and has no use for the counters.
          *
-         *     Every field is defaulted at the schema level, so a user document
-         *     written before this field existed reads back as a complete set of
-         *     defaults. No migration, and no null checks needed on the client.
+         *     Always the complete set: keys the stored document lacks (older
+         *     accounts, or keys added later such as `home`, `navSections`,
+         *     `flowBar`, `flowBarTools`) are filled with their defaults on read. No
+         *     migration, and no null checks needed on the client.
          *
          *     Backed by `src/modules/user/user.controller.ts#getUiPreferences`.
          */
@@ -7498,21 +7542,31 @@ export interface components {
             data?: components["schemas"]["AdminSubcategoryListData"];
         };
         ChatbotAskRequest: {
-            /** @example How do I sign up for WEO? */
+            /** @example What is a WeO? */
             question: string;
+            /**
+             * @description Conversation id from a previous answer. Omit on the first turn.
+             * @example 3f2b8c1e-6a0d-4f5e-9b8a-2d7c1e0f4a11
+             */
+            sessionId?: string;
         };
-        /**
-         * @description Raw shape — NOT the standard envelope. The chatbot route bypasses
-         *     `ResponseHandler` and emits `{ answer }` on success.
-         */
-        ChatbotAnswerRawResponse: {
-            /** @example You can sign up via the email OTP flow at the home page... */
+        ChatbotAnswer: {
+            /** @example A WeO is a Wealth Exchange Offer — a digital offer to buy or sell in real time. */
             answer: string;
+            /**
+             * @description Echoed, or minted when the request had none. Send it back to continue.
+             * @example 3f2b8c1e-6a0d-4f5e-9b8a-2d7c1e0f4a11
+             */
+            sessionId: string;
+            /**
+             * @description `true` when the RAG service could not answer and `answer` is a
+             *     placeholder sentence. Clients should fall back to their own help.
+             * @example false
+             */
+            degraded: boolean;
         };
-        /** @description Raw error shape — `{ error }` only, no envelope. */
-        ChatbotErrorRawResponse: {
-            /** @example Question is required */
-            error: string;
+        ChatbotAnswerResponse: components["schemas"]["BaseResponse"] & {
+            data?: components["schemas"]["ChatbotAnswer"];
         };
         /**
          * @description Circle = subset of follows where `isInCircle: true`. Reuses the
@@ -9548,9 +9602,10 @@ export interface components {
             b: number;
         };
         /**
-         * @description Complete shell preference set. Every field is defaulted at the schema
-         *     level, so a user document written before this field existed reads back
-         *     as a full set of defaults — no migration, no null checks on the client.
+         * @description Complete shell preference set. Every read fills keys the stored
+         *     document lacks with their defaults (`withPreferenceDefaults`), so a
+         *     user document written before a key existed — or with no preferences
+         *     at all — reads back as a full set. Never `null`, never partial.
          */
         UiPreferences: {
             /**
@@ -9653,6 +9708,32 @@ export interface components {
              * @example []
              */
             mutedKinds: string[];
+            /**
+             * @description Where the WeOverse wordmark lands — the design's "The wordmark
+             *     opens" setting. Community (`hub`) by default.
+             * @example hub
+             * @enum {string}
+             */
+            home: "hub" | "discover" | "create";
+            /**
+             * @description How the top bar names the sections: `one` is a single pill for
+             *     the section you are in (the rest open on intent), `all` puts every
+             *     section in the bar.
+             * @example one
+             * @enum {string}
+             */
+            navSections: "one" | "all";
+            /**
+             * @description The bottom flow bar, `full` or folded (`min`) to one pill and its verb.
+             * @example full
+             * @enum {string}
+             */
+            flowBar: "full" | "min";
+            /**
+             * @description Whether the flow bar's left capsule shows help and the utilities.
+             * @example false
+             */
+            flowBarTools: boolean;
         };
         /**
          * @description Partial update. Every key optional; omitted keys keep their stored
@@ -9685,9 +9766,16 @@ export interface components {
             valueDisplay?: "os" | "both";
             mutedFormats?: string[];
             mutedKinds?: string[];
+            /** @enum {string} */
+            home?: "hub" | "discover" | "create";
+            /** @enum {string} */
+            navSections?: "one" | "all";
+            /** @enum {string} */
+            flowBar?: "full" | "min";
+            flowBarTools?: boolean;
         };
         UiPreferencesResponse: components["schemas"]["BaseResponse"] & {
-            data?: components["schemas"]["UiPreferences"] | null;
+            data?: components["schemas"]["UiPreferences"];
         };
         NavSummaryIdentity: {
             id?: components["schemas"]["ObjectId"];
@@ -9786,9 +9874,10 @@ export interface components {
              * @description Inlined so the shell's first paint is already in the right theme
              *     and layout. Without this the client renders the default shell, then
              *     repaints once a second request resolves — a visible flash of the
-             *     wrong theme on every cold load.
+             *     wrong theme on every cold load. Always the complete set (defaults
+             *     filled in).
              */
-            uiPreferences?: components["schemas"]["UiPreferences"] | null;
+            uiPreferences?: components["schemas"]["UiPreferences"];
         };
         NavSummaryResponse: components["schemas"]["BaseResponse"] & {
             data?: components["schemas"]["NavSummary"];
@@ -16131,57 +16220,65 @@ export interface operations {
         };
         requestBody: {
             content: {
+                "application/json": components["schemas"]["ChatbotAskRequest"];
+            };
+        };
+        responses: {
+            /** @description Answer (check `degraded`) */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChatbotAnswerResponse"];
+                };
+            };
+            422: components["responses"]["ValidationError"];
+            429: components["responses"]["TooManyRequests"];
+            500: components["responses"]["ServerError"];
+        };
+    };
+    askChatbotStream: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
                 /**
                  * @example {
-                 *       "question": "How do I sign up for WEO?"
+                 *       "question": "What does WeO cost?",
+                 *       "sessionId": "3f2b8c1e-6a0d-4f5e-9b8a-2d7c1e0f4a11"
                  *     }
                  */
                 "application/json": components["schemas"]["ChatbotAskRequest"];
             };
         };
         responses: {
-            /** @description Answer */
+            /** @description SSE stream */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
                     /**
-                     * @example {
-                     *       "answer": "You can sign up via the email OTP flow at the home page..."
-                     *     }
+                     * @example event: session
+                     *     data: {"sessionId":"3f2b8c1e-6a0d-4f5e-9b8a-2d7c1e0f4a11"}
+                     *
+                     *     data: {"chunk":"You can start "}
+                     *
+                     *     data: {"chunk":"for free."}
+                     *
+                     *     event: done
+                     *     data: {}
                      */
-                    "application/json": components["schemas"]["ChatbotAnswerRawResponse"];
+                    "text/event-stream": string;
                 };
             };
-            /** @description Missing `question` */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    /**
-                     * @example {
-                     *       "error": "Question is required"
-                     *     }
-                     */
-                    "application/json": components["schemas"]["ChatbotErrorRawResponse"];
-                };
-            };
-            /** @description RAG service failure */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    /**
-                     * @example {
-                     *       "error": "Failed to get an answer"
-                     *     }
-                     */
-                    "application/json": components["schemas"]["ChatbotErrorRawResponse"];
-                };
-            };
+            422: components["responses"]["ValidationError"];
+            429: components["responses"]["TooManyRequests"];
         };
     };
     addToCircle: {
@@ -23815,7 +23912,11 @@ export interface operations {
                      *           "media": "rich",
                      *           "valueDisplay": "os",
                      *           "mutedFormats": [],
-                     *           "mutedKinds": []
+                     *           "mutedKinds": [],
+                     *           "home": "hub",
+                     *           "navSections": "one",
+                     *           "flowBar": "full",
+                     *           "flowBarTools": false
                      *         }
                      *       }
                      *     }
@@ -23865,7 +23966,11 @@ export interface operations {
                      *         "media": "rich",
                      *         "valueDisplay": "os",
                      *         "mutedFormats": [],
-                     *         "mutedKinds": []
+                     *         "mutedKinds": [],
+                     *         "home": "hub",
+                     *         "navSections": "one",
+                     *         "flowBar": "full",
+                     *         "flowBarTools": false
                      *       }
                      *     }
                      */
@@ -23918,7 +24023,11 @@ export interface operations {
                      *         "media": "rich",
                      *         "valueDisplay": "os",
                      *         "mutedFormats": [],
-                     *         "mutedKinds": []
+                     *         "mutedKinds": [],
+                     *         "home": "hub",
+                     *         "navSections": "one",
+                     *         "flowBar": "full",
+                     *         "flowBarTools": false
                      *       }
                      *     }
                      */

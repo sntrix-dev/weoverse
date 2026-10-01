@@ -1,0 +1,21 @@
+/* design: chrome.jsx Tip */
+.tip {
+  position: fixed;
+  width: 140px;
+  text-align: center;
+  pointer-events: none;
+  z-index: 2600;
+}
+.label {
+  display: inline-block;
+  white-space: nowrap;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: var(--hair);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  box-shadow: var(--shadow-card);
+  animation: weo-cardin 0.18s var(--ease-portal) both;
+}

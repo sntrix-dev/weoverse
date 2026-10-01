@@ -4,6 +4,7 @@ import { CallbackPage } from '@/features/auth/pages/CallbackPage';
 import { LoginPage } from '@/features/auth/pages/LoginPage';
 import { AppLayout, type RouteHandle } from './AppLayout';
 import { RequireAuth } from './RequireAuth';
+import { RootLayout } from './RootLayout';
 import { routes, type RouteName } from './routes';
 
 /** A route whose page lands in a later module renders PlannedPage until then. */
@@ -24,7 +25,7 @@ const devRoutes: RouteObject[] = import.meta.env.DEV
     ]
   : [];
 
-export const appRoutes: RouteObject[] = [
+const childRoutes: RouteObject[] = [
   { path: routes.login(), element: <LoginPage /> },
   { path: routes.callback(), element: <CallbackPage /> },
   ...devRoutes,
@@ -63,5 +64,8 @@ export const appRoutes: RouteObject[] = [
     ],
   },
 ];
+
+/** RootLayout wraps everything: theme, scroll restoration, toasts, ack, external gate. */
+export const appRoutes: RouteObject[] = [{ element: <RootLayout />, children: childRoutes }];
 
 export const router = createBrowserRouter(appRoutes);

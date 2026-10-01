@@ -1,64 +1,55 @@
-import { render, screen } from '@testing-library/react';
-import { createMemoryRouter, RouterProvider } from 'react-router';
+import { screen } from '@testing-library/react';
 import { tokens } from '@/api/tokens';
-import { appRoutes } from '../router';
-
-const renderAt = (path: string) => {
-  const router = createMemoryRouter(appRoutes, { initialEntries: [path] });
-  render(<RouterProvider router={router} />);
-  return router;
-};
+import { renderApp } from '@/test/renderApp';
 
 afterEach(() => tokens.clear());
 
+const planned = (module: string) => screen.findByText(`This screen is built in module ${module}.`);
+
 describe('routing', () => {
   it('sends anonymous visitors to sign in and keeps where they were going', async () => {
-    const router = renderAt('/discover?q=mug');
+    const { router } = renderApp('/discover?q=mug', { signedIn: false });
     expect(await screen.findByRole('button', { name: 'Continue with O-Wallet' })).toBeInTheDocument();
     expect(router.state.location.pathname).toBe('/login');
     expect(router.state.location.search).toBe(`?next=${encodeURIComponent('/discover?q=mug')}`);
   });
 
   it('opens on Create like the design', async () => {
-    tokens.set('acc', 'ref');
-    const router = renderAt('/');
-    expect(await screen.findByText('Create')).toBeInTheDocument();
+    const { router } = renderApp('/');
+    await planned('M07');
     expect(router.state.location.pathname).toBe('/create');
   });
 
   it.each([
-    ['/discover', 'Discover', 'M04'],
-    ['/collect', 'Collect', 'M06'],
-    ['/exchange', 'Exchange', 'M06'],
-    ['/community', 'Community', 'M05'],
-    ['/community/circles/c1', 'Circle', 'M05'],
-    ['/community/threads/t1', 'Thread', 'M05'],
-    ['/weos/abc', 'WeO', 'M04'],
-    ['/creators/mya', 'Creators', 'M08'],
-    ['/requests/rq-1', 'Ask', 'M08'],
-    ['/passport', 'Your passport', 'M09'],
-    ['/wallet', 'O-Wallet', 'M09'],
-    ['/settings', 'Settings', 'M09'],
-    ['/notifications', 'Notifications', 'M10'],
-    ['/company/about', 'WeO Global', 'M10'],
-  ])('%s renders its planned screen (%s, %s)', async (path, label, module) => {
-    tokens.set('acc', 'ref');
-    renderAt(path);
-    expect(await screen.findByText(label)).toBeInTheDocument();
-    expect(screen.getByText(module)).toBeInTheDocument();
+    ['/discover', 'M04'],
+    ['/collect', 'M06'],
+    ['/exchange', 'M06'],
+    ['/community', 'M05'],
+    ['/community/circles/c1', 'M05'],
+    ['/community/threads/t1', 'M05'],
+    ['/weos/abc', 'M04'],
+    ['/creators/mya', 'M08'],
+    ['/requests/rq-1', 'M08'],
+    ['/passport', 'M09'],
+    ['/wallet', 'M09'],
+    ['/settings', 'M09'],
+    ['/notifications', 'M10'],
+    ['/company/about', 'M10'],
+  ])('%s renders its planned screen (%s)', async (path, module) => {
+    renderApp(path);
+    expect(await planned(module)).toBeInTheDocument();
   });
 
-  it('sets the route colour for the design wash', async () => {
-    tokens.set('acc', 'ref');
-    renderAt('/wallet');
-    await screen.findByText('O-Wallet');
+  it('sets the route colour for the design wash and marks the lead section', async () => {
+    renderApp('/wallet');
+    await planned('M09');
     expect(document.documentElement.style.getPropertyValue('--focus-tint')).toBe('#F7C62B');
+    expect(document.querySelector('main section')).toHaveAttribute('data-lead');
   });
 
   it('redirects signed-in users away from /login', async () => {
-    tokens.set('acc', 'ref');
-    const router = renderAt('/login?next=/wallet');
-    await screen.findByText('O-Wallet');
+    const { router } = renderApp('/login?next=/wallet');
+    await planned('M09');
     expect(router.state.location.pathname).toBe('/wallet');
   });
 });

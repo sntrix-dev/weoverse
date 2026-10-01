@@ -1,0 +1,162 @@
+/* design: chrome.jsx FanDisc / NavDockNode / NavParkFlight */
+.disc {
+  position: relative;
+  display: block;
+  flex: 0 0 auto;
+}
+.discFan {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  transition: opacity 0.3s;
+}
+.discWell {
+  position: absolute;
+  border-radius: 50%;
+  background: var(--surface);
+  box-shadow: var(--nm-inset);
+}
+
+.root {
+  position: relative;
+  flex: 0 0 auto;
+}
+.node {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  color: var(--text-dim);
+  background: transparent;
+  box-shadow: none;
+  transition:
+    background 0.26s,
+    box-shadow 0.26s,
+    color 0.24s;
+}
+.node[data-parked] {
+  color: var(--o-violet);
+  background: var(--surface);
+  box-shadow: var(--nm-sm);
+}
+
+.menu {
+  position: fixed;
+  top: 74px;
+  right: clamp(12px, 2vw, 26px);
+  max-height: calc(100vh - 96px);
+  overflow-y: auto;
+  z-index: 400;
+  border-radius: 24px;
+  background: var(--glass);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow:
+    inset 0 0 0 1px var(--glass-brd),
+    var(--shadow-pop);
+}
+.confirm {
+  width: min(264px, calc(100vw - 24px));
+  padding: 16px;
+  animation: weo-cardin 0.32s var(--ease-portal) both;
+}
+.confirmHead {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.confirmText {
+  min-width: 0;
+}
+.confirmTitle {
+  margin: 0;
+  font-size: 13.5px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+.confirmSub {
+  margin: 2px 0 0;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+.confirmActions {
+  display: flex;
+  gap: 8px;
+  margin-top: 14px;
+  justify-content: flex-end;
+}
+
+.fan {
+  width: min(250px, calc(100vw - 24px));
+  padding: 10px;
+  animation: weo-cardin 0.3s var(--ease-portal) both;
+}
+.fanList {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.fanItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  text-align: left;
+  border: none;
+  cursor: pointer;
+  border-radius: 16px;
+  padding: 9px 10px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  background: transparent;
+  transition:
+    background 0.2s,
+    color 0.2s;
+}
+.fanItem:hover {
+  background: var(--surface);
+}
+.fanItem[data-on],
+.fanItem[data-on]:hover {
+  font-weight: 700;
+  color: var(--c);
+  background: color-mix(in srgb, var(--c) 10%, transparent);
+}
+.fanIcon {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  flex: 0 0 auto;
+  color: var(--c);
+  background: color-mix(in srgb, var(--c) 12%, var(--surface));
+}
+.fanFoot {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+}
+
+.flight {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 2400;
+  pointer-events: none;
+  transition:
+    transform 0.6s var(--ease-portal),
+    opacity 0.6s;
+}

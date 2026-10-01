@@ -1,0 +1,246 @@
+/* design: chrome.jsx SectionSwitch + NavPill */
+.root {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 0 0 auto;
+}
+.rootAll {
+  flex: 0 1 auto;
+  min-width: 0;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 14px 0 5px;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--text);
+  background: var(--surface-2);
+  box-shadow:
+    var(--nm-inset),
+    inset 0 0 0 1px var(--border);
+  white-space: nowrap;
+  transition: box-shadow 0.26s;
+}
+.pill[data-open] {
+  box-shadow: var(--nm-inset);
+}
+.pillIcon {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  color: #fff;
+  background: var(--c);
+  box-shadow: 0 8px 18px -8px var(--c);
+}
+.pillChevron {
+  display: grid;
+  place-items: center;
+  color: var(--text-faint);
+  transition: transform 0.3s var(--ease-portal);
+}
+.pillChevron[data-open] {
+  transform: rotate(180deg);
+}
+
+.next {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 40px;
+  padding: 0 6px 0 12px;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-dim);
+  background: transparent;
+  box-shadow: inset 0 0 0 1px var(--border);
+  white-space: nowrap;
+  transition:
+    color 0.2s,
+    box-shadow 0.2s;
+}
+.next:hover {
+  color: var(--c);
+  box-shadow: inset 0 0 0 1.5px var(--c);
+}
+.nextEyebrow {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+.nextIcon {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  color: #fff;
+  background: var(--c);
+}
+
+.menu {
+  position: absolute;
+  left: 0;
+  top: 48px;
+  z-index: 400;
+  min-width: 264px;
+  padding: 6px;
+  border-radius: 22px;
+  background: var(--surface);
+  box-shadow:
+    var(--shadow-pop),
+    inset 0 0 0 1px var(--border);
+  animation: weo-cardin 0.22s var(--ease-portal) both;
+}
+.item {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  width: 100%;
+  padding: 9px 10px;
+  border: none;
+  border-radius: 16px;
+  cursor: pointer;
+  background: transparent;
+  font: inherit;
+  text-align: left;
+}
+.item:hover {
+  background: var(--surface-2);
+}
+.item[data-on],
+.item[data-on]:hover {
+  cursor: default;
+  background: color-mix(in srgb, var(--c) 10%, transparent);
+}
+.itemIcon {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  flex: 0 0 auto;
+  color: var(--c);
+  background: color-mix(in srgb, var(--c) 12%, transparent);
+}
+.itemIcon[data-on] {
+  color: #fff;
+  background: var(--c);
+}
+.itemText {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.itemLabel {
+  font-size: 13.5px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+.itemLong {
+  font-size: 11.5px;
+  color: var(--text-dim);
+  white-space: nowrap;
+}
+.pref {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 6px 4px 2px;
+  padding: 10px;
+  border-top: 1px solid var(--border);
+  cursor: pointer;
+}
+.prefLabel {
+  flex: 1;
+  min-width: 0;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-dim);
+}
+
+.bar {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 3px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  box-shadow: var(--nm-inset);
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+.options {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  color: var(--text-faint);
+  background: transparent;
+}
+
+.navPillWrap {
+  position: relative;
+  flex: 0 0 auto;
+}
+.navPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
+  height: 38px;
+  padding: 0 11px;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+  white-space: nowrap;
+  background: transparent;
+  color: var(--text-faint);
+  box-shadow: none;
+  font-size: 13px;
+  font-weight: 500;
+  transition:
+    background 0.26s var(--ease-standard),
+    color 0.26s,
+    box-shadow 0.3s;
+}
+.navPill:hover,
+.navPill:focus-visible {
+  background: color-mix(in srgb, var(--c) 12%, transparent);
+  color: var(--c);
+}
+.navPill[data-active],
+.navPill[data-active]:hover {
+  gap: 7px;
+  padding: 0 15px;
+  background: var(--c);
+  color: #fff;
+  font-weight: 700;
+  box-shadow:
+    0 10px 22px -10px var(--c),
+    inset 0 1px 0 rgba(255, 255, 255, 0.35);
+}

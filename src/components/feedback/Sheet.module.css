@@ -1,0 +1,76 @@
+/* design: screens-more.jsx Sheet */
+.scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: color-mix(in srgb, var(--text) 38%, transparent);
+  backdrop-filter: blur(8px);
+  overflow-y: auto;
+  animation: weo-cardin 0.3s var(--ease-portal) both;
+}
+.card {
+  width: 100%;
+  max-height: calc(100vh - 32px);
+  overflow-y: auto;
+  margin: auto;
+  border-radius: 30px;
+  padding: clamp(16px, 2vw, 22px);
+  background: var(--glass);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  box-shadow:
+    var(--shadow-card),
+    inset 0 0 0 1px var(--glass-brd);
+}
+.head {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+.headText {
+  min-width: 0;
+}
+.title {
+  margin: 0;
+  font-size: 19px;
+  font-weight: 600;
+  letter-spacing: -0.024em;
+  color: var(--text);
+}
+.sub {
+  margin: 5px 0 0;
+  max-width: 52ch;
+  font-size: 12.5px;
+  font-weight: 400;
+  line-height: 1.55;
+  color: var(--text-dim);
+}
+.close {
+  margin-left: auto;
+  flex: 0 0 auto;
+  border: none;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  color: var(--text-dim);
+  background: var(--surface);
+  box-shadow: var(--nm-sm);
+}
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+  flex-wrap: wrap;
+}

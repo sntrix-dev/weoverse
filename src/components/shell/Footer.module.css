@@ -1,0 +1,313 @@
+/* design: screens-footer.jsx WeoFooter */
+.footer {
+  position: relative;
+  z-index: 2;
+  margin-left: calc(var(--shell-left, 0px) * -1);
+  width: calc(100% + var(--shell-left, 0px));
+  margin-top: clamp(36px, 5vw, 72px);
+  overflow-x: clip;
+  color: var(--text);
+  background: linear-gradient(180deg, #2b3038 0%, #23272e 100%);
+  /* the band paints on past the last pixel — a shadow, so it costs no layout and no scroll */
+  box-shadow: 0 100vh 0 100vh #23272e;
+  transition:
+    margin-left 0.34s var(--ease-portal),
+    width 0.34s var(--ease-portal);
+}
+.glow {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    90% 120% at 12% 0%,
+    color-mix(in srgb, var(--o-violet) 12%, transparent),
+    transparent 58%
+  );
+}
+.horizon {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in srgb, var(--o-violet) 60%, transparent) 18%,
+    color-mix(in srgb, var(--o-violet) 60%, transparent) 82%,
+    transparent
+  );
+}
+.inner {
+  position: relative;
+  max-width: var(--page-w);
+  margin: 0 auto;
+  padding: 0 clamp(14px, 2.4vw, 26px) 0 calc(var(--shell-left, 0px) + clamp(14px, 2.4vw, 26px));
+}
+.top {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+  padding: clamp(22px, 3vw, 34px) 0 16px;
+}
+.home {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: none;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+}
+.tagline {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--text-faint);
+}
+.topRight {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+.statusDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--o-green);
+  animation: weo-breathe-sm 3.4s var(--ease-standard) infinite;
+}
+.statusText {
+  font-size: 11.5px;
+  font-weight: 400;
+  color: var(--text-faint);
+}
+.sitemapBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 40px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-dim);
+  background: var(--surface);
+  box-shadow: var(--nm-sm);
+}
+.chev {
+  display: grid;
+  place-items: center;
+  transition: transform 0.3s var(--ease-portal);
+}
+.chev[data-open] {
+  transform: rotate(180deg);
+}
+.sitemap {
+  position: relative;
+  padding: 4px 0 28px;
+  animation: weo-cardin 0.4s var(--ease-portal) both;
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 28px 24px;
+}
+.about {
+  grid-column: span 2;
+  min-width: 0;
+}
+.aboutText {
+  margin: 0;
+  max-width: 42ch;
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--text-dim);
+}
+.aboutText b {
+  color: var(--text);
+}
+.me {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 16px;
+  border: none;
+  border-radius: 999px;
+  padding: 6px 16px 6px 6px;
+  background: var(--surface);
+  box-shadow: var(--nm-sm);
+  cursor: pointer;
+  text-align: left;
+}
+.meName {
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+}
+.meSub {
+  display: block;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+.socials {
+  display: flex;
+  gap: 9px;
+  margin-top: 18px;
+}
+.social {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  background: var(--surface);
+  box-shadow: var(--nm-sm);
+  color: var(--text-dim);
+}
+.secHead {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.secDot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--text-faint);
+  opacity: 0.6;
+}
+.secTitle {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+.links {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.link {
+  border: none;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--text-dim);
+  text-align: left;
+}
+.link:hover {
+  color: var(--text);
+}
+.signup {
+  margin-top: 26px;
+}
+.signupBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 44px;
+  padding: 0 16px;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--text-dim);
+  background: var(--surface);
+  box-shadow: var(--nm-sm);
+}
+.signupNote {
+  font-size: 11.5px;
+  font-weight: 400;
+  color: var(--text-faint);
+}
+.form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  max-width: 420px;
+  animation: weo-cardin 0.34s var(--ease-portal) both;
+}
+.email {
+  flex: 1 1 200px;
+  min-width: 0;
+  border: none;
+  border-radius: 999px;
+  padding: 12px 16px;
+  font-size: 13.5px;
+  color: var(--text);
+  background: var(--surface);
+  box-shadow: var(--nm-sm);
+  outline: none;
+}
+.legal {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 18px;
+  border-top: 1px solid var(--border);
+  padding: 16px 0 clamp(30px, 4vw, 52px);
+}
+.copy {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--text-faint);
+}
+.legalLink {
+  border: none;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--text-dim);
+}
+.protocol {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  font-weight: 400;
+  color: var(--text-faint);
+}
+.topBtn {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: none;
+  border-radius: 999px;
+  padding: 7px 14px;
+  cursor: pointer;
+  background: var(--surface);
+  box-shadow: var(--nm-sm);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-dim);
+}

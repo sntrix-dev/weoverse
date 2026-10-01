@@ -1,0 +1,60 @@
+/* design: screens-more.jsx ExternalGate */
+.scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 2600;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: color-mix(in srgb, var(--text) 40%, transparent);
+  backdrop-filter: blur(6px);
+}
+.card {
+  width: min(440px, 100%);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  border-radius: 28px;
+  padding: 24px;
+  background: var(--surface);
+  box-shadow:
+    var(--shadow-card),
+    inset 0 0 0 1px var(--glass-brd);
+  animation: weo-cardin 0.3s var(--ease-portal) both;
+}
+.eyebrow {
+  margin: 0;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+.title {
+  margin: 7px 0 0;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.026em;
+  color: var(--text);
+}
+.note {
+  margin: 9px 0 0;
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--text-dim);
+}
+.url {
+  border-radius: 16px;
+  padding: 11px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+  background: var(--surface-2);
+  box-shadow: var(--nm-inset);
+  word-break: break-all;
+}
+.actions {
+  display: flex;
+  gap: 9px;
+  justify-content: flex-end;
+}

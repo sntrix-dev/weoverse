@@ -1,0 +1,282 @@
+/* design: chrome.jsx WeOverseIdSheet */
+.sheet {
+  position: fixed;
+  top: 78px;
+  right: clamp(12px, 2vw, 26px);
+  z-index: 1150;
+  width: min(492px, calc(100vw - 24px));
+  max-height: calc(100vh - 96px);
+  overflow-y: auto;
+  border-radius: 30px;
+  padding: 18px;
+  background: var(--glass);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow:
+    inset 0 0 0 1px var(--glass-brd),
+    var(--shadow-pop);
+  animation: weo-cardin 0.3s var(--ease-portal) both;
+}
+.grid {
+  display: grid;
+  grid-template-columns: minmax(0, 206px) minmax(0, 1fr);
+  gap: 14px;
+}
+.eyebrow {
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+.balance {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 25px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+.bucketsToggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border: none;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  font: inherit;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--o-violet);
+}
+.chev {
+  display: inline-flex;
+  transition: transform 0.3s var(--ease-portal);
+}
+.chev[data-open] {
+  transform: rotate(180deg);
+}
+.buckets {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  animation: weo-cardin 0.32s var(--ease-portal) both;
+}
+.bucket {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  padding: 8px 10px;
+  border-radius: 13px;
+  background: var(--surface);
+  box-shadow: var(--nm-sm);
+}
+.bucketDot {
+  width: 7px;
+  height: 7px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+}
+.bucketLabel {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+.bucketValue {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+.priced {
+  font-size: 10px;
+  font-weight: 400;
+  color: var(--text-faint);
+}
+.walletRow {
+  display: flex;
+  gap: 7px;
+  margin-top: auto;
+}
+
+.credential {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.who {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+}
+.ring {
+  position: relative;
+  width: 74px;
+  height: 74px;
+  flex: 0 0 auto;
+}
+.face {
+  position: absolute;
+  inset: 11px;
+  border-radius: 50%;
+  overflow: hidden;
+  box-shadow: inset 0 0 0 1px var(--border);
+  display: grid;
+  place-items: center;
+}
+.initials {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-dim);
+}
+.whoText {
+  min-width: 0;
+}
+.name {
+  margin: 0;
+  font-size: 16.5px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+.handle {
+  margin: 2px 0 0;
+  font-size: 12px;
+  color: var(--text-dim);
+}
+.isr {
+  margin: 6px 0 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+.idRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: var(--surface);
+  box-shadow: var(--nm-inset);
+}
+.weoId {
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+.verified {
+  margin-left: auto;
+  white-space: nowrap;
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--o-green);
+}
+.rows {
+  display: grid;
+  gap: 1px;
+  border-radius: 18px;
+  overflow: hidden;
+  background: var(--border);
+}
+.row {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 9px 13px;
+  background: var(--surface);
+}
+.rowKey {
+  font-size: 12px;
+  color: var(--text-dim);
+}
+.rowValue {
+  margin-left: auto;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+.rowNote {
+  font-size: 10px;
+  color: var(--text-faint);
+  width: 58px;
+  flex: 0 0 auto;
+  white-space: nowrap;
+  text-align: right;
+}
+.utilRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.power {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--text-faint);
+}
+.utils {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.util {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: none;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  color: var(--text-dim);
+  background: var(--surface);
+  box-shadow: var(--nm-sm);
+}
+.leave {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: flex-end;
+}
+.logout {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-dim);
+  background: transparent;
+}

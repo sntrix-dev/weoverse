@@ -1,0 +1,228 @@
+/* design: chrome.jsx MyaDock */
+.orbShell {
+  position: fixed;
+  z-index: 2400;
+  width: 74px;
+  height: 74px;
+  border-radius: 50%;
+  padding: 6px;
+  cursor: grab;
+  touch-action: none;
+  background: var(--glass);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow:
+    inset 0 0 0 1px var(--glass-brd),
+    var(--nm-hero);
+}
+.orb {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: none;
+  padding: 0;
+  cursor: inherit;
+  overflow: hidden;
+  background: var(--surface-2);
+  box-shadow: var(--nm-inset);
+  animation: weo-breathe-sm 3.4s var(--ease-standard) infinite;
+}
+.video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.shine {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  pointer-events: none;
+  background: radial-gradient(60% 55% at 30% 22%, rgba(255, 255, 255, 0.42), transparent 62%);
+}
+.orbDot {
+  position: absolute;
+  right: 4px;
+  top: 4px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--o-violet);
+  box-shadow:
+    0 0 0 2px var(--surface),
+    0 0 10px color-mix(in srgb, var(--o-violet) 60%, transparent);
+}
+
+.panel {
+  position: fixed;
+  z-index: 2400;
+  width: min(372px, calc(100vw - 32px));
+  max-height: calc(100vh - 24px);
+  display: flex;
+  flex-direction: column;
+  border-radius: 28px;
+  overflow: hidden;
+  background: var(--glass);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+  border: 1px solid var(--glass-brd);
+  box-shadow: var(--shadow-pop), var(--nm-sm);
+  animation: weo-cardin 0.42s var(--ease-portal) both;
+}
+.head {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 13px 14px;
+  cursor: grab;
+  touch-action: none;
+}
+.face {
+  position: relative;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex: 0 0 auto;
+  background: var(--surface-2);
+  box-shadow: var(--nm-inset);
+  opacity: 1;
+  transition: opacity 0.3s;
+}
+.face[data-dim] {
+  opacity: 0.45;
+}
+.img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.title {
+  min-width: 0;
+  flex: 1;
+}
+.name {
+  display: block;
+  font-size: 13.5px;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  color: var(--text);
+}
+.sub {
+  display: block;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+.tabs {
+  display: flex;
+  gap: 3px;
+  margin: 0 14px 12px;
+  padding: 3px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  box-shadow: var(--nm-inset);
+}
+.tab {
+  flex: 1;
+  height: 32px;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--text-dim);
+  background: transparent;
+  transition:
+    background 0.26s,
+    color 0.2s;
+}
+.tab[data-on] {
+  font-weight: 700;
+  color: #fff;
+  background: var(--o-violet);
+}
+.settings {
+  max-height: min(430px, 62vh);
+  overflow-y: auto;
+  padding: 0 14px 16px;
+}
+.feed {
+  max-height: 260px;
+  overflow-y: auto;
+  padding: 0 14px 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+.intro {
+  margin: 0 0 4px;
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--text-dim);
+}
+.starter {
+  text-align: left;
+  border: none;
+  cursor: pointer;
+  border-radius: 16px;
+  padding: 9px 12px;
+  background: var(--surface-2);
+  box-shadow: var(--nm-inset);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text);
+}
+.msg {
+  align-self: flex-start;
+  max-width: 86%;
+  border-radius: 18px;
+  padding: 10px 13px;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--text);
+  background: var(--surface);
+  box-shadow: var(--nm-sm);
+  white-space: pre-wrap;
+}
+.msg[data-me] {
+  align-self: flex-end;
+  color: #fff;
+  background: var(--o-violet);
+  box-shadow: none;
+}
+.dots {
+  align-self: flex-start;
+  display: inline-flex;
+  gap: 4px;
+  padding: 10px 13px;
+}
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--o-violet);
+  animation: weo-breathe-sm 1.1s infinite;
+}
+.form {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+}
+.input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  border-radius: 999px;
+  padding: 10px 14px;
+  font-size: 13px;
+  color: var(--text);
+  background: var(--surface-2);
+  box-shadow: var(--nm-inset);
+  outline: none;
+}

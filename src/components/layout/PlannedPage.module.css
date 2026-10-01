@@ -3,7 +3,7 @@
 .page {
   max-width: var(--page-w);
   margin: 0 auto;
-  padding: 120px 24px 190px;
+  padding: 40px 24px 190px;
   display: grid;
   place-items: center;
   min-height: 70dvh;

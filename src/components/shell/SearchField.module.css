@@ -1,0 +1,55 @@
+/* design: chrome.jsx TopBar search field / shell.jsx SupportSearch */
+.root {
+  display: flex;
+  align-items: center;
+  height: 40px;
+  width: 40px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: transparent;
+  box-shadow: none;
+  transition:
+    width 0.42s var(--ease-portal),
+    background 0.3s,
+    box-shadow 0.3s;
+}
+.root[data-open] {
+  background: var(--surface);
+  box-shadow: var(--nm-inset);
+}
+.root[data-open][data-variant='bar'] {
+  width: clamp(180px, 22vw, 280px);
+}
+.root[data-open][data-variant='support'] {
+  width: clamp(160px, 20vw, 250px);
+}
+.icon {
+  flex: 0 0 auto;
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: var(--text-dim);
+  transition: color 0.24s;
+}
+.icon[data-open] {
+  color: var(--o-violet);
+}
+.input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 13px;
+  color: var(--text);
+  padding-right: 14px;
+  opacity: 0;
+  transition: opacity 0.26s;
+}
+.input[data-open] {
+  opacity: 1;
+}
