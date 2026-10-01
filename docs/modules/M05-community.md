@@ -2,7 +2,7 @@
 
 | Status | FE branch | BE branch | Report |
 |---|---|---|---|
-| in progress | `feat/m05-community` | `redesign/m05-community` (from `redesign/m04-discover`) | `reports/M05-community.md` |
+| ✅ done 2026-10-01 | `feat/m05-community` | `redesign/m05-community` (from `redesign/m04-discover`) | `reports/M05-community.md` |
 
 Q-2 is resolved (user, 2026-10-01): **Stewards are the backend's top contributors** (`GET /community/snapshot/contributors`). No new role, no steward badge on circles or answers (D-036).
 
@@ -60,7 +60,7 @@ Modals (`screens-more.jsx`): `ComposeModal` (2 steps: question/detail/prompts �
 - D-037 In flight until M11 = your drafts (stage Draft, verb Rehearse → Create) + your live WeOs (stage Live, verb Move with the market → Exchange). "With your circle" is 0 until reactions/pledges exist.
 - D-038 `OWalletPanel` moves from M09 to M05 (the hub's Wallet row). Move Os posts a real transfer.
 - D-039 Circle figures: desire = `resolvedRate7d`×100 (as M04), win rate = `collectThrough7d`, "here now" = `activeNow`, rim = first six members.
-- D-040 A WeO card engages Push only when it is yours (the backend allows creators only); anyone else's opens the WeO.
+- D-040 Push / Ask opens the push sheet on any WeO: yours posts via `/community/push`, anyone else's is a question with the WeO attached.
 - D-041 Report reasons: Spam or scam → `spam`, Harassment or hate → `harassment`, Off-topic or misleading → `misleading`, Something else → `other`.
 - D-042 "Accept answer" shows only to the thread's author; everyone else sees "Accepted" on the accepted answer.
 
@@ -72,8 +72,10 @@ Modals (`screens-more.jsx`): `ComposeModal` (2 steps: question/detail/prompts �
 | Attached WeO `circleCount` always 0 | G-44 (FE reads the full WeO instead) |
 | Report response returns other reporters and admin notes | G-45 |
 | `GET /users/:id` and `GET /users` leak email/phone/address | G-46 |
+| Several tabs refreshing the session at once signed the user out (browser pass) | M12 (single-flight refresh across tabs) |
+| A circle's `weoCount` counts more than the WeOs pushed into it (`/weos` can be empty while the count is 18) | G-47 |
 | Stories have no detail page; a story without `threadId` opens its WeO | design gap |
-| Rehearse this context / Enter a world | M11 (toast until then, like M04) |
+| Rehearse this context / Enter a world | M11 (hidden until then, D-027) |
 
 ## Acceptance criteria
 

@@ -65,11 +65,17 @@ Backend: `weo-3.0`, local base URL **`http://localhost:3002/api`**. Full endpoin
 | M04 | WeO detail | `GET /frontend/weos/:id` | wired; `/collectors`, `/ratings` not used yet |
 | M04 | Collect flow | `GET /frontend/weos/:id/collect/quote` → `POST /frontend/weos/:id/collect` (`quote.payload`) | wired (`features/collect/api/collect.ts`) |
 | M04 | Like | `POST/DELETE /frontend/weos/:id/like` | hook ready (`useLikeWeo`); no surface in the design's M04 screens |
-| M05 | Circles, members, WeOs, join/leave/mute | `/frontend/community/circles*` | exists |
-| M05 | Threads, answers, votes, replies, accept | `/frontend/community/threads*`, `/community/answers/*` | exists |
-| M05 | Stories, pulse, contributors, my standing, search | `/frontend/community/stories`, `/community/snapshot/*`, `/community/search` | exists |
-| M05 | Push WeO to circle | `POST /frontend/community/push` | exists |
-| M05 | Report | `POST /frontend/report` | exists |
+| M05 | Your / open circles | `GET /frontend/community/circles?filter=all` | wired (`features/community/api/community.ts`) |
+| M05 | Circle page | `GET /frontend/community/circles/:id` (+ `collectThrough7d`, M05), `/members?limit`, `/weos` | wired |
+| M05 | Join / leave / mute | `POST …/:id/join`, `DELETE …/:id/leave`, `PATCH …/:id/notification` | wired |
+| M05 | Questions feed | `GET /frontend/community/discussions?filter=all\|open\|resolved\|mine` (+ `attachedWeoFace`, M05) | wired |
+| M05 | Thread | `GET /frontend/community/threads/:id`; `POST …/threads/:id/answers`; `POST /frontend/community/answers/:id/vote\|replies\|accept` | wired (vote optimistic) |
+| M05 | New discussion / push / ask about a WeO | `POST /frontend/community/threads`, `POST /frontend/community/push` | wired (D-040) |
+| M05 | Report | `POST /frontend/report` | wired (D-041) |
+| M05 | Stewards, stories, pulse | `GET /frontend/community/snapshot/contributors` (+ steward fields, M05), `/stories`, `/snapshot/pulse` | wired (D-036) |
+| M05 | Follow | `POST /frontend/users/:id/follow`, `DELETE /frontend/users/:id/unfollow` | wired (400/404/409, M05) |
+| M05 | In flight | `GET /frontend/me/drafts`, `GET /frontend/community/my-weos` (fixed M05) | wired (D-037) |
+| M05 | Wallet row | `GET /frontend/wallet/overview`, `GET /frontend/me/collections?limit=3`, `POST /frontend/wallet/transfer` | wired (D-038) |
 | M06 | Holdings | `GET /frontend/me/collections`, `/snapshot`, `/:collectionId` | exists |
 | M06 | Listings | `GET /frontend/me/listings`, `/history`, `/snapshot`, `/:id` | exists |
 | M06 | Relist | `POST /frontend/weos/:id/resell` | exists |

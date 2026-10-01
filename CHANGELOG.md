@@ -2,6 +2,13 @@
 
 All notable changes per module. Newest first.
 
+## M05 — Community (2026-10-01)
+
+- The Community hub: your WeOs in flight (drafts and live WeOs as Next-Os), your circles and the ones you can join (records that open into their orbit), questions / stewards / stories, and the O-Wallet panel (moved forward from M09).
+- Circle page (header figures, snapshot cards as tabs, discussions with trending-tag filter, members, WeOs), thread page (answers by score, vote, reply, accept, answer, report, attached WeO), manage circles (mute, leave, join), stewards (top contributors, format tabs, follow), stories.
+- Compose, push / ask and report sheets over any page; "Ask" and "Push to Circle" now live on the WeO page and cards.
+- Backend (`redesign/m05-community`): steward fields on contributors, circle collect-through, WeO faces in the feed, real thread authors and circle names, my-weos no longer empty, follow errors with real statuses.
+
 ## M04 — Discover · WeO · Collect (2026-10-01)
 
 - Discover: hero with live figures, the stage, the feed (cover + editorial / cards / list), closing / moving / creators-you-circle rails, who is trading, circles, interests and the whole floor with lenses and search.

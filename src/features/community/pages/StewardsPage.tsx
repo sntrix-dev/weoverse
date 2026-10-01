@@ -71,8 +71,9 @@ export function StewardsPage() {
           </div>
         ))}
       </div>
-      <div style={{ margin: '24px 0 22px' }}>
-        <Tabs tabs={withTabIcons(FILTERS)} value={filter} onChange={setFilter} tone="var(--o-gold)" />
+      {/* five tabs outgrow a phone: they scroll rather than widen the page (the design clips them) */}
+      <div style={{ margin: '24px 0 22px', overflowX: 'auto', scrollbarWidth: 'none' }}>
+        <Tabs tabs={withTabIcons(FILTERS)} value={filter} onChange={setFilter} tone="var(--o-gold)" style={{ minWidth: 'max-content' }} />
       </div>
       <StewardGrid list={list} onFollow={act.toggleFollow} onOpen={(s) => void navigate(routes.creators(s.id))} />
       {!list.length && (

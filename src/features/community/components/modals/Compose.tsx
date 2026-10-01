@@ -254,10 +254,11 @@ export function PushSheet({ weo: w, circleId }: { weo: PushTarget; circleId: str
   const [step, setStep] = useState<1 | 2>(1);
   const [question, setQuestion] = useState('');
   const [detail, setDetail] = useState('');
-  // inside a circle it goes there; elsewhere to the circle of its format (design)
+  // inside a circle it goes there; elsewhere to the circle of its format, else its own (design)
   const c =
     circles.find((x) => x.id === circleId) ??
     circles.find((x) => x.bestType === w.type) ??
+    circles.find((x) => w.circleIds.includes(x.id)) ??
     circles.find((x) => x.icon === 'ask') ??
     circles[0];
 

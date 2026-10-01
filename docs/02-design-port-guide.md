@@ -77,3 +77,5 @@ States the design does not draw but a real app needs (loading, error, empty, una
 | 11 | `Progress` gets `tone="gold" / "green" / "violet"` on the WeO page, which the DS paints as CSS named colours | ✅ M04: `var(--o-gold)` / `var(--o-green)` / `var(--o-violet)` |
 | 12 | `weo-model` `shortLeft` prints "closed" for a WeO with no close time at all | ✅ M04: no clock reads "open" |
 | 13 | A Pool with no edition size reads "Left 0 of 0"; the WeO page repeats a Listing's Resale row | ✅ M04: "Funded n%"; Resale row only when the terms lack it |
+| 14 | Stewards: five format tabs overflow a phone and are clipped | ✅ M05: the tab row scrolls sideways |
+| 15 | Circle trending-tag chips only toast "Filter by …" | ✅ M05: they filter the circle's discussions |

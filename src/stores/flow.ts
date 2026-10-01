@@ -11,6 +11,8 @@ export interface PushTarget {
   hex: string;
   /** a creator pushes their own WeO; anyone else asks about it (D-040) */
   creatorId: string;
+  /** the circles the WeO already sits in */
+  circleIds: string[];
 }
 
 export const pushTargetOf = (w: WeoCardModel): PushTarget => ({
@@ -21,6 +23,7 @@ export const pushTargetOf = (w: WeoCardModel): PushTarget => ({
   category: w.category,
   hex: w.hex,
   creatorId: w.creatorId,
+  circleIds: w.circleIds,
 });
 
 export interface ReportTarget {
