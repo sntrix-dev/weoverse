@@ -591,7 +591,7 @@ Endpoints marked with an asterisk (*) also need a `requirePermission(...)` RBAC 
 
 ### 5.13 Other public surfaces
 - **`/api/weo-website/*`** (none, 25 routes): partnership (+ `/onboarding`, `/:id`), careers (+ `/:id`), investor, inquiry, contact, report, waitlist (+ `check/:email`, `count`), custom-integration, invite-request (+ `check/:email`, `count`), contact-module, careers-module (+ `check/:email`, `/:id`). These validate with in-handler `parse` and return **400** with `"Validation error: …"`.
-- **`/api/chatbot`**: `POST /ask` (`{question, sessionId?}` → `{answer, sessionId}`) and `POST /ask/stream` (SSE; sends `event: session` first, then tokens). Both use `zodValidate`.
+- **`/api/chatbot`** (public): `POST /ask` (`{question, sessionId?}` → envelope `data: {answer, sessionId, degraded}` — `degraded` since redesign M02) and `POST /ask/stream` (SSE; sends `event: session` first, then tokens). Both use `zodValidate`.
 - **`/api/mcp`**: `POST /` with `apiKeyAuth([])` → `handleMcpRequest`, Streamable HTTP JSON-RPC. Tools: `create_weo`, `validate_weo`, `search_weo`, `get_weo_details`, `list_categories`, `upload_media`, `upload_media_batch`.
 - **`GET /health`**: raw `{status, uptime, timestamp}`.
 
