@@ -44,4 +44,14 @@ export const qk = {
   wallet: {
     overview: () => ['wallet', 'overview'] as const,
   },
+  holdings: {
+    all: ['holdings'] as const,
+    snapshot: (window: string) => ['holdings', 'snapshot', window] as const,
+    resellQuote: (weoId: string, collectionId?: string) =>
+      ['holdings', 'resell-quote', weoId, collectionId ?? null] as const,
+  },
+  listings: {
+    all: ['listings'] as const,
+    snapshot: (window: string) => ['listings', 'snapshot', window] as const,
+  },
 } as const;

@@ -37,8 +37,18 @@ export interface ReportTarget {
  * design `app.openCollect(w)` / `app.openCompose()` / `app.openPush(w)` / `app.openReport(label)`
  * — the one flow sheet open over any page. Holds only ids and labels: the sheets read the rest.
  */
+/** The holding the relist sheet puts back on the floor. */
+export interface RelistTarget {
+  weoId: string;
+  collectionId: string;
+  name: string;
+  img: string | null;
+  format: string;
+}
+
 interface FlowState {
   collect: string | null;
+  relist: RelistTarget | null;
   /** the compose sheet, optionally pre-pointed at a circle */
   compose: { circleId: string | null } | null;
   /** push a WeO of yours; `circleId` when opened from inside a circle */
@@ -46,11 +56,13 @@ interface FlowState {
   report: ReportTarget | null;
 }
 
-const closed = { collect: null, compose: null, push: null, report: null };
+const closed = { collect: null, relist: null, compose: null, push: null, report: null };
 
 export const useFlow = create<FlowState>(() => ({ ...closed }));
 
 export const openCollect = (weoId: string) => useFlow.setState({ ...closed, collect: weoId });
+/** design `app.openRelist(h)` */
+export const openRelist = (target: RelistTarget) => useFlow.setState({ ...closed, relist: target });
 export const openCompose = (circleId: string | null = null) => useFlow.setState({ ...closed, compose: { circleId } });
 export const openPush = (weo: PushTarget, circleId: string | null = null) =>
   useFlow.setState({ ...closed, push: { weo, circleId } });

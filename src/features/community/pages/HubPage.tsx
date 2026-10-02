@@ -10,6 +10,7 @@ import { FlowBar, FlowFoot } from '@/components/shell/FlowBar';
 import { PathBar } from '@/components/shell/PathBar';
 import { useWeoView } from '@/components/weo/WeoView';
 import { Button, ICO, Tabs } from '@/design-system';
+import { WalletRow } from '@/features/wallet/components/WalletRow';
 import { circleView, type CircleView } from '@/lib/circleModel';
 import {
   useCommunityCircles,
@@ -24,7 +25,6 @@ import { CircleGrid } from '../components/CircleGrid';
 import { LensSegs, StoryGrid, ThreadRow, useHubPath, useOpenStory, type HubLens } from '../components/Hub';
 import { FLIGHT_VIEWS, InFlightGrid, nextAct, type FlightHandlers } from '../components/InFlight';
 import { StewardGrid } from '../components/StewardGrid';
-import { WalletRow } from '../components/WalletRow';
 import { flightItems, stewardModel, storyModel, threadModel } from '../model/community';
 import { useCommunityActions } from '../useCommunity';
 

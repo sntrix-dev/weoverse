@@ -97,6 +97,7 @@ export const creatorsFixture: S['CreatorListRow'][] = [
     name: 'Lena V',
     handle: '@lenav',
     avatarUrl: null,
+    bio: 'Capped editions, generative stems.',
     isr: 89,
     formats: ['regular'],
     format: 'Drop',

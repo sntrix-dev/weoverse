@@ -22,6 +22,7 @@ import {
   threadFixture,
   walletFixture,
 } from '../fixtures/community';
+import { collectionsSnapshotFixture, listingsSnapshotFixture, resellQuoteFixture } from '../fixtures/holdings';
 
 /** Wraps data in the backend envelope (weo-3.0 ResponseHandler.success). */
 export const ok = <T>(data: T, message = 'OK') => HttpResponse.json({ success: true, message, data });
@@ -76,6 +77,10 @@ export const handlers = [
   http.get(url('/frontend/me/drafts'), () => ok({ items: draftsFixture, total: 1 })),
   http.get(url('/frontend/me/collections'), () => ok({ items: [], pagination: { total: 0, page: 1, limit: 3, totalPages: 0 } })),
   http.get(url('/frontend/wallet/overview'), () => ok(walletFixture)),
+  // M06 reads — Collect and Exchange
+  http.get(url('/frontend/me/collections/snapshot'), () => ok(collectionsSnapshotFixture())),
+  http.get(url('/frontend/me/listings/snapshot'), () => ok(listingsSnapshotFixture())),
+  http.get(url('/frontend/weos/:id/resell/quote'), ({ params }) => ok(resellQuoteFixture({ weoId: String(params.id) }))),
   http.get(url('/frontend/weos/:id'), ({ params }) => {
     const w = liveWeos().find((x) => x._id === params.id);
     return w ? ok(w) : fail(404, 'WeO not found');

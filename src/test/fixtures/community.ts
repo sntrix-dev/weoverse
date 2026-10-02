@@ -1,3 +1,4 @@
+import type { DraftDto } from '@/features/community/api/community';
 import type { components } from '@/api/generated/schema';
 import { circleFixture, liveWeos } from './discover';
 
@@ -199,7 +200,9 @@ export const myWeosFixture: S['CommunityMyWeoCardView'][] = [
   },
 ];
 
-export const draftsFixture = [{ _id: 'd-1', title: 'Night Market Print', coverUrl: null, weoType: 'regular', ready: 0.4, updatedAt: T0 }];
+export const draftsFixture: DraftDto[] = [
+  { _id: 'd-1', title: 'Night Market Print', coverUrl: null, weoType: 'regular', ready: 0.4, updatedAt: T0 },
+];
 
 /** Only what the wallet panel reads; the rest of the O-Wallet screen is M09's. */
 export const walletFixture = {

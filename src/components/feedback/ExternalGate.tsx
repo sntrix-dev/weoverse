@@ -23,6 +23,7 @@ export function ExternalGate() {
   if (!g) return null;
   const go = () => {
     closeExternal();
+    g.onConfirm?.();
     if (g.url)
       window.open(/^https?:\/\//.test(g.url) ? g.url : `https://${g.url}`, '_blank', 'noopener,noreferrer');
   };

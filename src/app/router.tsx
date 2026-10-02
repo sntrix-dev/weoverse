@@ -59,8 +59,8 @@ const childRoutes: RouteObject[] = [
       page('/discover', 'discover', () =>
         import('@/features/discover/pages/DiscoverPage').then((m) => ({ default: m.DiscoverPage })),
       ),
-      planned('/collect', 'collected'),
-      planned('/exchange', 'listed'),
+      page('/collect', 'collected', () => import('@/features/collect/pages/CollectPage')),
+      page('/exchange', 'listed', () => import('@/features/exchange/pages/ExchangePage')),
       page('/community', 'hub', () => import('@/features/community/pages/HubPage')),
       page('/community/circles', 'manage', () => import('@/features/community/pages/ManagePage')),
       page('/community/circles/:circleId', 'circle', () => import('@/features/community/pages/CirclePage')),

@@ -1087,6 +1087,63 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/frontend/me/collections/{collectionId}/redeem": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Confirm you received a regular holding
+         * @description The collector marks a regular holding as received (`redeemedAt`).
+         *     No money moves and the seller is not paid again — settlement
+         *     already happened at collect / installment time. Idempotent in
+         *     intent: a second call answers 409.
+         *
+         *     Owner-only (404 otherwise, to avoid leaking existence); regular
+         *     holdings only (404 for crowdfund / lottery). 409 when the holding
+         *     is cancelled / rejected, disputed, or already confirmed.
+         */
+        post: operations["redeemMyCollection"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/frontend/me/collections/{collectionId}/dispute": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Report a problem with a regular holding
+         * @description Files a moderation report on the WeO (reason mapped to a report
+         *     type: `not_received` → fraud, `not_as_described` → misleading,
+         *     `other` → other; the description names the holding) and marks the
+         *     holding disputed (`disputedAt`, `disputeReportId`). No money
+         *     moves; a disputed holding cannot be relisted or confirmed.
+         *
+         *     If the caller already has an open report on this WeO, the holding
+         *     is still marked and `disputeReportId` is `null`.
+         *
+         *     Owner-only (404 otherwise); regular holdings only. 409 when the
+         *     holding is already disputed or already confirmed received.
+         */
+        post: operations["disputeMyCollection"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/frontend/weos/{id}/collectors": {
         parameters: {
             query?: never;
@@ -1102,6 +1159,11 @@ export interface paths {
          *       * `GET /api/frontend/crowdfunds/{id}/backers`
          *       * `GET /api/frontend/lotteries/{id}/participants`
          *       * `GET /api/frontend/collect/get-customers/{id}`
+         *
+         *     A crowdfund backer who pledged `anonymous: true` is masked for
+         *     everyone except themself and the WeO's creator: `userId` is `""`
+         *     and `collector` reads `{ _id: "", fullName: null, handle:
+         *     "Anonymous backer", avatarUrl: null }`.
          *
          *     Each row carries the populated `collector` block (the buyer —
          *     `_id`, `fullName`, `handle`, `avatarUrl`, `isr`) and `seller`
@@ -5581,11 +5643,19 @@ export interface paths {
          *       * `offer.isResellable === true` (creator policy — propagates
          *         through the chain because each resold-offer copies it from
          *         the previous owner's doc).
-         *       * Caller has a `RegularCollection` row for this WeO
-         *         (`(userId, weoId)` lookup).
+         *       * Caller has a `RegularCollection` row for this WeO. With
+         *         `collectionId` that exact holding; otherwise the oldest one
+         *         not yet relisted (falling back to any, so the 409 below can
+         *         say why).
          *       * `collection.isFullyPaid === true` — no reselling on a partial.
          *       * `collection.isResold === false` — one resell per collection
          *         row; the flag flips on success and never flips back.
+         *       * The holding is not disputed (`disputedAt` null) — 409.
+         *
+         *     **Units.** `amountOs` is the ask in Os (what every redesign
+         *     surface shows) and wins over `amount`, the legacy US-dollar ask
+         *     that `price.amount` stores. Send one of the two. No fee is taken
+         *     on a resale (`priceSplit: 0`; the collect core withholds nothing).
          *
          *     **Discovery** of resold WeOs happens through the existing
          *     `/weos` + `/weos/:id/collect` surface — resold-offers flow
@@ -5606,6 +5676,34 @@ export interface paths {
          *       * `WEO_RESELL` activity log
          */
         post: operations["resellWeo"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/frontend/weos/{id}/resell/quote": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * What the relist sheet may say before the holder confirms
+         * @description The holder's figures for relisting this WeO: what they paid
+         *     (`paidOs`), its current price in Os (`valueOs`), an ask dial in
+         *     Os, and the POST body's defaults (title, description, quantity,
+         *     tags, collectionId).
+         *
+         *     `blockers` mirror `POST /frontend/weos/{id}/resell` one for one
+         *     (`not_resellable`, `not_held`, `already_relisted`, `unpaid`,
+         *     `disputed`); `resellable` is true only when there are none.
+         *     `fees` is always empty — a resale settles with no fee or royalty.
+         */
+        get: operations["resellQuote"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -6997,12 +7095,49 @@ export interface paths {
          *     `OfferService.deleteOffer`; non-regular ids return 404 via the
          *     `OfferModel` discriminator filter.
          *
+         *     Owner only (403 otherwise), and refused with 409 once anyone has
+         *     collected it (`soldCount > 0`) — collectors' holdings and
+         *     installments point at it. Pause it with
+         *     `PATCH /frontend/weos/{id}/status` instead.
+         *
          *     Replaces `DELETE /frontend/offers/{id}`.
          */
         delete: operations["deleteWeo"];
         options?: never;
         head?: never;
         patch?: never;
+        trace?: never;
+    };
+    "/frontend/weos/{id}/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Pause or re-activate your WeO (any kind)
+         * @description The creator's on/off switch. `inactive` takes the WeO off the
+         *     floor — it keeps its stock, collectors and history and cannot be
+         *     collected (quote and collect both refuse it); `active` puts it
+         *     back.
+         *
+         *     Changes the status **in place**. `PUT /frontend/weos/{id}` would
+         *     re-version a regular WeO that has sales; this never does.
+         *
+         *     Only `active` ↔ `inactive`. Any other current status (resold,
+         *     funded, drawn, blocked, …) is the system's and answers 409. The
+         *     write is conditional on the status it read, so racing toggles
+         *     cannot both apply (the loser gets 409). Sending the current
+         *     status is a no-op (`changed: false`).
+         */
+        patch: operations["setWeoStatus"];
         trace?: never;
     };
 }
@@ -7796,11 +7931,28 @@ export interface components {
             weo?: components["schemas"]["CollectionWeoSummary"];
             userId: components["schemas"]["ObjectId"];
             sellerId: components["schemas"]["ObjectId"];
+            /**
+             * @description Regular: the listed US-dollar price per unit (despite
+             *     `currency`, which reads "O" for every kind — kept for wire
+             *     shape). Crowdfund / lottery: Os. Read `amountOs` for Os.
+             */
             amount: number;
             /** @example O */
             currency: string;
+            /**
+             * @description Os this collection commits, whatever the kind: regular → the
+             *     full `oPriceTotal` (paid or owed), crowdfund / lottery → `amount`.
+             * @example 1980
+             */
+            amountOs: number;
             /** @description Raw per-kind enum, narrowed by `collectionType`. */
             status: string;
+            /**
+             * @description The holder has relisted this holding (`POST /frontend/weos/{id}/resell`).
+             *     Buying someone else's re-listing starts a fresh holding with
+             *     `isResold: false`; its origin is `previousOwnerId`.
+             */
+            isResold: boolean;
             /**
              * @description Server-formatted UI label — drives the badge on every card.
              *     Mapping:
@@ -7813,7 +7965,6 @@ export interface components {
              * @example Fully Paid
              */
             statusLabel: string;
-            isResold: boolean;
             qty: components["schemas"]["CollectionQty"];
             /** Format: date-time */
             createdAt: string;
@@ -8284,6 +8435,15 @@ export interface components {
              */
             weoDetail: components["schemas"]["RegularWeoDetail"] | components["schemas"]["CrowdfundWeoDetail"] | components["schemas"]["LotteryWeoDetail"] | null;
             data: components["schemas"]["RegularCollectionData"] | components["schemas"]["CrowdfundCollectionData"] | components["schemas"]["LotteryCollectionDetailData"];
+        };
+        HoldingStateView: {
+            collectionId: components["schemas"]["ObjectId"];
+            status: string;
+            /** Format: date-time */
+            redeemedAt: string | null;
+            /** Format: date-time */
+            disputedAt: string | null;
+            disputeReportId: string | null;
         };
         SearchCircleHit: {
             id: components["schemas"]["ObjectId"];
@@ -10986,13 +11146,13 @@ export interface components {
              * @enum {string}
              */
             unit: "count" | "os" | "ratio";
-            trend: components["schemas"]["TrendValue"];
+            trend: components["schemas"]["TrendValue"] | null;
             /**
              * @description One value per day across the current window, oldest first,
              *     densified — a quiet day is a real `0` rather than a missing
              *     point the chart would silently close over.
              */
-            series: number[];
+            series: number[] | null;
         };
         /**
          * @description One readiness check against a listing. Every check reads a field
@@ -11022,6 +11182,10 @@ export interface components {
          *     someone something, and filing that under "Closed" is how
          *     obligations get forgotten. `blocked` listings are excluded from
          *     the response entirely, so there is no state for them.
+         *
+         *     `resold` (a holder's re-listing) is `live` while its unit is
+         *     there; a regular listing whose every unit is collected is
+         *     `closed`. `inactive` reads `draft` — see the row's `paused`.
          * @enum {string}
          */
         ListingState: "live" | "scheduled" | "draft" | "closed";
@@ -11039,8 +11203,28 @@ export interface components {
             /** @enum {string} */
             weoType: "regular" | "crowdfund" | "lottery";
             state: components["schemas"]["ListingState"];
+            /**
+             * @description The stored status. Only `active` and `inactive` can be
+             *     switched by the creator (`PATCH /frontend/weos/{id}/status`),
+             *     so this tells a client whether to offer Pause / Activate.
+             */
+            status: string;
+            /**
+             * @description Taken off the floor by its creator (`status: inactive`). Such
+             *     a row keeps `state: draft` (unchanged wire value) but is not
+             *     unfinished work — it keeps its stock and returns on activate.
+             *     Real drafts live in `GET /frontend/me/drafts`.
+             */
+            paused: boolean;
+            /** @description The creator lets collectors resell it — it can travel again. */
+            isResellable: boolean;
+            /**
+             * @description The creator-facing format, projected exactly as on the floor.
+             * @enum {string}
+             */
+            format: "Listing" | "Drop" | "Bid" | "Pool" | "Hunt";
             /** @description First media url. `null` — the client draws its own placeholder orb. */
-            img: string;
+            img: string | null;
             /** Format: date-time */
             createdAt: string;
             /**
@@ -11048,13 +11232,14 @@ export interface components {
              * @description Deadline (crowdfund) / draw date (lottery) / availability
              *     end (regular). `null` when open-ended.
              */
-            endsAt: string;
+            endsAt: string | null;
             /**
-             * @description Headline price in O, normalised: regular `price.amount`,
-             *     crowdfund `goal.amount`, lottery `ticket.price`. `null` on a
-             *     draft that has not been priced.
+             * @description Headline price in O, normalised: regular `price.amount` ×
+             *     the O peg (the stored figure is US dollars), crowdfund
+             *     `goal.amount`, lottery `ticket.price`. `null` on a draft that
+             *     has not been priced.
              */
-            ask: number;
+            ask: number | null;
             /**
              * @description The lifetime `viewsCount`. Named `lifetime` because views
              *     have no event log behind them — see the endpoint description.
@@ -11064,16 +11249,18 @@ export interface components {
             lifetimeSaves: number;
             /** @description Collections inside the window. */
             collects: number;
-            /** @description O settled inside the window. */
+            /** @description O settled inside the window (regular rows count `paidAmount`, the Os that moved; other kinds `amount`). */
             settled: number;
             /** @description Likes recorded inside the window. */
             saves: number;
             /**
-             * @description Units moved / (moved + left), 0..1. `null` for a crowdfund,
+             * @description Units moved / (moved + left), 0..1. For a regular listing
+             *     left = `totalWeoInCirculation` and moved = `soldCount` (collect
+             *     moves one into the other). `null` for a crowdfund,
              *     which has a funding position rather than unit stock — it has
              *     not sold through 0% of anything.
              */
-            collectThrough: number;
+            collectThrough: number | null;
             stockLeft: number | null;
             stockTotal: number | null;
             /**
@@ -11119,7 +11306,7 @@ export interface components {
              *     and a draft at 0% would otherwise drag the same number in
              *     opposite directions until it described nothing actionable.
              */
-            collectThrough: number;
+            collectThrough: number | null;
             /** @description Each listing once. The boards below are orderings into this. */
             rows: components["schemas"]["ListingSnapshotRow"][];
             boards: {
@@ -11186,20 +11373,25 @@ export interface components {
             img: string | null;
             /** Format: date-time */
             createdAt: string;
-            /** @description O the holder actually put in — for a regular row, what has cleared. */
+            /**
+             * @description O the holder actually put in — for a regular row, what has
+             *     cleared (`paidAmount`; the row's `amount` is a dollar price).
+             */
             paid: number;
             /**
-             * @description What the row is worth at the WeO's current ask. `null` when
+             * @description What the row is worth at the WeO's current ask, in Os (a
+             *     regular WeO's dollar price × the O peg × units). `null` when
              *     the WeO no longer carries a comparable price (archived
              *     listing, unpriced draft). A `0` here would read as
              *     "worthless" rather than "unknown", which is the difference
              *     between a warning and a rounding error.
              */
-            valueNow: number;
+            valueNow: number | null;
             /**
-             * @description Computed from three fields (`isResold`, the WeO's
-             *     `isResellable`, and the row status) so the client does not
-             *     re-derive the rule and get it slightly different.
+             * @description Computed from the same guards the resell POST applies
+             *     (`isResold`, the WeO's `isResellable`, the row status, fully
+             *     paid, not disputed) so the client does not re-derive the rule
+             *     and get it slightly different.
              */
             resellable: boolean;
             /** @description Already re-listed — excluded from uplift, still shown. */
@@ -11215,6 +11407,11 @@ export interface components {
             isNegotiable: boolean;
             /** @description See `isNegotiable`. */
             isLimitedDrop: boolean;
+            /**
+             * @description The creator-facing format, projected as on the floor.
+             * @enum {string}
+             */
+            format: "Listing" | "Drop" | "Bid" | "Pool" | "Hunt";
             /**
              * @description The Circle this WeO lives in. `null` when it is attached to
              *     none. Resolved in one batched read for the whole page, never
@@ -11233,6 +11430,17 @@ export interface components {
             note: string;
             sellerId: string;
             sellerName: string | null;
+            sellerAvatar: string | null;
+            /**
+             * Format: date-time
+             * @description When the holder confirmed receipt (`POST /frontend/me/collections/{id}/redeem`).
+             */
+            redeemedAt: string | null;
+            /**
+             * Format: date-time
+             * @description When the holder reported a problem (`POST /frontend/me/collections/{id}/dispute`).
+             */
+            disputedAt: string | null;
         };
         /**
          * @description A board row that is an aggregate rather than a holding. The
@@ -11242,7 +11450,7 @@ export interface components {
          */
         HoldingGroupRow: {
             /**
-             * @description Namespaced — `format:<weoType>` or `creator:<userId>`.
+             * @description Namespaced — `format:<Listing|Drop|Bid|Pool|Hunt>` or `creator:<userId>`.
              * @example creator:6512f0…
              */
             id: string;
@@ -11252,9 +11460,9 @@ export interface components {
             /** @description O held in this group, at current asks. */
             value: number;
             /** @description Share of total held value, 0..1. `null` when nothing is priceable. */
-            share: number;
+            share: number | null;
             /** @description An avatar (creators) or `null` (formats — the client draws an initial). */
-            img: string;
+            img: string | null;
         };
         /**
          * @description Where the holder's O sits across their COLLECTION. This is not
@@ -11287,14 +11495,14 @@ export interface components {
                 /** @description O put in across every holding, lifetime. */
                 spent: number;
                 /** @description `null` when nothing held is priceable. */
-                valueNow: number;
+                valueNow: number | null;
                 /**
                  * @description What resale would realise above cost, across resellable
                  *     holdings only. `null` — not `0` — when nothing is
                  *     resellable: they have not broken even, there is nothing
                  *     to value.
                  */
-                upliftIfResold: number;
+                upliftIfResold: number | null;
                 collected: components["schemas"]["TrendValue"];
                 spend: components["schemas"]["TrendValue"];
                 creators: components["schemas"]["TrendValue"];
@@ -14289,6 +14497,8 @@ export interface components {
             /** @description "@lowercase" from the creator name, or empty */
             handle: string;
             avatarUrl: string | null;
+            /** @description Their profile bio (trimmed), or null */
+            bio: string | null;
             isr: number;
             formats: string[];
             /**
@@ -16991,6 +17201,126 @@ export interface operations {
             500: components["responses"]["ServerError"];
         };
     };
+    redeemMyCollection: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                collectionId: components["schemas"]["ObjectId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Receipt confirmed. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "success": true,
+                     *       "message": "Marked as received",
+                     *       "data": {
+                     *         "collectionId": "66b1f0c2a1b2c3d4e5f60719",
+                     *         "status": "delivered",
+                     *         "redeemedAt": "2026-10-03T10:00:00.000Z",
+                     *         "disputedAt": null,
+                     *         "disputeReportId": null
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["BaseResponse"] & {
+                        data?: components["schemas"]["HoldingStateView"];
+                    };
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            /** @description Not the caller's regular holding. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Cancelled / rejected, disputed, or already confirmed. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            422: components["responses"]["ValidationError"];
+            500: components["responses"]["ServerError"];
+        };
+    };
+    disputeMyCollection: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                collectionId: components["schemas"]["ObjectId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                /**
+                 * @example {
+                 *       "reason": "not_received",
+                 *       "description": "Nothing arrived after two weeks."
+                 *     }
+                 */
+                "application/json": {
+                    /**
+                     * @default other
+                     * @enum {string}
+                     */
+                    reason?: "not_received" | "not_as_described" | "other";
+                    description?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Holding disputed. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BaseResponse"] & {
+                        data?: components["schemas"]["HoldingStateView"];
+                    };
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            /** @description Not the caller's regular holding. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Already disputed or already confirmed received. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            422: components["responses"]["ValidationError"];
+            500: components["responses"]["ServerError"];
+        };
+    };
     listCollectorsOfWeo: {
         parameters: {
             query?: {
@@ -18695,6 +19025,12 @@ export interface operations {
                 sort?: "isr" | "settled" | "recent";
                 page?: number;
                 limit?: number;
+                /**
+                 * @description `joined` — only creators (never the caller) who are joined
+                 *     members of at least one Circle the caller has joined. Empty when
+                 *     the caller has joined none.
+                 */
+                circle?: "joined";
             };
             header?: never;
             path?: never;
@@ -18719,6 +19055,7 @@ export interface operations {
                      *             "name": "Lena V",
                      *             "handle": "@lenav",
                      *             "avatarUrl": null,
+                     *             "bio": "Makes notebooks from offcuts.",
                      *             "isr": 82,
                      *             "formats": [
                      *               "regular"
@@ -26231,13 +26568,28 @@ export interface operations {
         };
         requestBody: {
             content: {
+                /**
+                 * @example {
+                 *       "title": "Field Notes",
+                 *       "description": "Three notebooks, unopened.",
+                 *       "amountOs": 2180,
+                 *       "quantity": 3,
+                 *       "tags": [
+                 *         "paper"
+                 *       ],
+                 *       "collectionId": "66b1f0c2a1b2c3d4e5f60719"
+                 *     }
+                 */
                 "application/json": {
                     title: string;
                     description: string;
-                    /** @description Seller's asking price in O (must be > 0). */
-                    amount: number;
+                    /** @description The ask in Os. Wins over `amount`. */
+                    amountOs?: number;
+                    /** @description Legacy ask in US dollars (`price.amount` units). */
+                    amount?: number;
                     quantity: number;
                     tags?: string[];
+                    collectionId?: components["schemas"]["ObjectId"];
                 };
             };
         };
@@ -26286,7 +26638,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description Caller has already resold this collection row. */
+            /** @description Caller has already resold this collection row, or it is disputed. */
             409: {
                 headers: {
                     [name: string]: unknown;
@@ -26295,6 +26647,111 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
+            500: components["responses"]["ServerError"];
+        };
+    };
+    resellQuote: {
+        parameters: {
+            query?: {
+                /** @description Quote this holding (default — the oldest not yet relisted). */
+                collectionId?: components["schemas"]["ObjectId"];
+            };
+            header?: never;
+            path: {
+                id: components["schemas"]["ObjectId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Quote. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "success": true,
+                     *       "message": "Resell quote",
+                     *       "data": {
+                     *         "weoId": "66b1f0c2a1b2c3d4e5f60718",
+                     *         "collectionId": "66b1f0c2a1b2c3d4e5f60719",
+                     *         "resellable": true,
+                     *         "blockers": [],
+                     *         "title": "Field Notes",
+                     *         "description": "Three notebooks",
+                     *         "img": "https://cdn.example/a.jpg",
+                     *         "format": "Listing",
+                     *         "tags": [
+                     *           "paper"
+                     *         ],
+                     *         "quantity": 3,
+                     *         "unitName": "books",
+                     *         "paidOs": 1980,
+                     *         "valueOs": 1980,
+                     *         "dial": {
+                     *           "start": 2180,
+                     *           "min": 990,
+                     *           "max": 4750,
+                     *           "lo": 1880,
+                     *           "hi": 2970,
+                     *           "step": 10
+                     *         },
+                     *         "usdAgainstO": 99,
+                     *         "fees": []
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["BaseResponse"] & {
+                        data?: {
+                            weoId: components["schemas"]["ObjectId"];
+                            collectionId: components["schemas"]["ObjectId"] | null;
+                            resellable: boolean;
+                            blockers: {
+                                /** @enum {string} */
+                                code: "not_resellable" | "not_held" | "already_relisted" | "unpaid" | "disputed";
+                                message: string;
+                            }[];
+                            title: string;
+                            description: string;
+                            img: string | null;
+                            /** @enum {string} */
+                            format: "Listing" | "Drop" | "Bid" | "Pool" | "Hunt";
+                            tags: string[];
+                            /** @description Units per WeO as listed — the POST quantity. */
+                            quantity: number;
+                            unitName: string;
+                            /** @description Os paid (or owed in full) for this holding. */
+                            paidOs: number | null;
+                            /** @description The WeO's current price in Os. */
+                            valueOs: number;
+                            dial: {
+                                start: number;
+                                min: number;
+                                max: number;
+                                /** @description Lower edge of the band most likely to clear. */
+                                lo: number;
+                                hi: number;
+                                step: number;
+                            };
+                            usdAgainstO: number;
+                            fees: unknown[];
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            /** @description WeO not found. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            422: components["responses"]["ValidationError"];
             500: components["responses"]["ServerError"];
         };
     };
@@ -28473,6 +28930,15 @@ export interface operations {
                 };
             };
             401: components["responses"]["Unauthorized"];
+            /** @description Caller is not the WeO's creator. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
             /** @description Not a regular WeO (or not found). */
             404: {
                 headers: {
@@ -28482,6 +28948,101 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
+            /** @description Someone has collected it — pause instead. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            422: components["responses"]["ValidationError"];
+            500: components["responses"]["ServerError"];
+        };
+    };
+    setWeoStatus: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["schemas"]["ObjectId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                /**
+                 * @example {
+                 *       "status": "inactive"
+                 *     }
+                 */
+                "application/json": {
+                    /** @enum {string} */
+                    status: "active" | "inactive";
+                };
+            };
+        };
+        responses: {
+            /** @description Status set. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "success": true,
+                     *       "message": "WeO paused",
+                     *       "data": {
+                     *         "_id": "66b1f0c2a1b2c3d4e5f60718",
+                     *         "weoType": "regular",
+                     *         "status": "inactive",
+                     *         "changed": true
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["BaseResponse"] & {
+                        data?: {
+                            _id: components["schemas"]["ObjectId"];
+                            /** @enum {string} */
+                            weoType?: "regular" | "crowdfund" | "lottery";
+                            /** @enum {string} */
+                            status: "active" | "inactive";
+                            changed: boolean;
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            /** @description Caller is not the WeO's creator. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description WeO not found. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Current status cannot be switched, or it changed mid-request. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            422: components["responses"]["ValidationError"];
             500: components["responses"]["ServerError"];
         };
     };

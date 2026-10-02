@@ -17,6 +17,8 @@ export interface ExternalGateData {
   url?: string;
   cta?: string;
   tone?: 'violet' | 'blue' | 'green' | 'gold';
+  /** an in-app action behind the gate (design `done`): runs on Continue instead of opening `url` */
+  onConfirm?: () => void;
 }
 
 export type DockTab = 'mya' | 'settings';

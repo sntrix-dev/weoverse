@@ -4,15 +4,15 @@ import { ApiError } from '@/api/client';
 import { routes } from '@/app/routes';
 import { OWalletPanel, type MovePerson } from '@/components/wallet/OWalletPanel';
 import { useCreators } from '@/features/discover/api/discover';
-import { useHoldingFaces, useMoveOs, useWalletView } from '@/features/wallet/api/wallet';
+import { useNavSummary } from '@/features/shell/api/navSummary';
+import { useHoldingFaces, useMoveOs, useWalletView } from '../api/wallet';
 import { osFmt } from '@/lib/format';
 import { ack, toast } from '@/stores/ui';
-import { useMeId } from '../useCommunity';
 
-/** The hub's Wallet row: the O-Wallet panel on the real wallet read (D-038). */
+/** The Wallet row (hub, Collect): the O-Wallet panel on the real wallet read (D-038). */
 export function WalletRow() {
   const navigate = useNavigate();
-  const me = useMeId();
+  const me = useNavSummary().data?.id;
   const wallet = useWalletView();
   const faces = useHoldingFaces(3);
   const creators = useCreators(6);

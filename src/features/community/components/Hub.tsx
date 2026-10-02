@@ -1,20 +1,11 @@
 import { useState, type ReactNode } from 'react';
 import { useNavigate } from 'react-router';
 import { routes } from '@/app/routes';
-import type { PathItem } from '@/components/shell/PathBar';
 import { Avatar, ICO, Orb, svg } from '@/design-system';
 import { relTime } from '@/lib/time';
 import type { StoryModel, ThreadModel } from '../model/community';
 
-/** design: v3-screens.jsx hubPath — WeOverse › Community › …tail. */
-export function useHubPath(tail: PathItem[] = []) {
-  const navigate = useNavigate();
-  const hub = () => void navigate(routes.hub());
-  return {
-    onHub: hub,
-    items: [{ label: 'WeOverse', onClick: hub }, { label: 'Community', onClick: hub }, ...tail] as PathItem[],
-  };
-}
+export { useHubPath } from '@/components/shell/useHubPath';
 
 /** design: section-hero.jsx PreviewCard — image first, one line of summary, the rest on ask. */
 export function PreviewCard({

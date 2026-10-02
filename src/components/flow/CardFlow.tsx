@@ -37,6 +37,8 @@ export interface CardFlowSpec {
   img?: string | null;
   cta: string;
   priceLabel: string;
+  /** the footer's label on the review step (default "You pay · they receive") */
+  commitLabel?: string;
   front: (advance: () => void) => ReactNode;
   dial: { V: DialRange; value: number; onValue: (v: number) => void; note: ReactNode };
   /** under the dial: the hunt's bundle choice, the bid's attempt notice */
@@ -443,7 +445,7 @@ export function CardFlow({ spec }: { spec: CardFlowSpec }) {
                   color: 'var(--text-faint)',
                 }}
               >
-                {stage === 'commit' ? 'You pay · they receive' : spec.priceLabel}
+                {stage === 'commit' ? (spec.commitLabel ?? 'You pay · they receive') : spec.priceLabel}
               </span>
               <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 7, marginTop: 3 }}>
                 <span
