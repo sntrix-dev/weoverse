@@ -22,6 +22,7 @@ import {
   threadFixture,
   walletFixture,
 } from '../fixtures/community';
+import { asksFixture, categoriesFixture, pegFixture, templatesFixture } from '../fixtures/create';
 import { collectionsSnapshotFixture, listingsSnapshotFixture, resellQuoteFixture } from '../fixtures/holdings';
 
 /** Wraps data in the backend envelope (weo-3.0 ResponseHandler.success). */
@@ -85,4 +86,29 @@ export const handlers = [
     const w = liveWeos().find((x) => x._id === params.id);
     return w ? ok(w) : fail(404, 'WeO not found');
   }),
+  // M07 — Create
+  http.get(url('/frontend/config/o'), () => ok(pegFixture)),
+  http.get(url('/frontend/templates'), () => ok(templatesFixture())),
+  // the categories read answers in the envelope like every other read
+  http.get(url('/frontend/categories'), () => ok(categoriesFixture)),
+  http.get(url('/frontend/request-weos'), () => ok({ requestOffers: asksFixture, total: asksFixture.length, page: 1, totalPages: 1 })),
+  http.post(url('/frontend/media'), ({ request }) => {
+    const type = request.headers.get('content-type') ?? '';
+    return HttpResponse.json(
+      {
+        success: true,
+        message: 'Uploaded',
+        data: { url: `https://cdn.test/weoverse/app/u/weos/2026/10/up.${type.split('/')[1] ?? 'bin'}`, type: type.startsWith('video/') ? 'video' : 'image', size: 9, contentType: type },
+      },
+      { status: 201 },
+    );
+  }),
+  http.post(url('/frontend/ai/describe'), () => ok({ lines: ['Sixty prints, each signed and numbered by hand.', 'One of sixty — yours, signed.'] })),
+  http.post(url('/frontend/weos'), () => ok({ _id: 'weo-new', title: 'Posted' }, 'WeO created successfully')),
+  http.put(url('/frontend/weos/:id'), ({ params }) => ok({ _id: String(params.id) })),
+  http.post(url('/frontend/request-weos'), () => ok({ _id: 'rq-new' })),
+  http.post(url('/frontend/me/drafts'), () => ok({ _id: 'draft-new' })),
+  http.put(url('/frontend/me/drafts/:id'), ({ params }) => ok({ _id: String(params.id) })),
+  http.delete(url('/frontend/me/drafts/:id'), () => ok(null)),
+  http.post(url('/frontend/community/push'), () => ok({ id: 't-push' })),
 ];

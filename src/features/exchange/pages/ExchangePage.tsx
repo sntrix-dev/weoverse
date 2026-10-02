@@ -103,8 +103,8 @@ export function ExchangePage() {
   const open = (l: ListingModel) => void navigate(l.kind === 'draft' ? routes.create(l.id) : routes.weo(l.id));
   const act: ListingRowHandlers = {
     onOpen: open,
-    // editing a live WeO arrives with the composer (M07): until then it opens the WeO
-    onEdit: open,
+    // a live WeO opens in the composer (M07); a Hunt has no composer yet (CRE-12) and opens the WeO
+    onEdit: (l) => void navigate(l.kind === 'draft' ? routes.create(l.id) : l.format === 'Hunt' ? routes.weo(l.id) : routes.edit(l.id)),
     onToggle: (l) => {
       const to = l.paused ? 'active' : 'inactive';
       setStatus.mutate(

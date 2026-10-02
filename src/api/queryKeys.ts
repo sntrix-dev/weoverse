@@ -50,6 +50,13 @@ export const qk = {
     resellQuote: (weoId: string, collectionId?: string) =>
       ['holdings', 'resell-quote', weoId, collectionId ?? null] as const,
   },
+  create: {
+    peg: () => ['create', 'peg'] as const,
+    templates: () => ['create', 'templates'] as const,
+    categories: () => ['create', 'categories'] as const,
+    asks: () => ['create', 'asks'] as const,
+    draft: (id: string) => ['create', 'draft', id] as const,
+  },
   listings: {
     all: ['listings'] as const,
     snapshot: (window: string) => ['listings', 'snapshot', window] as const,

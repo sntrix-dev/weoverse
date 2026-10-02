@@ -13,6 +13,9 @@ configure({ asyncUtilTimeout: 4000 });
 // jsdom has no scrolling or windows: stub them so tests stay quiet (a test that cares spies on them)
 window.scrollTo = (() => {}) as typeof window.scrollTo;
 window.open = (() => null) as typeof window.open;
+// …and no media playback: the Create O plays and pauses its clips (jsdom logs "not implemented")
+HTMLMediaElement.prototype.pause = () => {};
+HTMLMediaElement.prototype.play = () => Promise.resolve();
 
 beforeAll(() => server.listen({ onUnhandledFrame: 'error' }));
 afterEach(() => {

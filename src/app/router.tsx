@@ -55,7 +55,7 @@ const childRoutes: RouteObject[] = [
     children: [
       // design: index.html opens on Create
       { index: true, element: <Navigate to={routes.create()} replace /> },
-      planned('/create', 'create'),
+      page('/create', 'create', () => import('@/features/create/pages/CreatePage')),
       page('/discover', 'discover', () =>
         import('@/features/discover/pages/DiscoverPage').then((m) => ({ default: m.DiscoverPage })),
       ),

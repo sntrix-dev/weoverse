@@ -159,7 +159,10 @@ async function request<T>(
 ): Promise<T> {
   const { query, body, auth = true, signal } = opts;
   const headers: Record<string, string> = { Accept: 'application/json' };
-  if (body !== undefined && !(body instanceof FormData)) headers['Content-Type'] = 'application/json';
+  // a Blob / File goes as the raw body with its own type (POST /frontend/media)
+  const raw = typeof Blob !== 'undefined' && body instanceof Blob;
+  if (raw) headers['Content-Type'] = body.type || 'application/octet-stream';
+  else if (body !== undefined && !(body instanceof FormData)) headers['Content-Type'] = 'application/json';
   const access = tokens.getAccess();
   if (auth && access) headers.Authorization = `Bearer ${access}`;
 
@@ -167,7 +170,7 @@ async function request<T>(
     method,
     headers,
     signal,
-    body: body === undefined ? undefined : body instanceof FormData ? body : JSON.stringify(body),
+    body: body === undefined ? undefined : raw || body instanceof FormData ? (body as BodyInit) : JSON.stringify(body),
   });
   const payload = await readBody(res);
 

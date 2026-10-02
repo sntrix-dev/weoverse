@@ -2,55 +2,74 @@
 
 | Status | FE branch | BE branch | Report |
 |---|---|---|---|
-| planned | `feat/m07-create` | `redesign/m07-create` | `reports/M07-create.md` |
+| ⏳ in progress | `feat/m07-create` | `redesign/m07-create` (from `redesign/m06-collect-exchange`) | `reports/M07-create.md` |
 
-The largest page (`create.jsx`, ~1,400 lines). Split into feature components; no file over ~250 lines.
+The largest page (`create.jsx`, ~1,400 lines). Split into feature components; no file over ~300 lines.
 
-## Screens (`/create`, `/create?edit=:id`, `/create?draft=:id`, `/create?forRequest=:id`)
+## Screens (`/create`, `?draft=:id`, `?edit=:id`)
 
-1. **Hero** (`CreateHero`): rotating `Headline` (MAKE_MANTRAS), O donut with edge videos (`MAKE_EDGES`) jumping to discover/collect/create/exchange, 8 format orbs (Listing "Sell", Pool, Bid, Request, and "soon": Hunt, Drop, Gift, Subscription — "notify me"), docks: Carry on (drafts `OrbSlider` / Blank WeO), Templates (shelf + TemplateSheet), Rehearse, Asked for (request count), Track it. FlowFoot.
-2. **Composer**: header (format icon, "02 — Create", `V3ModRing`), left/right `ModWell` rails (collapsible, pinnable), centre `PortalStage` Orb ↔ `WeOCard` flip, category, inline title/description, `CardAssist` (AI draft), `InlineNum` terms per format, fork card Preflight vs Vet it first, template drawer, "Still needed". FlowBar 2/3.
-   - Modules: Category · Media (cover + ≤2 images or 1 video; image 10 MB, video 100 MB) · Tags · Pool (goal, min pledge, deadline) · Hunt (entry price, entries, draw date, rules) · Bid (opening bid, closes in, reserve) · Request (budget range, closes in) · Listing/Drop (price, negotiable %, quantity+unit, circulation, duration, resellable 2%).
-3. **Preflight**: checklist, card preview, "What you receive" (price − 2 % Flow fee), Post it / Ask a Circle / Rehearse it. FlowBar 3/3.
-4. **Posted**: PortalStage + Push to a Circle / Rehearse / See it in Exchange / Create another.
-
-`PostSheet` (network / circle / direct → `SuccessMoment`).
-
-## Format → backend mapping
-
-| Design format | `weoType` | Key fields |
+| Step | Design | Blocks, in design order |
 |---|---|---|
-| Listing | regular | price{amount, priceSplit, negotiableUpTo}, quantity{amount, unitName}, totalWeoInCirculation, duration, availabilityTill |
-| Bid | regular (negotiable) | price.negotiableUpTo > 0 (reserve), close time |
-| Drop | regular (limited) | totalWeoInCirculation 1..100 |
-| Pool | crowdfund | goal.amount, contribution.minimum, deadline |
-| Hunt | lottery | ticket{price, totalTickets}, prizes[], draw.drawAt |
-| Request | request-weo (RFQ) | price{min,max}, deadline |
+| 1 · Hero | `create.jsx` `CreateHero` | PathBar (WeOverse › Create) · glass frame · `Headline` (MAKE_MANTRAS rotating) · the O: `MakeDonut` + `MakeWell` (logo loop, edge clips under the pointer — voice / Enter jumps to the section; centre starts a blank WeO) · 8 format orbs on the ring (Sell, Pool, Bid, Request live; Hunt, Drop, Gift, Subscription "soon" → Notify me) · docks: Carry on (your drafts `OrbSlider` / Blank WeO), Templates (shelf strip + "All as cards" → `TemplateSheet`) | Asked for (open requests count → Requests), Track it (→ Exchange). FlowFoot back Community, next Templates |
+| 2 · Composer | `CreateScreen` step 2 | card frame: format icon + "02 — Create" + `V3ModRing` (done/total) · three columns: left `ModWell`s (Category, Media, Tags, …), centre `PortalStage` Orb ↔ `WeOCard` ("See it as the card"), category line, `InlineText` title + description, `CardAssist` (draft with Mya), `InlineNum` terms per format, fork card **Preflight** (+ "Vet it first" hidden until M11), "Still needed", template drawer row; right `ModWell`s (terms) with collapse toggle · FlowBar step 2 of 3 |
+| 3 · Preflight | step 3 | SectionHead "03 — Preflight / What goes live" · checklist (title & description + every module) · "How collectors see it" `WeOCard` · "What you receive" · **Post it** · FlowBar step 3 of 3 |
+| Post | `screens-flows.jsx` `PostSheet` | where it goes: the whole network · a Circle (your joined + suggested) · one person (an open ask) → `SuccessMoment` → Exchange / circle / requests |
+| 4 · Posted | `posted` | PathBar … › Posted · PortalStage orb · "{name} is live" · circle sentence · Push to a Circle · See it in Exchange · Create another |
+
+Sheets: `TemplateSheet` (carousel of templates as WeO cards, fills, filmstrip), `TemplateDrawer` (bottom strip inside the composer).
+
+## Formats → backend (D-051)
+
+| Design | Endpoint | Shape |
+|---|---|---|
+| Listing ("Sell") | `POST /frontend/weos` `weoType: regular` | `price {amount: Os ÷ peg, priceSplit: 0, negotiableUpTo: %}` (0 unless "accept offers"), `quantity {amount, unitName}`, `customerLimit = totalWeoInCirculation = circulation`, `duration`, `availabilityTill`, `isResellable` |
+| Bid | same, `negotiableUpTo` = the lowest offer you take, as % below the opening figure (default 20) | a negotiable regular WeO reads as a Bid everywhere |
+| Pool | `weoType: crowdfund` | `goal.amount`, `contribution.minimum` (Os), `deadline`, `duration` |
+| Request | `POST /frontend/request-weos` | `price {min, max}` (Os), `deadline` (epoch ms), category id + name |
+| Hunt, Drop, Gift, Subscription | — | "coming soon" in the design (CRE-12): on the ring, never open a composer |
+
+Prices are entered in Os; a regular WeO stores US dollars, so the composer converts with the backend's peg (`GET /frontend/config/o`), never a hard-coded rate (D-005).
 
 ## API map
 
-| Block | Endpoint |
-|---|---|
-| post | `POST /frontend/weos` (discriminated on `weoType`) / RFQ `POST /frontend/request-weos` |
-| edit | `GET /frontend/me/listings/:id` → `PUT /frontend/weos/:id` |
-| drafts + autosave | `GET/POST /frontend/me/drafts`, `PUT /me/drafts/:id` (debounced), `DELETE` |
-| categories | `GET /frontend/categories` (raw, no envelope) |
-| for a request | `GET /frontend/request-weos/:id` → `POST /frontend/weos/requested` |
-| push to circle | `POST /frontend/community/push` |
-| asked-for count | `GET /frontend/request-weos` |
+| Block | Endpoint | Status |
+|---|---|---|
+| categories | `GET /frontend/categories` | OK |
+| post | `POST /frontend/weos`, `POST /frontend/request-weos` | OK (body mapping D-051) |
+| post to a circle / answer an ask | then `POST /frontend/community/push`; `POST /frontend/weos/requested {requestedId}` | OK |
+| peg | `GET /frontend/config/o` | BE new |
+| media | `POST /frontend/media` (raw body, image ≤ 10 MB, video ≤ 100 MB) | BE new (reuses `MediaService`) |
+| draft with Mya | `POST /frontend/ai/describe {title, format, category?}` → three lines | BE new (LangChain chat model, rate-limited) |
+| templates | `GET /frontend/templates` | BE new (D-050) |
+| drafts | `GET/POST /frontend/me/drafts`, `PUT/DELETE /me/drafts/:id` (debounced autosave) | OK |
+| edit | `GET /frontend/me/listings/:id` → `PUT /frontend/weos/:id` | OK |
+| asked-for count | `GET /frontend/request-weos?limit=1` (total) | OK |
+| push after posting | `POST /frontend/community/push` (push sheet) | OK |
 
-## Gaps
+## Decisions (see `decisions.md`)
 
-| Need | Proposal |
+- D-050 Templates are served by the backend; premium shows locked until plans/billing (M09).
+- D-051 Format mapping above; prices in Os converted with the backend peg.
+- D-052 The backend requires a description, so the composer asks for "a line" alongside a name, a category and a figure before preflight.
+- D-053 A format pick starts with no media (the design seeds a stock image — that would post a design asset as the WeO's picture); the orb shows the format colour until you upload.
+- D-054 "Vet it first", "Ask a Circle", "Rehearse" and the hero's Rehearse dock wait for M11 (D-027). "Notify me" on soon formats is remembered on this device only.
+- D-055 Fees: the preflight shows what settlement takes (nothing today), not the design's 2 % Flow fee.
+
+## Gaps / questions
+
+| Need | Status |
 |---|---|
-| Media upload (create requires ≥1 media URL) | `POST /frontend/media` multipart (reuse `MediaService`, S3, limits from env) → `{url, type, thumbnail?}`. New module `media` frontend route + swagger + tests. |
-| AI draft (`CardAssist`, was `window.claude.complete`) | `POST /frontend/ai/draft-weo {format, title?, notes?}` using the existing LangChain/OpenAI setup, rate-limited |
-| Templates catalogue + Pro unlock (Q-3) | backend catalogue `GET /frontend/templates` (D-050); unlock with plans/billing (M09) — premium shows locked until then |
-| "Notify me" for soon formats | small additive endpoint or skip |
+| Media upload | BE new |
+| AI draft | BE new |
+| Templates | BE new |
+| O peg for the client | BE new |
+| Unlock a premium template (plan / Os) | M09 (Q-4) |
+| Hunt / Drop / Gift / Subscription creation | design says "coming soon" |
 
 ## Acceptance criteria
 
-- Create and post each available format end to end; appears in Exchange and Discover.
-- Drafts autosave and resume; edit an existing WeO.
+- Post a Listing, a Bid, a Pool and a Request end to end; each appears in Exchange (and Discover for WeOs).
+- Drafts autosave, show under "Carry on" and resume; edit an existing WeO.
 - Media uploads to S3 and renders on the card.
-- Page at parity for hero, composer (each format), preflight, posted.
+- Templates prefill the composer; premium ones show locked.
+- Hero, composer (each format), preflight, post sheet and posted at parity (1440×900, 390×844, light and dark), network 2xx, zero console errors.

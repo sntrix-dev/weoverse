@@ -16,8 +16,9 @@ describe('routing', () => {
 
   it('opens on Create like the design', async () => {
     const { router } = renderApp('/');
-    await planned('M07');
+    expect(await screen.findByRole('region', { name: 'Make a WeO' })).toBeInTheDocument();
     expect(router.state.location.pathname).toBe('/create');
+    expect(document.documentElement.style.getPropertyValue('--focus-tint')).toBe('#22C55E');
   });
 
   it.each([

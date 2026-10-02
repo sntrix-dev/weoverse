@@ -37,6 +37,8 @@ export const routes = {
   callback: () => '/callback',
   /** `draft` opens a saved draft in the composer (M07) */
   create: (draft?: string) => (draft ? `/create?draft=${enc(draft)}` : '/create'),
+  /** a live WeO of yours back in the composer (M07) */
+  edit: (weoId: string) => `/create?edit=${enc(weoId)}`,
   discover: (q?: string) => (q ? `/discover?q=${enc(q)}` : '/discover'),
   collected: () => '/collect',
   listed: () => '/exchange',

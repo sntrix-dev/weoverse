@@ -761,7 +761,7 @@ export interface paths {
         /**
          * List users I've added to my circle
          * @description Paginated. `search` substring-filters the populated
-         *     `followingId.fullName`/`creatorName`/`emailAddress`. Sorted by
+         *     `followingId.fullName`/`creatorName` (literal match; other members' email is neither returned nor searchable — G-49). Sorted by
          *     `circleAddedAt` desc.
          */
         get: operations["getMyCircle"];
@@ -2115,6 +2115,113 @@ export interface paths {
         patch: operations["adminRestoreCommunityThread"];
         trace?: never;
     };
+    "/frontend/config/o": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * The O peg
+         * @description The figure every price conversion uses. A regular WeO stores its price
+         *     in US dollars and charges `price.amount × usdAgainstO` Os; a client that
+         *     takes an ask in Os divides by this before posting, never by a number of
+         *     its own.
+         */
+        get: operations["getOConfig"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/frontend/media": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Upload one image or video for a WeO
+         * @description The request body is the file itself and `Content-Type` is the file's
+         *     type — no multipart, no base64. Photos (JPEG, PNG, WebP, GIF, AVIF,
+         *     HEIC) up to 10 MB; a video (MP4, WebM, MOV) up to 100 MB. SVG is
+         *     refused (it can carry script).
+         *
+         *     The answer is exactly the `{ url, type }` a WeO's `media[]` takes.
+         *     The object key is `weoverse/app/{userId}/weos/{yyyy}/{mm}/{uuid}.{ext}`;
+         *     `filename` is a hint only and never reaches the key.
+         */
+        post: operations["uploadMedia"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/frontend/ai/describe": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Mya drafts a one-line description
+         * @description "Ask Mya to draft it" in the composer. Reads the title, the format and
+         *     (optionally) the category and returns one to three alternative
+         *     one-line descriptions. Nothing is stored; the creator picks one or
+         *     ignores them.
+         *
+         *     Each call is a model request, so it is limited to ten a minute per
+         *     signed-in user (429) on top of the global per-IP limit. 503 when the
+         *     server has no model configured; 502 when the model fails or returns
+         *     nothing usable.
+         */
+        post: operations["describeWeo"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/frontend/templates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * The Create templates catalogue
+         * @description Almost-finished WeOs a creator picks and owns — six free, four
+         *     premium. A premium template carries its plan (Maker needs the player
+         *     tier, Pro needs prime) and `usable` says whether the caller's tier
+         *     covers it. Unlocking one outright (`unlockOs`) is shown only; buying
+         *     it lands with plans and billing.
+         *
+         *     `os` is the suggested figure in Os (a Request's 0 = name your own
+         *     budget); `qty` 0 = open-ended. `live: false` marks a format Create
+         *     cannot post yet (Drop, Hunt). `category.id` is set when a category with
+         *     that name exists.
+         */
+        get: operations["listTemplates"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/frontend/creators": {
         parameters: {
             query?: never;
@@ -2894,9 +3001,9 @@ export interface paths {
         /**
          * My followers
          * @description Paginated. `search` is an optional substring filter applied across
-         *     the populated follower's `fullName`/`creatorName`/`emailAddress`.
+         *     the populated follower's `fullName`/`creatorName` (literal match; other members' email is neither returned nor searchable — G-49).
          *     `followerId` is populated to `{_id, fullName, creatorName,
-         *     profileImage, emailAddress}`; `followingId` is the caller's id (raw).
+         *     profileImage}`; `followingId` is the caller's id (raw).
          */
         get: operations["getMyFollowers"];
         put?: never;
@@ -2917,7 +3024,7 @@ export interface paths {
         /**
          * Users I follow
          * @description Paginated. `search` substring-filters the populated `followingId`'s
-         *     `fullName`/`creatorName`/`emailAddress`. `followingId` is populated;
+         *     `fullName`/`creatorName` (literal match; other members' email is neither returned nor searchable — G-49). `followingId` is populated;
          *     `followerId` is the caller's id (raw).
          */
         get: operations["getMyFollowing"];
@@ -8757,6 +8864,113 @@ export interface components {
                 /** @enum {string} */
                 metric: "helpful";
             } | null;
+        };
+        OConfig: {
+            /**
+             * @description Os per US dollar (a regular WeO's dollar price × this = its price in Os)
+             * @example 99
+             */
+            usdAgainstO: number;
+            /**
+             * @description US dollars per O (1 / usdAgainstO)
+             * @example 0.010101010101010102
+             */
+            usdPerO: number;
+        };
+        OConfigResponse: components["schemas"]["BaseResponse"] & {
+            data?: components["schemas"]["OConfig"];
+        };
+        UploadedMedia: {
+            /** Format: uri */
+            url: string;
+            /** @enum {string} */
+            type: "image" | "video";
+            /** @description Bytes stored */
+            size: number;
+            /** @example image/jpeg */
+            contentType: string;
+        };
+        UploadedMediaResponse: components["schemas"]["BaseResponse"] & {
+            data?: components["schemas"]["UploadedMedia"];
+        };
+        AiDescribeBody: {
+            /** @example Signed edition */
+            title: string;
+            /** @enum {string} */
+            format: "Listing" | "Bid" | "Pool" | "Request";
+            /** @example Creating */
+            category?: string;
+        };
+        AiDescribeResponse: components["schemas"]["BaseResponse"] & {
+            data?: {
+                lines: string[];
+            };
+        };
+        WeoTemplate: {
+            /** @example tpl-edition */
+            key: string;
+            /** @example Signed edition */
+            name: string;
+            /** @example A capped run, each one numbered */
+            line: string;
+            /** @enum {string} */
+            format: "Listing" | "Pool" | "Bid" | "Request" | "Drop" | "Hunt";
+            /**
+             * @description Offering type as the design names it
+             * @example Product
+             */
+            type: string;
+            /** @example Craft */
+            sector: string;
+            category: {
+                /** @description The matching category, when one with this name exists */
+                id: components["schemas"]["ObjectId"] | null;
+                /** @example Creating */
+                name: string;
+            };
+            /**
+             * @description Suggested figure in Os (0 on a Request = name your budget)
+             * @example 4200
+             */
+            os: number;
+            /**
+             * @description Suggested quantity (0 = open-ended)
+             * @example 60
+             */
+            qty: number;
+            /** Format: uri */
+            image: string;
+            /**
+             * @description 0 free · 1 Maker · 2 Pro
+             * @enum {integer}
+             */
+            tier: 0 | 1 | 2;
+            /** @description The format can be posted today */
+            live: boolean;
+            /** @enum {string|null} */
+            plan: "Maker" | "Pro" | null;
+            /** @description The caller's tier covers it */
+            usable: boolean;
+            /** @description Os to unlock outright (display only until billing) */
+            unlockOs: number | null;
+        };
+        TemplatesResponse: components["schemas"]["BaseResponse"] & {
+            data?: {
+                templates: components["schemas"]["WeoTemplate"][];
+                myTier: {
+                    /** @enum {string} */
+                    name: "not applicable" | "participant" | "player" | "prime";
+                    rank: number;
+                };
+                plans: {
+                    tier: number;
+                    name: string;
+                    unlockOs: number;
+                    requiresTier: string;
+                }[];
+                /** @description Templates the caller's tier does not cover */
+                locked: number;
+            };
         };
         CrowdfundStatus: components["schemas"]["WeoStatus"];
         CrowdfundMilestone: {
@@ -16813,8 +17027,7 @@ export interface operations {
                      *               "_id": "651f8c2a3b9c0d12e4567891",
                      *               "fullName": "John Buyer",
                      *               "creatorName": null,
-                     *               "profileImage": null,
-                     *               "emailAddress": "john@example.com"
+                     *               "profileImage": null
                      *             },
                      *             "isInCircle": true,
                      *             "circleAddedAt": "2024-10-11T14:02:08.123Z",
@@ -16937,8 +17150,7 @@ export interface operations {
                      *               "_id": "651f8c2a3b9c0d12e4567892",
                      *               "fullName": "Sam Creator",
                      *               "creatorName": "samcreator",
-                     *               "profileImage": null,
-                     *               "emailAddress": "sam@example.com"
+                     *               "profileImage": null
                      *             },
                      *             "followingId": "651f8c2a3b9c0d12e4567890",
                      *             "isInCircle": true,
@@ -19016,6 +19228,199 @@ export interface operations {
             500: components["responses"]["ServerError"];
         };
     };
+    getOConfig: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The peg */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "success": true,
+                     *       "message": "O config",
+                     *       "data": {
+                     *         "usdAgainstO": 99,
+                     *         "usdPerO": 0.010101010101010102
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["OConfigResponse"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+        };
+    };
+    uploadMedia: {
+        parameters: {
+            query?: {
+                /** @example cover.jpg */
+                filename?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "image/jpeg": string;
+                "image/png": string;
+                "image/webp": string;
+                "image/gif": string;
+                "image/avif": string;
+                "image/heic": string;
+                "video/mp4": string;
+                "video/webm": string;
+                "video/quicktime": string;
+            };
+        };
+        responses: {
+            /** @description Uploaded */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "success": true,
+                     *       "message": "Uploaded",
+                     *       "data": {
+                     *         "url": "https://weo-media.s3.us-east-1.amazonaws.com/weoverse/app/651f8c2a3b9c0d12e4567890/weos/2026/10/0b6c3c1e-8a7e-4f57-9a55-2d0f0d7b1c11.jpg",
+                     *         "type": "image",
+                     *         "size": 482113,
+                     *         "contentType": "image/jpeg"
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["UploadedMediaResponse"];
+                };
+            };
+            /** @description The body is empty */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BaseResponse"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            /** @description Past the size limit for its kind (10 MB image, 100 MB video) */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BaseResponse"];
+                };
+            };
+            /** @description Not a photo or a video a WeO can hold */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BaseResponse"];
+                };
+            };
+            422: components["responses"]["ValidationError"];
+        };
+    };
+    describeWeo: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                /**
+                 * @example {
+                 *       "title": "Signed edition",
+                 *       "format": "Listing",
+                 *       "category": "Creating"
+                 *     }
+                 */
+                "application/json": components["schemas"]["AiDescribeBody"];
+            };
+        };
+        responses: {
+            /** @description One to three lines */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "success": true,
+                     *       "message": "Drafted",
+                     *       "data": {
+                     *         "lines": [
+                     *           "A signed print from a run of sixty, numbered by hand.",
+                     *           "Your own numbered print, signed and yours to keep.",
+                     *           "One of sixty signed prints, each with its number."
+                     *         ]
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["AiDescribeResponse"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            422: components["responses"]["ValidationError"];
+            429: components["responses"]["TooManyRequests"];
+            /** @description The model failed or returned nothing usable */
+            502: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BaseResponse"];
+                };
+            };
+            /** @description No model configured on this server */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BaseResponse"];
+                };
+            };
+        };
+    };
+    listTemplates: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The catalogue */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TemplatesResponse"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+        };
+    };
     listCreators: {
         parameters: {
             query?: {
@@ -20616,8 +21021,7 @@ export interface operations {
                      *               "_id": "651f8c2a3b9c0d12e4567891",
                      *               "fullName": "John Buyer",
                      *               "creatorName": null,
-                     *               "profileImage": null,
-                     *               "emailAddress": "john@example.com"
+                     *               "profileImage": null
                      *             },
                      *             "followingId": "651f8c2a3b9c0d12e4567890",
                      *             "isInCircle": false,
@@ -20682,8 +21086,7 @@ export interface operations {
                      *               "_id": "651f8c2a3b9c0d12e4567892",
                      *               "fullName": "Sam Creator",
                      *               "creatorName": "samcreator",
-                     *               "profileImage": null,
-                     *               "emailAddress": "sam@example.com"
+                     *               "profileImage": null
                      *             },
                      *             "isInCircle": true,
                      *             "circleAddedAt": "2024-10-11T14:02:08.123Z",
