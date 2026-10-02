@@ -50,7 +50,7 @@ Modals (`screens-more.jsx`): `ComposeModal` (2 steps: question/detail/prompts �
 | stewards "Resolved · 7d" | `GET /frontend/community/snapshot/pulse?window=7d` | OK |
 | follow | `POST /frontend/users/:id/follow`, `DELETE /frontend/users/:id/unfollow` | fix: 400/404/409 instead of 500 |
 | push a WeO | `POST /frontend/community/push {weoId, question, description?, circleId}` | fix: response carries `author` + `circleName` |
-| report | `POST /frontend/report {threadId\|answerId, reportType, description?}` | OK (response leak logged, G-45) |
+| report | `POST /frontend/report {threadId\|answerId, reportType, description?}` | OK (response narrowed to the reporter, G-45) |
 | in flight | `GET /frontend/me/drafts`, `GET /frontend/community/my-weos` | fix: my-weos filtered a non-existent `isDeleted` path → always empty |
 | wallet row | `GET /frontend/wallet/overview`, `POST /frontend/wallet/transfer {toUserId, amount}` | OK |
 
@@ -68,8 +68,8 @@ Modals (`screens-more.jsx`): `ComposeModal` (2 steps: question/detail/prompts �
 
 | Need | Status |
 |---|---|
-| Thread vote race returns 500; GET thread bumps `viewCount` on every read | G-43 — fixed (follow-up) |
-| Attached WeO `circleCount` always 0 | G-44 (FE reads the full WeO instead) |
+| Thread vote race returns 500; GET thread bumps `viewCount` on every read | G-42, G-43 — fixed (follow-up) |
+| Attached WeO `circleCount` always 0 | G-44 — fixed (follow-up) |
 | Report response returns other reporters and admin notes | G-45 — fixed (follow-up) |
 | `GET /users/:id` and `GET /users` leak email/phone/address | G-46 — fixed (follow-up) |
 | Several tabs refreshing the session at once signed the user out (browser pass) | fixed (D-043) |
