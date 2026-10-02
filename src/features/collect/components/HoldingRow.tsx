@@ -43,7 +43,9 @@ export function HoldingRow({ h, i, act }: { h: HoldingModel; i: number; act: Hol
   const [focus, setFocus] = useState(false);
   const tone = formatHex(h.format);
   const delta = h.current - h.paid;
-  const show = hov || focus;
+  // no hover on a touch screen: the row's two actions stay visible there
+  const touch = typeof window !== 'undefined' && !!window.matchMedia?.('(hover: none)').matches;
+  const show = hov || focus || touch;
   return (
     <div
       onMouseEnter={() => setHov(true)}

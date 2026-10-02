@@ -392,6 +392,7 @@ export function SnapshotPanel({
   rail,
   onPick,
   onOpenSection,
+  empty,
 }: {
   boards: Record<string, Board>;
   pulse: Record<string, Pulse>;
@@ -402,6 +403,8 @@ export function SnapshotPanel({
   rail?: ReactNode;
   onPick: (row: BoardRow) => void;
   onOpenSection?: (section: string) => void;
+  /** what an empty board says */
+  empty?: string;
 }) {
   const keys = Object.keys(boards);
   const cur = boards[boardKey] ? boardKey : (keys[0] ?? '');
@@ -465,7 +468,25 @@ export function SnapshotPanel({
         }}
       >
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12, minWidth: 0 }}>
-          <Podium rows={board.rows} onPick={onPick} />
+          {board.rows.length ? (
+            <Podium rows={board.rows} onPick={onPick} />
+          ) : (
+            // a board with nothing on it says so, rather than leaving a blank well
+            <p
+              style={{
+                margin: 0,
+                padding: '36px 20px',
+                borderRadius: 20,
+                textAlign: 'center',
+                fontSize: 13,
+                color: 'var(--text-dim)',
+                background: 'var(--surface-2)',
+                boxShadow: 'var(--nm-inset)',
+              }}
+            >
+              {empty ?? 'Nothing on this board yet.'}
+            </p>
+          )}
           <div
             style={{
               display: 'grid',
