@@ -83,10 +83,14 @@ Backend: `weo-3.0`, local base URL **`http://localhost:3002/api`**. Full endpoin
 | M06 | Inactivate / Activate | `PATCH /frontend/weos/:id/status` (new, M06) | wired (optimistic, rolls back) |
 | M06 | Creators in your circles | `GET /frontend/creators?circle=joined` (new param + `bio`, M06), fallback `sort=isr` | wired |
 | M06 | Rate | `POST /frontend/weos/:id/rating` | exists |
-| M07 | Create / update | `POST /frontend/weos`, `PUT /frontend/weos/:id` | exists |
-| M07 | Drafts | `/frontend/me/drafts*` | exists |
-| M07 | Media upload | — | **gap** |
-| M07 | AI draft | — | **gap** |
+| M07 | Post / save an edit | `POST /frontend/weos`, `POST /frontend/request-weos`, `PUT /frontend/weos/:id` | wired (`features/create/api/create.ts`, D-051) |
+| M07 | O peg | `GET /frontend/config/o` (new, M07) | wired — every Os → dollar conversion |
+| M07 | Media upload | `POST /frontend/media` (new, M07; raw body, image ≤ 10 MB, video ≤ 100 MB) | wired (`MediaUploader`) |
+| M07 | Draft with Mya | `POST /frontend/ai/describe` (new, M07; 10/min per user) | wired (`AiDraft`) |
+| M07 | Templates | `GET /frontend/templates` (new, M07; tier gating) | wired (D-050) |
+| M07 | Drafts (autosave, carry on) | `/frontend/me/drafts*` | wired (`useAutosave`, 2.5 s quiet) |
+| M07 | Categories, asks | `GET /frontend/categories`, `GET /frontend/request-weos` | wired |
+| M07 | Post into a circle | `POST /frontend/community/push` after the create (D-056) | wired |
 | M08 | Creators | `GET /frontend/creators`, `/creators/:id`, `/weos/top-creators` | exists |
 | M08 | Follow / circle a person | `/frontend/users/:id/follow`, `/circle/*` | exists |
 | M08 | Requests | `/frontend/request-weos*` | exists |

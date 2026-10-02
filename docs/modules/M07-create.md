@@ -23,8 +23,9 @@ Sheets: `TemplateSheet` (carousel of templates as WeO cards, fills, filmstrip), 
 | Design | Endpoint | Shape |
 |---|---|---|
 | Listing ("Sell") | `POST /frontend/weos` `weoType: regular` | `price {amount: Os ÷ peg, priceSplit: 0, negotiableUpTo: %}` (0 unless "accept offers"), `quantity {amount, unitName}`, `customerLimit = totalWeoInCirculation = circulation`, `duration`, `availabilityTill`, `isResellable` |
-| Bid | same, `negotiableUpTo` = the lowest offer you take, as % below the opening figure (default 20) | a negotiable regular WeO reads as a Bid everywhere |
+| Bid | same, `negotiableUpTo` = the lowest offer you take, as % below the opening figure | a negotiable regular WeO reads as a Bid everywhere |
 | Pool | `weoType: crowdfund` | `goal.amount`, `contribution.minimum` (Os), `deadline`, `duration` |
+| Bid reserve | `price.negotiableUpTo` | reserve held = the floor % under the opening bid (default 20); none = 90 (D-056) |
 | Request | `POST /frontend/request-weos` | `price {min, max}` (Os), `deadline` (epoch ms), category id + name |
 | Hunt, Drop, Gift, Subscription | — | "coming soon" in the design (CRE-12): on the ring, never open a composer |
 
@@ -54,15 +55,34 @@ Prices are entered in Os; a regular WeO stores US dollars, so the composer conve
 - D-053 A format pick starts with no media (the design seeds a stock image — that would post a design asset as the WeO's picture); the orb shows the format colour until you upload.
 - D-054 "Vet it first", "Ask a Circle", "Rehearse" and the hero's Rehearse dock wait for M11 (D-027). "Notify me" on soon formats is remembered on this device only.
 - D-055 Fees: the preflight shows what settlement takes (nothing today), not the design's 2 % Flow fee.
+- D-056 Post sheet: network = create; a Circle = create then push (title as the question); one person = create with `requestedId` (Listing / Bid). A Request posts straight to the asks board. Bid reserve = the floor. `?edit=` saves in place.
+- D-057 A Request has no Media module (the request endpoint stores none).
+
+## Components
+
+| Component | File |
+|---|---|
+| `CreatePage` (seed: blank / `?draft=` / `?edit=`) → `CreateFlow` (steps, posting) | `features/create/pages/CreatePage.tsx`, `components/CreateFlow.tsx` |
+| `CreateHero`, `HeroDocks`, `FormatOrb`, `FormatReadout` | `components/CreateHero.tsx`, `HeroDocks.tsx`, `HeroRing.tsx` |
+| `Headline`, `MakeDonut`, `MakeWell`, `useLook`, `edgeAt` | `components/MakeO.tsx` |
+| `FloatMod`, `OrbSlider` | `components/Docks.tsx` |
+| `TemplateSheet`, `TemplateDrawer`, `TemplateShelf` | `components/TemplateSheet.tsx`, `TemplateTiles.tsx` |
+| `Composer`, `ModRail`, `ModWell`, `buildModules` | `components/Composer.tsx`, `ModRail.tsx`, `ModWell.tsx`, `modules.tsx` |
+| `MediaUploader`, `AiDraft`, `CardAssist` | `components/MediaUploader.tsx`, `AiDraft.tsx` |
+| `Preflight`, `PostSheet`, `Posted` | `components/Preflight.tsx`, `PostSheet.tsx`, `Posted.tsx` |
+| `InlineText`, `InlineNum`, `Stepper`, `ModRing` | `components/bits.tsx` |
+| form, payload, media rules, drafts | `model/composer.ts`; card preview + circles `model/card.ts`; edit `model/edit.ts`; formats `model/formats.ts` |
 
 ## Gaps / questions
 
 | Need | Status |
 |---|---|
-| Media upload | BE new |
-| AI draft | BE new |
-| Templates | BE new |
-| O peg for the client | BE new |
+| Media upload | BE done (M07) |
+| AI draft | BE done (M07) |
+| Templates | BE done (M07) |
+| O peg for the client | BE done (M07) |
+| Media on a Request | the request endpoint stores none (D-057) |
+| Post into a circle without a question | the push needs one; the title stands in (D-056) |
 | Unlock a premium template (plan / Os) | M09 (Q-4) |
 | Hunt / Drop / Gift / Subscription creation | design says "coming soon" |
 
