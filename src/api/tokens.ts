@@ -34,6 +34,21 @@ const safeStorage = {
 
 let accessToken: string | null = (!safeStorage.get(REFRESH_KEY) && env.devAccessToken) || null;
 
+const notify = () => listeners.forEach((l) => l());
+
+/*
+ * Another tab signed out (its refresh token was removed from the shared storage): this tab's
+ * access token is the same person's, so it ends here too instead of carrying on until it expires.
+ */
+if (typeof window !== 'undefined') {
+  window.addEventListener('storage', (e) => {
+    if (e.key === REFRESH_KEY && e.oldValue && !e.newValue && accessToken) {
+      accessToken = null;
+      notify();
+    }
+  });
+}
+
 export const tokens = {
   getAccess: () => accessToken,
   getRefresh: () => safeStorage.get(REFRESH_KEY),
@@ -42,12 +57,12 @@ export const tokens = {
   set(access: string | null, refresh?: string | null) {
     accessToken = access;
     if (refresh !== undefined) safeStorage.set(REFRESH_KEY, refresh);
-    listeners.forEach((l) => l());
+    notify();
   },
   clear() {
     accessToken = null;
     safeStorage.set(REFRESH_KEY, null);
-    listeners.forEach((l) => l());
+    notify();
   },
   subscribe(l: Listener) {
     listeners.add(l);

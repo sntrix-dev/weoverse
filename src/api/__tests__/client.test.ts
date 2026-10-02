@@ -126,6 +126,63 @@ describe('api client', () => {
     expect(refreshCalls).toBe(1);
   });
 
+  it('waits its turn across tabs and spends the refresh token the previous tab rotated in', async () => {
+    tokens.set('expired', 'refresh-1');
+    const spent: string[] = [];
+    // another tab holds the lock and rotates the shared token before this tab gets it
+    Object.defineProperty(navigator, 'locks', {
+      configurable: true,
+      value: {
+        request: async (_name: string, cb: () => Promise<boolean>) => {
+          localStorage.setItem('weo.auth.refresh', 'refresh-from-other-tab');
+          return cb();
+        },
+      },
+    });
+    server.use(
+      http.get(url('/frontend/me'), ({ request }) =>
+        request.headers.get('authorization') === 'Bearer fresh' ? ok('me') : new HttpResponse('No token', { status: 401 }),
+      ),
+      http.post(url('/frontend/auth/new_access_token'), async ({ request }) => {
+        const { refresh_token } = (await request.json()) as { refresh_token: string };
+        spent.push(refresh_token);
+        return refresh_token === 'refresh-from-other-tab'
+          ? ok({ accessToken: 'fresh', refreshToken: 'refresh-3' })
+          : fail(401, 'Refresh token reused');
+      }),
+    );
+    try {
+      await expect(api.get('/frontend/me')).resolves.toBe('me');
+    } finally {
+      Reflect.deleteProperty(navigator, 'locks');
+    }
+    expect(spent).toEqual(['refresh-from-other-tab']);
+    expect(tokens.getRefresh()).toBe('refresh-3');
+  });
+
+  it('without locks, a refusal caused by another tab rotating the token retries with the newer one', async () => {
+    tokens.set('expired', 'refresh-1');
+    const spent: string[] = [];
+    server.use(
+      http.get(url('/frontend/me'), ({ request }) =>
+        request.headers.get('authorization') === 'Bearer fresh' ? ok('me') : new HttpResponse('No token', { status: 401 }),
+      ),
+      http.post(url('/frontend/auth/new_access_token'), async ({ request }) => {
+        const { refresh_token } = (await request.json()) as { refresh_token: string };
+        spent.push(refresh_token);
+        if (refresh_token === 'refresh-1') {
+          // the other tab won the race and stored its rotated token
+          localStorage.setItem('weo.auth.refresh', 'refresh-2');
+          return fail(401, 'Refresh token reused');
+        }
+        return ok({ accessToken: 'fresh', refreshToken: 'refresh-3' });
+      }),
+    );
+    await expect(api.get('/frontend/me')).resolves.toBe('me');
+    expect(spent).toEqual(['refresh-1', 'refresh-2']);
+    expect(tokens.hasSession()).toBe(true);
+  });
+
   it('clears the session and calls the expiry handler when refresh fails', async () => {
     tokens.set('expired', 'refresh-1');
     const expired = vi.fn();

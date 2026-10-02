@@ -39,7 +39,7 @@ Modals (`screens-more.jsx`): `ComposeModal` (2 steps: question/detail/prompts �
 | your / suggested circles | `GET /frontend/community/circles?filter=all` | OK |
 | circle header + discussions + trending tags | `GET /frontend/community/circles/:id` | BE additive: `collectThrough7d`; fix `threads[].circleName` |
 | members tab, member rim | `GET …/circles/:id/members?limit` | OK |
-| WeOs tab | `GET …/circles/:id/weos` | OK |
+| WeOs tab | `GET …/circles/:id/weos?scope=all` | BE additive (follow-up, G-47) |
 | join / leave / mute | `POST …/:id/join`, `DELETE …/:id/leave`, `PATCH …/:id/notification {off\|all}` | OK |
 | questions feed | `GET /frontend/community/discussions?filter=all\|open\|resolved\|mine&limit` | OK |
 | thread | `GET /frontend/community/threads/:id` | fix: `author.isr` was always 100 |
@@ -68,12 +68,12 @@ Modals (`screens-more.jsx`): `ComposeModal` (2 steps: question/detail/prompts �
 
 | Need | Status |
 |---|---|
-| Thread vote race returns 500; GET thread bumps `viewCount` on every read | logged G-42, G-43 |
+| Thread vote race returns 500; GET thread bumps `viewCount` on every read | G-43 — fixed (follow-up) |
 | Attached WeO `circleCount` always 0 | G-44 (FE reads the full WeO instead) |
-| Report response returns other reporters and admin notes | G-45 |
-| `GET /users/:id` and `GET /users` leak email/phone/address | G-46 |
-| Several tabs refreshing the session at once signed the user out (browser pass) | M12 (single-flight refresh across tabs) |
-| A circle's `weoCount` counts more than the WeOs pushed into it (`/weos` can be empty while the count is 18) | G-47 |
+| Report response returns other reporters and admin notes | G-45 — fixed (follow-up) |
+| `GET /users/:id` and `GET /users` leak email/phone/address | G-46 — fixed (follow-up) |
+| Several tabs refreshing the session at once signed the user out (browser pass) | fixed (D-043) |
+| A circle's `weoCount` counts more than the WeOs pushed into it (`/weos` can be empty while the count is 18) | G-47 — fixed (follow-up) |
 | Stories have no detail page; a story without `threadId` opens its WeO | design gap |
 | Rehearse this context / Enter a world | M11 (hidden until then, D-027) |
 

@@ -19,7 +19,7 @@
 | backend | `npm run docs:lint` | ✅ | 37 warnings = base |
 | frontend | `npm run typecheck` | ✅ | |
 | frontend | `npm run lint` | ✅ | 0 errors; 26 warnings, all in `src/design-system/` (D-016) |
-| frontend | `npm test` | ✅ | 156 / 156 (18 files) — +17 |
+| frontend | `npm test` | ✅ | 160 / 160 (18 files) — +21 (incl. the 2026-10-03 follow-up) |
 | frontend | `npm run build` | ✅ | community pages, sheets and the wallet panel load as their own chunks |
 
 ### What the new frontend tests cover
@@ -70,8 +70,8 @@
 
 ## 6. Open issues & follow-ups
 
-- **Session across tabs (M12):** opening four app iframes at once made several refreshes race and signed the user out. Needs a single-flight refresh shared across tabs (BroadcastChannel / lock).
-- Backend gaps opened: G-42 vote race 500, G-43 view counted per read, G-44 attached `circleCount` always 0, G-45 report response leak, G-46 user endpoints leak contact data, G-47 circle `weoCount` vs posted WeOs.
+- ~~Session across tabs~~ — fixed 2026-10-03 (D-043): one refresh at a time across tabs (Web Lock), sign-out follows across tabs. +4 tests.
+- ~~Backend gaps G-42…G-47~~ — fixed 2026-10-03 at Surya's go-ahead: atomic votes, thread views once per viewer per window, attached-WeO circle count, reporter-only report view, other people's profiles without contact details and a staff-only user list, live circle WeO counts with `scope=all` (the circle's WeOs tab now lists every WeO it holds). Backend +5 tests.
 - No stories in the dev data — the Stories page and lens were checked with their empty state live and the full layout in tests.
 - Test content left in the dev database: one thread "[M05 test] How do I price a first Listing?" in Selling with one answer and one reply.
 

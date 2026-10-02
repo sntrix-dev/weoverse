@@ -1283,8 +1283,10 @@ export interface paths {
         /**
          * Get one thread with all its answers + replies + caller's votes
          * @description Single payload — the FE renders the entire thread page from
-         *     this response. Side-effect: increments `thread.viewCount` on
-         *     every call (no dedup in v1).
+         *     this response. Side-effect: counts a view — once per viewer per
+         *     30-minute window, never the author's own (it counted every read,
+         *     refetches included — G-43). `attachedWeo.circleCount` is the number
+         *     of circles the WeO has been posted into (it always read 0 — G-44).
          */
         get: operations["getCommunityThread"];
         put?: never;
@@ -1325,7 +1327,9 @@ export interface paths {
          * Up/down/un-vote on an answer
          * @description Idempotent. `value: 1` upvotes, `value: -1` downvotes, `value: 0`
          *     removes the caller's existing vote. Flipping direction is one
-         *     atomic delta on `answer.voteScore` and `thread.voteScore`.
+         *     atomic delta on `answer.voteScore` and `thread.voteScore`. The vote
+         *     row is swapped atomically, so two votes landing together count
+         *     once and never 500 (G-42); `voteScore` is the score after the write.
          */
         post: operations["voteOnCommunityAnswer"];
         delete?: never;
@@ -1506,6 +1510,12 @@ export interface paths {
          *     while `total` still reports the raw thread-aggregate count.
          *
          *     Sort: `latestPushedAt` desc — newest push first.
+         *
+         *     **`scope=all`** — every WeO the circle holds: those of its format
+         *     (`weoTypeKey`) or category (`categoryId`), plus any posted into it,
+         *     newest first. Rows for WeOs never posted here carry
+         *     `latestPushedAt: null`, `latestThreadId: null`, `pushCount: 0`.
+         *     This is the set the circle's `weoCount` counts (G-47).
          */
         get: operations["getCommunityCircleAttachedWeos"];
         put?: never;
@@ -3582,6 +3592,12 @@ export interface paths {
          *     submission to `reports[]` and bumps `reportCount`. A user
          *     reporting the same target twice returns `409`.
          *
+         *     The response is the reporter's view of the aggregate: `reports[]`
+         *     holds only the caller's own submission(s), and `adminNotes` /
+         *     `resolvedBy` are `null` — other people's reports and the
+         *     moderators' notes stay with the moderators (G-45). The same applies
+         *     to the caller's report list.
+         *
          *     Wire-shape note: the retired `offerId` payload field is GONE.
          *     Use `weoId` instead.
          */
@@ -4288,9 +4304,12 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * List all users (legacy debug endpoint)
-         * @description Returns every user document with no pagination or filtering. Marked
-         *     TODO in source for admin-gating; treat as semi-public until removed.
+         * List all users (staff only)
+         * @description Returns every user document (no pagination or filtering), minus the
+         *     secrets (`password`, `fcmTokens`, `googleId`, `invitationCode`).
+         *     **Staff only** — `admin`, `super_admin` or `support`; any other
+         *     caller gets `403`. (It had no role check and returned every user's
+         *     contact details to any signed-in member — G-46.)
          */
         get: operations["getUsers"];
         /**
@@ -4322,6 +4341,13 @@ export interface paths {
          * @description Returns the requested user augmented with social state relative to
          *     the caller (`isFollowing`, `isInCircle`), plus `weoCount`,
          *     `activeWeoCount`, and placeholder `likeCount`/`viewsCount` fields.
+         *
+         *     **Owner-only fields** — `emailAddress`, `phoneNumber`, `address`,
+         *     `oWalletId`, `isPasswordSet`, `uiPreferences`, `notificationEnabled`,
+         *     `notificationPreferences`, `statusReason`, `statusUpdatedBy`,
+         *     `statusUpdatedAt` — are present only when `{id}` is the caller.
+         *     Anyone else gets the public profile (G-46). A malformed id is `400`,
+         *     an unknown one `404` (both were `500`).
          */
         get: operations["getUserById"];
         put?: never;
@@ -14064,6 +14090,12 @@ export interface components {
             isPlatform: boolean;
             memberCount: number;
             threadCount: number;
+            /**
+             * @description How many WeOs the circle holds — of its format or category, or
+             *     posted into it; blocked ones excluded. Counted live (it was a
+             *     counter that only ever grew — G-47); equals
+             *     `GET /circles/{id}/weos?scope=all` → `pagination.total`.
+             */
             weoCount: number;
             activeNow: number;
             resolvedRate7d: number;
@@ -14177,8 +14209,9 @@ export interface components {
             /**
              * @description `_id` of the most recent attaching thread — feed to
              *     `GET /community/threads/{id}` for the full discussion.
+             *     `null` only on `scope=all` rows for a WeO never posted here.
              */
-            latestThreadId: string;
+            latestThreadId: string | null;
             /**
              * @description Number of threads in this circle that attach this WeO. Typically
              *     1 (single push-to-hub); higher when a creator re-pushed.
@@ -17901,6 +17934,8 @@ export interface operations {
                  * @example 20
                  */
                 limit?: components["parameters"]["LimitParam"];
+                /** @description `pushed` (default) — WeOs posted into the circle; `all` — the whole set the circle holds. */
+                scope?: "pushed" | "all";
             };
             header?: never;
             path: {
@@ -24055,6 +24090,15 @@ export interface operations {
                 };
             };
             401: components["responses"]["Unauthorized"];
+            /** @description Not a staff role. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
             /** @description User not found */
             404: {
                 headers: {

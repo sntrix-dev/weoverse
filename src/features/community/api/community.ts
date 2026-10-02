@@ -82,7 +82,9 @@ export function useCircleMembers(id: string | undefined, limit = 24) {
 export function useCircleWeos(id: string | undefined) {
   return useQuery({
     queryKey: qk.circles.weos(id ?? ''),
-    queryFn: () => api.get<Paged<CircleWeoRow>>(`${C}/circles/${enc(id ?? '')}/weos`, { query: { limit: 24 } }),
+    // every WeO the circle holds — its format, its category, what was posted in — the set its count counts
+    queryFn: () =>
+      api.get<Paged<CircleWeoRow>>(`${C}/circles/${enc(id ?? '')}/weos`, { query: { limit: 24, scope: 'all' } }),
     enabled: !!id,
     staleTime: 60_000,
   });

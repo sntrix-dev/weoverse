@@ -2,6 +2,11 @@
 
 All notable changes per module. Newest first.
 
+## M05 follow-up (2026-10-03)
+
+- Sessions survive several open tabs: one refresh at a time across tabs, and signing out in one tab signs out the others.
+- Backend: votes can't double-count or fail when two land together; a thread view counts once per person; reports no longer show other reporters or moderator notes; other people's profiles no longer include contact details and the full user list is staff-only; a circle's WeO count matches its WeOs tab, which now lists every WeO the circle holds.
+
 ## M05 — Community (2026-10-01)
 
 - The Community hub: your WeOs in flight (drafts and live WeOs as Next-Os), your circles and the ones you can join (records that open into their orbit), questions / stewards / stories, and the O-Wallet panel (moved forward from M09).

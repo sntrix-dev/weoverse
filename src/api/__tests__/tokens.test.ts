@@ -28,3 +28,28 @@ describe('dev token', () => {
     expect(tokens.hasSession()).toBe(true);
   });
 });
+
+describe('across tabs', () => {
+  it('signing out in another tab ends this tab’s session too', async () => {
+    const { tokens } = await import('../tokens');
+    tokens.set('acc', 'ref');
+    const seen = vi.fn();
+    const off = tokens.subscribe(seen);
+    localStorage.removeItem('weo.auth.refresh');
+    window.dispatchEvent(new StorageEvent('storage', { key: 'weo.auth.refresh', oldValue: 'ref', newValue: null }));
+    expect(tokens.getAccess()).toBeNull();
+    expect(tokens.hasSession()).toBe(false);
+    expect(seen).toHaveBeenCalled();
+    off();
+  });
+
+  it('a token rotated in another tab leaves this tab signed in', async () => {
+    const { tokens } = await import('../tokens');
+    tokens.set('acc', 'ref');
+    localStorage.setItem('weo.auth.refresh', 'ref-2');
+    window.dispatchEvent(new StorageEvent('storage', { key: 'weo.auth.refresh', oldValue: 'ref', newValue: 'ref-2' }));
+    expect(tokens.getAccess()).toBe('acc');
+    tokens.clear();
+  });
+});
+

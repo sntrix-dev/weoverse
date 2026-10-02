@@ -94,7 +94,7 @@ function toError(res: Response, body: unknown): ApiError {
   );
 }
 
-/* ---------- refresh (single flight) ---------- */
+/* ---------- refresh (single flight, across tabs) ---------- */
 
 let refreshing: Promise<boolean> | null = null;
 let onSessionExpired: (() => void) | null = null;
@@ -104,21 +104,42 @@ export const setSessionExpiredHandler = (fn: (() => void) | null) => {
   onSessionExpired = fn;
 };
 
+/** One tab at a time may spend the (shared, rotating) refresh token. */
+const REFRESH_LOCK = 'weo.auth.refresh';
+
+async function exchange(refreshToken: string): Promise<boolean> {
+  const res = await fetch(buildUrl('/frontend/auth/new_access_token'), {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ refresh_token: refreshToken }),
+  });
+  const body = await readBody(res);
+  if (!res.ok || !isEnvelope(body) || !body.success) return false;
+  const data = body.data as components['schemas']['NewAccessTokenData'];
+  tokens.set(data.accessToken, data.refreshToken);
+  return true;
+}
+
+/**
+ * Spends the refresh token as it is NOW in storage — read inside the lock, so a tab that waited
+ * uses the token the previous tab just rotated in, never the one it already spent. If the
+ * exchange is refused but another tab rotated the token meanwhile (a browser without Web Locks),
+ * it tries once more with the newer one before giving up.
+ */
+async function refreshFromStorage(): Promise<boolean> {
+  const first = tokens.getRefresh();
+  if (!first) return false;
+  if (await exchange(first)) return true;
+  const latest = tokens.getRefresh();
+  return !!latest && latest !== first && exchange(latest);
+}
+
 export function refreshAccessToken(): Promise<boolean> {
-  const refreshToken = tokens.getRefresh();
-  if (!refreshToken) return Promise.resolve(false);
+  if (!tokens.getRefresh()) return Promise.resolve(false);
   refreshing ??= (async () => {
     try {
-      const res = await fetch(buildUrl('/frontend/auth/new_access_token'), {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ refresh_token: refreshToken }),
-      });
-      const body = await readBody(res);
-      if (!res.ok || !isEnvelope(body) || !body.success) return false;
-      const data = body.data as components['schemas']['NewAccessTokenData'];
-      tokens.set(data.accessToken, data.refreshToken);
-      return true;
+      const locks = typeof navigator !== 'undefined' ? navigator.locks : undefined;
+      return locks ? await locks.request(REFRESH_LOCK, refreshFromStorage) : await refreshFromStorage();
     } catch {
       return false;
     } finally {
