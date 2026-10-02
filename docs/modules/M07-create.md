@@ -45,7 +45,7 @@ The largest page (`create.jsx`, ~1,400 lines). Split into feature components; no
 |---|---|
 | Media upload (create requires ≥1 media URL) | `POST /frontend/media` multipart (reuse `MediaService`, S3, limits from env) → `{url, type, thumbnail?}`. New module `media` frontend route + swagger + tests. |
 | AI draft (`CardAssist`, was `window.claude.complete`) | `POST /frontend/ai/draft-weo {format, title?, notes?}` using the existing LangChain/OpenAI setup, rate-limited |
-| Templates catalogue + Pro unlock (Q-3) | FE static catalogue first (from `template-data.js`) unless backend wanted |
+| Templates catalogue + Pro unlock (Q-3) | backend catalogue `GET /frontend/templates` (D-050); unlock with plans/billing (M09) — premium shows locked until then |
 | "Notify me" for soon formats | small additive endpoint or skip |
 
 ## Acceptance criteria

@@ -4,6 +4,7 @@ Newest first. Each entry: date · decision · why · who decided. Open questions
 
 | # | Date | Decision | Why | By |
 |---|---|---|---|---|
+| D-050 | 2026-10-03 | Templates (Create) are **served by the backend**: a seeded catalogue (`GET /frontend/templates`, each with its tier and whether the caller may use it); "Use this template" pre-fills the composer from the server's copy. Unlocking a premium template (plan tier or an Os price) is enforced server-side and lands with plans/billing (Q-4, M09); until then premium templates show locked. Resolves Q-3. | A premium catalogue gated by plan and paid in Os cannot be protected or charged from a client-side list, and porting `template-data.js` into the app would break "real data only" (CLAUDE.md §2). | Surya ("whichever is right") / Claude |
 | D-049 | 2026-10-03 | Collect / Exchange pulse tiles and boards use the backend's measures and labels (Collects, Views · lifetime, Settled, Preflight; Movers, Formats, Creators, Awaiting). A tile with no daily source shows no sparkline; deltas come from the window trend. | The design's figures were invented ("Through 67%", "8.7k views · 7d"); a label must say what was measured. | Claude |
 | D-048 | 2026-10-03 | "Where your Os sit" (Collect): Available = the wallet's available balance; Protected / Pending / Locked = the collections snapshot's `osPlacement` (backed, entries, committed holdings). | The wallet's other buckets are hard-coded 0 (G-51); the snapshot measures where holdings commit Os. | Claude |
 | D-047 | 2026-10-03 | Exchange "Draft" = your drafts (`/me/drafts`). A paused (`inactive`) listing is "Paused" under Live with Activate (the wire keeps `state: draft`; `paused` tells them apart). A draft's "N open" is `round((1 − ready) × 5)` — the composer records only the share of the five checks. A re-listing (`resold`) cannot be paused, so its menu has no Inactivate. | Matches the design's tabs without inventing check names. | Claude |
@@ -59,7 +60,7 @@ Newest first. Each entry: date · decision · why · who decided. Open questions
 | # | Question | Needed by |
 |---|---|---|
 | ~~Q-1~~ | Resolved 2026-10-01: previous build env shared (IdP `https://wallet.ocono.me`, scope `profile`, redirect `:5173/callback`); authorize path to confirm in browser. | M01 |
-| Q-3 | Templates (Create): keep the design's static template catalogue in the frontend, or serve from the backend (with Pro unlock)? | M07 |
+| ~~Q-3~~ | Resolved 2026-10-03 (D-050): templates are served by the backend; unlock with plans/billing (M09). | M07 |
 | Q-4 | Plans/apps (Wallet "Apps and plans", Simulation Pro) — real billing or display-only for now? | M09 / M11 |
 | Q-5 | The global rate limit (70 req/min/IP) will throttle local testing. OK to make it configurable via env (default unchanged)? | M01 |
 | Q-6 | Tiers: the design shows Member / Contributor / Steward with an advantage % (`Tier 2 · 10%`); the backend has participant / player / prime (L1–L3) and no %. Which names, and is there an advantage figure? | M09 |
