@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Navigate, useSearchParams } from 'react-router';
 import { buildAuthorizeUrl, buildGoogleSignInUrl } from '@/api/auth';
-import { routes } from '@/app/routes';
+import { safeNext } from '@/app/routes';
 import { useHasSession } from '@/app/session';
 import { Alert, Button, Card, WeOverseLettering } from '@/design-system';
 import { env } from '@/lib/env';
@@ -10,7 +10,7 @@ import styles from './AuthPage.module.css';
 /** Sign in with the O-Wallet (OAuth2 + PKCE). */
 export function LoginPage() {
   const [params] = useSearchParams();
-  const next = params.get('next') || routes.create();
+  const next = safeNext(params.get('next'));
   const hasSession = useHasSession();
   const [busy, setBusy] = useState<null | 'owallet' | 'google'>(null);
   const [error, setError] = useState<string | null>(null);

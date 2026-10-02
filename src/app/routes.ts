@@ -31,9 +31,18 @@ export type RouteName = keyof typeof ROUTE_META;
 
 const enc = encodeURIComponent;
 
+/** Where to land after signing in: a same-site path, never the sign-in page itself. */
+export function safeNext(next: string | null | undefined): string {
+  let n = next ?? '';
+  // an older nested `/login?next=/login?next=…` unwraps to where it was going
+  for (let i = 0; i < 8 && n.startsWith('/login'); i++) n = new URLSearchParams(n.split('?')[1] ?? '').get('next') ?? '';
+  return n.startsWith('/') && !n.startsWith('//') && !n.startsWith('/login') ? n : '/create';
+}
+
 export const routes = {
   home: () => '/',
-  login: (next?: string) => (next ? `/login?next=${enc(next)}` : '/login'),
+  /** a `next` that is itself the sign-in page is kept as it is, never wrapped again */
+  login: (next?: string) => (!next ? '/login' : next.startsWith('/login') ? next : `/login?next=${enc(next)}`),
   callback: () => '/callback',
   /** `draft` opens a saved draft in the composer (M07) */
   create: (draft?: string) => (draft ? `/create?draft=${enc(draft)}` : '/create'),

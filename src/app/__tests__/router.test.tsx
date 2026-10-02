@@ -1,5 +1,6 @@
 import { screen } from '@testing-library/react';
 import { tokens } from '@/api/tokens';
+import { routes, safeNext } from '@/app/routes';
 import { renderApp } from '@/test/renderApp';
 
 afterEach(() => tokens.clear());
@@ -59,6 +60,15 @@ describe('routing', () => {
     await planned('M09');
     expect(document.documentElement.style.getPropertyValue('--focus-tint')).toBe('#F7C62B');
     expect(document.querySelector('main section')).toHaveAttribute('data-lead');
+  });
+
+  it('a nested sign-in link unwraps to where it was going, and never wraps itself again', async () => {
+    const nested = `/login?next=${encodeURIComponent(`/login?next=${encodeURIComponent('/wallet')}`)}`;
+    const { router } = renderApp(nested);
+    await planned('M09');
+    expect(router.state.location.pathname).toBe('/wallet');
+    expect(routes.login(nested)).toBe(nested);
+    expect(safeNext('//evil.test')).toBe('/create');
   });
 
   it('redirects signed-in users away from /login', async () => {
