@@ -2,7 +2,7 @@
 
 | Status | FE branch | BE branch | Report |
 |---|---|---|---|
-| ⏳ in progress | `feat/m06-collect-exchange` | `redesign/m06-collect-exchange` (from `redesign/m05-community`) | `reports/M06-collect-exchange.md` |
+| ✅ done 2026-10-03 | `feat/m06-collect-exchange` | `redesign/m06-collect-exchange` (from `redesign/m05-community`) | `reports/M06-collect-exchange.md` |
 
 Product answers (Surya, 2026-10-03): **Redeem = confirm receipt** — the holder marks a holding received; no money moves (settlement already happened at collect). **Dispute = report + disputed flag** — a moderation report on the WeO, and the holding is marked disputed (no relist, no confirm).
 
@@ -59,7 +59,7 @@ Sheet: `RelistSheet` (`screens-flows.jsx`) — the CardFlow portal with your ask
 | Bid held / standing bids ("You are the standing bid…") | G-50 — M11 |
 | "Offers waiting · Reply" in Needs attention | no offers model on listings — omitted |
 | Fees on resale (design 2% + 2%) | G-52 — product |
-| Other members' email in circle / follow lists | G-49 — asked |
+| Other members' email in circle / follow lists | G-49 — removed (approved) |
 | Rehearse | M11 (D-027) |
 | Edit a live WeO | M07 (opens the WeO until then) |
 
