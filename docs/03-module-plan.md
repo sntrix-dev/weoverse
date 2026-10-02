@@ -10,7 +10,7 @@ Twelve build modules after setup. Each is delivered with the workflow in `04-mod
 | M03 | Shared WeO & list kit | SectionHero, ViewBar/view prefs, Scene, Rows, SectionHead/Mark, Fold/Rail, IconSegs, WeoTile/StallTile/WeoView, CircleRecord/Oi/Chip, PersonOi/Spark/StandChip, Snapshot chart/panel, Pip, OWalletPanel, `cardModel` | card price in Os + crowdfund pledge bounds on the projection (G-29) | M02 | ✅ 2026-10-01 (wallet/profile composites → M09, D-028) |
 | M04 | Discover · WeO · Collect flow | discover, weo, CollectSheet/CardFlow | quote in Os + payload, feed/list/creators fixes (G-30…G-34) | M03 | ✅ 2026-10-01 |
 | M05 | Community | community (hub), circle, thread, circles (manage), stewards, stories; Compose/Push/Report modals; O-Wallet panel | steward fields, collect-through, WeO faces, author fixes, follow statuses (G-42…G-46 logged) | M03 | ✅ 2026-10-01 |
-| M06 | Collect & Exchange | collect (holdings), exchange (listings), RelistSheet, NeedsYou | pause/activate, redeem, dispute | M04 | ⏳ next |
+| M06 | Collect & Exchange | collect (holdings), exchange (listings), RelistSheet, NeedsYou | pause/activate, redeem, dispute, resell quote, Os-true snapshots (G-49…G-53) | M04 | ⏳ in progress |
 | M07 | Create | create (hero, composer, preflight, posted), templates, media upload, PostSheet, AI draft | media upload REST, AI draft, templates | M05, M06 | |
 | M08 | People & requests | creators, requests, tracking; CreatorSheet, OfferSheet, make-for-request | tracking watchlist, offer-a-holding | M04 | |
 | M09 | Identity & money | passport, wallet, settings; profile/tier/ISR sheets, MoveOsSheet, plans | notification channel prefs, plans | M03 | |

@@ -76,9 +76,12 @@ Backend: `weo-3.0`, local base URL **`http://localhost:3002/api`**. Full endpoin
 | M05 | Follow | `POST /frontend/users/:id/follow`, `DELETE /frontend/users/:id/unfollow` | wired (400/404/409, M05) |
 | M05 | In flight | `GET /frontend/me/drafts`, `GET /frontend/community/my-weos` (fixed M05) | wired (D-037) |
 | M05 | Wallet row | `GET /frontend/wallet/overview`, `GET /frontend/me/collections?limit=3`, `POST /frontend/wallet/transfer` | wired (D-038) |
-| M06 | Holdings | `GET /frontend/me/collections`, `/snapshot`, `/:collectionId` | exists |
-| M06 | Listings | `GET /frontend/me/listings`, `/history`, `/snapshot`, `/:id` | exists |
-| M06 | Relist | `POST /frontend/weos/:id/resell` | exists |
+| M06 | Collect: holdings, needs you, stats, pulse, boards | `GET /frontend/me/collections/snapshot?window=7d` (Os fixes + `format`, `redeemedAt`, `disputedAt`, M06) | wired (`features/collect/api/holdings.ts`) |
+| M06 | Confirm receipt / dispute | `POST /frontend/me/collections/:id/redeem`, `/dispute` (new, M06) | wired (D-044, D-045) |
+| M06 | Relist | `GET /frontend/weos/:id/resell/quote` (new, M06), `POST /frontend/weos/:id/resell {amountOs, collectionId, …}` | wired (D-046) |
+| M06 | Exchange: listings, stats, pulse, boards | `GET /frontend/me/listings/snapshot?window=7d` (fixes + `status`, `paused`, `isResellable`, `format`, M06), `GET /frontend/me/drafts` | wired (`features/exchange/api/listings.ts`, D-047) |
+| M06 | Inactivate / Activate | `PATCH /frontend/weos/:id/status` (new, M06) | wired (optimistic, rolls back) |
+| M06 | Creators in your circles | `GET /frontend/creators?circle=joined` (new param + `bio`, M06), fallback `sort=isr` | wired |
 | M06 | Rate | `POST /frontend/weos/:id/rating` | exists |
 | M07 | Create / update | `POST /frontend/weos`, `PUT /frontend/weos/:id` | exists |
 | M07 | Drafts | `/frontend/me/drafts*` | exists |

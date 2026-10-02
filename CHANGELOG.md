@@ -2,6 +2,13 @@
 
 All notable changes per module. Newest first.
 
+## M06 — Collect & Exchange (in progress, 2026-10-03)
+
+- Collect: what you hold in Os (what you put in, value now, if you resold today), Needs you (confirm it arrived / something is wrong / it would fetch more / read the pool's report), your WeOs by format with Resell, Track and Circle, the snapshot (movers, formats, creators, awaiting) with "Where your Os sit", and the wallet.
+- Exchange: what you flow — listings and drafts with Live / Draft / Closed tabs, a ⋯ menu (Edit, Inactivate / Activate, Push to hub), preflight on drafts, the snapshot with "Needs attention", and the creators who share your circles.
+- Relist sheet: your ask in Os on the dial, figures from the backend's resell quote.
+- Backend (`redesign/m06-collect-exchange`): snapshots no longer count dollars as Os or double-count stock; re-listings stay live and can be collected; confirm receipt, dispute, pause/activate and the resell quote; only a WeO's creator can delete it; auto-paid installments now reach the seller; anonymous backers stay anonymous.
+
 ## M05 follow-up (2026-10-03)
 
 - Sessions survive several open tabs: one refresh at a time across tabs, and signing out in one tab signs out the others.
