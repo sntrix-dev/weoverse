@@ -40,6 +40,8 @@ describe('composer payload (D-051)', () => {
     expect(endpoint).toBe('weo');
     expect(body).toMatchObject({
       weoType: 'regular',
+      // the creator's choice is stored, so a 60-copy Listing never reads as a Drop
+      format: 'Listing',
       title: 'Signed print',
       description: 'One of sixty',
       categoryId: CAT._id,
@@ -66,6 +68,9 @@ describe('composer payload (D-051)', () => {
     const bid = { ...listing, kind: 'Bid' as const, reserve: true, negotiateOff: 20 };
     expect((buildPayload(bid, { usdAgainstO: 99 }).body.price as { negotiableUpTo: number }).negotiableUpTo).toBe(20);
     expect((buildPayload({ ...bid, reserve: false }, { usdAgainstO: 99 }).body.price as { negotiableUpTo: number }).negotiableUpTo).toBe(90);
+    expect(buildPayload(bid, { usdAgainstO: 99 }).body.format).toBe('Bid');
+    // editing a WeO made as a Drop keeps it a Drop
+    expect(buildPayload({ ...listing, keepFormat: 'Drop' }, { usdAgainstO: 99 }).body.format).toBe('Drop');
   });
 
   it('answering an ask carries its id', () => {

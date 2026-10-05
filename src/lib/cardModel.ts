@@ -135,6 +135,8 @@ export interface WeoCardModel {
 /* ---------- derivations: every display value has exactly one source ---------- */
 
 export function formatOf(w: WeoCardDto): WeoFormat {
+  // the backend's reading (the creator's choice when stored, M07) wins over the flags
+  if (w.format && (FORMATS as readonly string[]).includes(w.format)) return w.format as WeoFormat;
   if (w.weoType === 'crowdfund') return 'Pool';
   if (w.weoType === 'lottery') return 'Hunt';
   if (w.isNegotiable) return 'Bid';

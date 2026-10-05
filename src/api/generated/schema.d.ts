@@ -13614,6 +13614,14 @@ export interface components {
              * @enum {string}
              */
             status: "inactive" | "active";
+            /**
+             * @description The format the creator chose (redesign M07). Optional: when set it is
+             *     how every surface reads the WeO (a 60-copy Listing stays a Listing; a
+             *     Listing that takes offers stays a Listing). Unset, the format is
+             *     derived — negotiable → Bid, 100 or fewer issued → Drop.
+             * @enum {string}
+             */
+            format?: "Listing" | "Bid" | "Drop";
             price: {
                 amount: number;
                 priceSplit: number;
@@ -13889,6 +13897,11 @@ export interface components {
             joinedSince: string | null;
         };
         WeoCardCommon: {
+            /**
+             * @description The creator-facing format — the stored choice when there is one, otherwise derived (additive, M07).
+             * @enum {string}
+             */
+            format?: "Listing" | "Bid" | "Drop" | "Pool" | "Hunt";
             _id: components["schemas"]["ObjectId"];
             weoType: components["schemas"]["WeoType"];
             /** @example woodland */

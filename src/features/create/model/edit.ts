@@ -43,13 +43,16 @@ export function formFromWeo(w: WeoDetailDto, categories: readonly CategoryDto[])
     };
   }
   const off = num(obj(raw.negotiation).negotiableUpTo, num(obj(raw.price).negotiableUpTo));
-  const isBid = str(wv.format) === 'Bid' || off > 0;
+  const fmt = str(raw.format) || str(wv.format);
+  // the stored format decides; an older negotiable WeO reads as a Bid
+  const isBid = fmt ? fmt === 'Bid' : off > 0;
   const qty = obj(raw.quantity);
   const circ = num(raw.totalWeoInCirculation) + num(raw.soldCount);
   return {
     ...base,
-    // a negotiable regular WeO reads as a Bid everywhere (D-051), so it reopens as one
     kind: isBid ? 'Bid' : 'Listing',
+    keepFormat: fmt === 'Drop' ? 'Drop' : '',
+    negotiable: !isBid && off > 0,
     price: num(wv.priceOs),
     qty: Math.max(1, num(qty.amount, 1)),
     unit: str(qty.unitName, 'piece'),

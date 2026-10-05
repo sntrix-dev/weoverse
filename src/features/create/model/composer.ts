@@ -44,6 +44,8 @@ export interface ComposerForm {
   negotiable: boolean;
   /** % below the figure an offer may go (Listing offers, Bid reserve) */
   negotiateOff: number;
+  /** editing a WeO made as a Drop keeps it one (the composer has no Drop of its own yet) */
+  keepFormat: '' | 'Drop';
 }
 
 /** CRE-05: nothing is priced or counted until you say so. */
@@ -69,6 +71,7 @@ export const EMPTY_FORM: ComposerForm = {
   reserve: false,
   negotiable: false,
   negotiateOff: 10,
+  keepFormat: '',
 };
 
 export const MEDIA_MAX = 3;
@@ -123,6 +126,7 @@ export function templateForm(tp: TemplateDto, prev: ComposerForm): ComposerForm 
     reserve: kind === 'Bid',
     negotiable: false,
     negotiateOff: kind === 'Bid' ? BID_RESERVE_DEFAULT : 10,
+    keepFormat: '',
   };
 }
 
@@ -279,6 +283,8 @@ export function buildPayload(
     body: {
       ...shared,
       weoType: 'regular',
+      // the format the creator chose — otherwise a 60-copy Listing would read as a Drop (M07-B2)
+      format: f.keepFormat || f.kind,
       price: { amount: f.price / peg, priceSplit: 0, negotiableUpTo },
       quantity: {
         amount: Math.max(1, Math.round(f.qty || 1)),

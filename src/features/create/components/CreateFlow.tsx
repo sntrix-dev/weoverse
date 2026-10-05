@@ -371,7 +371,7 @@ export function CreateFlow({
           primary={{ label: 'Preflight', act: goPreflight }}
         />
       )}
-      {!posted && step === 3 && (
+      {!posted && !sheet && step === 3 && (
         <FlowBar
           screen="create"
           tone={tone}

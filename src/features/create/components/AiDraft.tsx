@@ -1,6 +1,7 @@
 // design: create.jsx AiDraft + CardAssist — Mya reads what the WeO already is (title, format,
 // category) and offers lines you can take. Nothing is written into your field until you choose one.
 import { useState } from 'react';
+import { ApiError } from '@/api/client';
 import { svg } from '@/design-system';
 import { useDescribe } from '../api/create';
 import type { LiveKind } from '../model/formats';
@@ -34,7 +35,9 @@ export function AiDraft({
       {
         onSuccess: (d) =>
           d.lines.length ? setOpts(d.lines.slice(0, 3)) : setErr('Could not draft that — try again.'),
-        onError: () => setErr('Could not draft that — try again.'),
+        // 503: no model on this server, 429: the per-minute limit — say so rather than "try again"
+        onError: (e) =>
+          setErr(e instanceof ApiError && (e.status === 503 || e.status === 429) ? e.message : 'Could not draft that — try again.'),
       },
     );
   };
