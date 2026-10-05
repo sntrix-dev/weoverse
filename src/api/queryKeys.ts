@@ -5,6 +5,9 @@
 export const qk = {
   me: {
     all: ['me'] as const,
+    passport: () => ['me', 'passport'] as const,
+    graph: () => ['me', 'graph'] as const,
+    settings: () => ['me', 'settings'] as const,
     navSummary: () => ['me', 'nav-summary'] as const,
     preferences: () => ['me', 'preferences'] as const,
   },
