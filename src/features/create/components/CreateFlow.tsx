@@ -79,7 +79,8 @@ export function CreateFlow({
   // the clock the open asks are read against (one reading per visit is enough for "closes in 3d")
   const [now] = useState(() => Date.now());
 
-  const autosave = useAutosave(f, step > 1 && !editId && !posted, draftId);
+  // an answer to a brief is posted to that ask or not at all — a draft would lose the ask (D-067)
+  const autosave = useAutosave(f, step > 1 && !editId && !posted && !forRequest, draftId);
   const pub = usePublish({
     usdAgainstO: peg?.usdAgainstO,
     creatorName: me?.handle?.replace(/^@/, '') || me?.name || '',

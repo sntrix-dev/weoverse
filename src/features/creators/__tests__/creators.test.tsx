@@ -85,6 +85,21 @@ describe('creators · the page', () => {
     expect(await screen.findByText('Following Lena V')).toBeInTheDocument();
   });
 
+  it('your own record does not offer to circle or collect yourself', async () => {
+    server.use(
+      http.get(url('/frontend/creators/:id'), () =>
+        ok(
+          creatorViewFixture({
+            viewer: { circled: false, tracked: false, sharedCircles: [], canContact: true, isSelf: true },
+          }),
+        ),
+      ),
+    );
+    renderApp('/creators/c-1');
+    expect(await screen.findByText('This is you — what others see on your record.')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Circle them' })).toBeNull();
+  });
+
   it('Mya opens as a guide, never ranked', async () => {
     const user = userEvent.setup();
     renderApp('/creators');

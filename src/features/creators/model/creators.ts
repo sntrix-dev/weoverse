@@ -45,6 +45,9 @@ export const creatorModel = (c: CreatorRowDto): CreatorModel => ({
   circlesLed: c.circlesLed ?? 0,
 });
 
+/** How many people a board ranks. */
+export const BOARD_ROWS = 12;
+
 const weeks = (n: number) => `${n} week${n === 1 ? '' : 's'}`;
 
 /**
@@ -62,7 +65,12 @@ export function creatorBoards(list: CreatorModel[]): Record<string, Board> {
     avatar: c.avatar,
     isr: c.isr,
   });
-  const by = (k: (c: CreatorModel) => number) => list.slice().sort((a, b) => k(b) - k(a));
+  // the podium and the nine behind it — the grid below holds everyone
+  const by = (k: (c: CreatorModel) => number) =>
+    list
+      .slice()
+      .sort((a, b) => k(b) - k(a))
+      .slice(0, BOARD_ROWS);
   return {
     standing: {
       label: 'Highest standing',

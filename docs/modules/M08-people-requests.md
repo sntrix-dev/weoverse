@@ -2,7 +2,7 @@
 
 | Status | FE branch | BE branch | Report |
 |---|---|---|---|
-| ⏳ in progress | `feat/m08-people-requests` | `redesign/m08-people-requests` (from `redesign/m07-create`) | `reports/M08-people-requests.md` |
+| ✅ done 2026-10-05 | `feat/m08-people-requests` | `redesign/m08-people-requests` (from `redesign/m07-create`) | `reports/M08-people-requests.md` |
 
 ## Screens
 
@@ -26,10 +26,11 @@ Global sheets: `CreatorSheet` (`screens-network.jsx`) opened from any face or na
 | track drops / tracking page | `GET /frontend/me/tracking`, `POST/DELETE /frontend/me/tracking/weos/:id`, `…/creators/:id` | **BE new** (notes from what changed since you started tracking; trackers hear when a tracked creator lists) |
 | invite into a Circle | `POST /frontend/community/circles/:id/invite {userId}` | **BE new** (a notification; obeys `publicProfile.invites`) |
 | contact | compose (`/community/threads`) in a shared circle | OK |
-| open briefs, offers, circles asking | `GET /frontend/request-weos?status=open` | OK + additive `status` filter, `where`, `offerers`, `circle {id,name,image}`, `mine` (BE) |
+| open briefs, offers, circles asking | `GET /frontend/request-weos?status=open` | OK + additive `status` filter, `by`, `offerers`, `circle {id,name,image,coverColor}`, `open`, `mine`, `offered` (BE); no `where` (D-065) |
 | one brief | `GET /frontend/request-weos/:id` | OK (+ same additive fields) |
 | offer one you hold | `POST /frontend/request-weos/:id/accept` (a requested WeO at your figure, made from one of your WeOs) | OK |
 | offers on my brief | `GET /frontend/request-weos/:id/accepted-weos` | OK |
+| close my brief | `POST /frontend/request-weos/:id/close` | **BE new** (D-065) |
 | make a WeO for this | `/create?forRequest=:id` → `POST /frontend/weos` with `requestedId` | OK |
 | post a request | `/create` → Request | OK (M07) |
 
@@ -41,6 +42,10 @@ Global sheets: `CreatorSheet` (`screens-network.jsx`) opened from any face or na
 - D-062 A WeO is tracked from its page (a directory entry "Track it"), which the tracking page's empty state points to.
 - D-063 "Circles asking" = category circles with an open brief; a brief's image is its category circle's cover.
 - D-064 Rehearse buttons (creator panel, Mya, request panel) wait for M11 (D-027).
+- D-065 No place on a brief (fully digital); its category circle fills the slot. Requesters close their briefs and see the offers in.
+- D-066 The creators snapshot reads the directory as it stands (no history, no delta).
+- D-067 "Make a WeO for this" seeds the composer from the brief and posts to that ask; not autosaved.
+- D-068 Creator boards rank twelve.
 
 ## Gaps
 
@@ -48,7 +53,9 @@ Global sheets: `CreatorSheet` (`screens-network.jsx`) opened from any face or na
 |---|---|
 | Tracking watchlist + notes + drop alerts | BE new |
 | Invite into a community circle | BE new |
-| Request `where`, offerers, circle, open filter | BE additive |
+| Request offerers, circle, open filter, close | BE additive / new |
+| Request `where` (a place) | won't do (D-065) |
+| `GET /request-weos/:id` returns requested-WeO documents to any member | open (backend G-58, breaking to trim) |
 | Creator `weeksLive`, `weos`, `circlesLed` on the list | BE additive |
 | Steward role | none (M05: top contributors) |
 

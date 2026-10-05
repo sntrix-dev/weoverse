@@ -310,6 +310,7 @@ export function CreatorPanel({
   const list = orbitOf(detail).slice(0, 8);
   const R = 132;
   const first = list[0];
+  const self = !!detail?.viewer.isSelf;
   const stats: [React.ReactNode, string][] = [
     [
       <span key="s" style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
@@ -433,25 +434,33 @@ export function CreatorPanel({
           ))}
         </div>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 9, marginTop: 20 }}>
-          <Button
-            size="sm"
-            variant="primary"
-            tone="blue"
-            disabled={!first}
-            title={
-              first
-                ? first.name
-                : detail && !detail.shows.collections
-                  ? 'Their WeOs are private'
-                  : 'Nothing live yet'
-            }
-            onClick={() => first && openCollect(first.id)}
-          >
-            Collect a WeO
-          </Button>
-          <Button size="sm" variant="ghost" tone="green" selected={c.circled} onClick={() => onCircle(c)}>
-            {c.circled ? '✓ Circled' : 'Circle them'}
-          </Button>
+          {self ? (
+            <span style={{ alignSelf: 'center', fontSize: 12, color: 'var(--text-dim)' }}>
+              This is you — what others see on your record.
+            </span>
+          ) : (
+            <>
+              <Button
+                size="sm"
+                variant="primary"
+                tone="blue"
+                disabled={!first}
+                title={
+                  first
+                    ? first.name
+                    : detail && !detail.shows.collections
+                      ? 'Their WeOs are private'
+                      : 'Nothing live yet'
+                }
+                onClick={() => first && openCollect(first.id)}
+              >
+                Collect a WeO
+              </Button>
+              <Button size="sm" variant="ghost" tone="green" selected={c.circled} onClick={() => onCircle(c)}>
+                {c.circled ? '✓ Circled' : 'Circle them'}
+              </Button>
+            </>
+          )}
           {/* "Rehearse a pairing" arrives with worlds (M11, D-064) */}
           <Button size="sm" variant="ghost" tone="blue" onClick={onCollapse}>
             Close

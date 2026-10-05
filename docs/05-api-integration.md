@@ -92,6 +92,15 @@ Backend: `weo-3.0`, local base URL **`http://localhost:3002/api`**. Full endpoin
 | M07 | Categories, asks | `GET /frontend/categories`, `GET /frontend/request-weos` | wired |
 | M07 | Post into a circle | `POST /frontend/community/push` after the create (D-056) | wired |
 | M07 | Format a WeO was made as | `format` on regular create / update and on every WeO card (additive, M07, D-058) | wired (`lib/cardModel.ts formatOf`, composer payload) |
+| M08 | Creators directory, boards | `GET /frontend/creators?sort=isr&limit=48` (+ `weos`, `weeksLive`, `circlesLed`, M08) | wired (`features/creators/api/creators.ts`) |
+| M08 | Creator record / sheet | `GET /frontend/creators/:id` (+ `viewer.tracked`, M08) | wired (`CreatorPanel`, `CreatorSheet`) |
+| M08 | Circle them | `POST /frontend/users/:id/follow`, `DELETE …/unfollow` | wired (D-059) |
+| M08 | Track drops, tracking page, Track it | `GET /frontend/me/tracking`, `POST/DELETE /frontend/me/tracking/{weos,creators}/:id` (new, M08) | wired (`features/tracking`, D-060, D-062) |
+| M08 | Invite into a circle | `POST /frontend/community/circles/:id/invite {userId}` (new, M08) | wired (`CreatorSheet`) |
+| M08 | Open briefs, one brief | `GET /frontend/request-weos?status=open`, `GET /frontend/request-weos/:id` (+ `by`, `offerers`, `circle`, `open`, `mine`, `offered`, M08) | wired (`features/requests`) |
+| M08 | Offer one you hold | `POST /frontend/request-weos/:id/accept` (a regular-WeO body from your WeO, your figure) | wired (`OfferSheet`, D-061) |
+| M08 | Offers on your brief, close it | `GET /frontend/request-weos/:id/accepted-weos`, `POST /frontend/request-weos/:id/close` (new, M08) | wired (`RequestPanel`, D-065) |
+| M08 | Make a WeO for this | `/create?forRequest=:id` → `POST /frontend/weos` with `requestedId` | wired (D-067) |
 | M08 | Creators | `GET /frontend/creators`, `/creators/:id`, `/weos/top-creators` | exists |
 | M08 | Follow / circle a person | `/frontend/users/:id/follow`, `/circle/*` | exists |
 | M08 | Requests | `/frontend/request-weos*` | exists |

@@ -12,7 +12,7 @@ Twelve build modules after setup. Each is delivered with the workflow in `04-mod
 | M05 | Community | community (hub), circle, thread, circles (manage), stewards, stories; Compose/Push/Report modals; O-Wallet panel | steward fields, collect-through, WeO faces, author fixes, follow statuses (G-42…G-46 logged) | M03 | ✅ 2026-10-01 |
 | M06 | Collect & Exchange | collect (holdings), exchange (listings), RelistSheet, NeedsYou | pause/activate, redeem, dispute, resell quote, Os-true snapshots (G-49…G-53) | M04 | ✅ 2026-10-03 |
 | M07 | Create | create (hero, composer, preflight, posted), templates, media upload, PostSheet, AI draft | O peg, media upload, AI describe, templates, stored format | M05, M06 | ✅ 2026-10-05 |
-| M08 | People & requests | creators, requests, tracking; CreatorSheet, OfferSheet, make-for-request | tracking watchlist, offer-a-holding | M04 | ⏳ next |
+| M08 | People & requests | creators, requests, tracking; CreatorSheet, OfferSheet, make-for-request | tracking watchlist, circle invite, brief fields + close, creator rows | M04 | ✅ 2026-10-05 |
 | M09 | Identity & money | passport, wallet, settings; profile/tier/ISR sheets, MoveOsSheet, plans | notification channel prefs, plans | M03 | |
 | M10 | Notifications & company | notifications, company | fix `DELETE /notifications/read` shadowing, category map | M02 | |
 | M11 | Worlds & lifecycle | WorldStudio + `<weo-world>` (three.js, lazy), V3 lifecycle (rehearse → react → pledge → live), In-flight, arrivals/walkthrough | reactions & pledges endpoints | M07 | |

@@ -2,6 +2,14 @@
 
 All notable changes per module. Newest first.
 
+## M08 — People & requests (2026-10-05)
+
+- Creators: the snapshot boards (standing, settled, reach, weeks live), creators by standing with Mya as your guide, records that open into their WeOs in orbit (collect one, circle them), and the WeOs from creators you circle. `/creators/:id` opens that record.
+- The creator sheet, from any face — the WeO page, Discover's stage, Collect and Exchange: their standing, what they made, what they did in public, and Collect, Circle them, Track drops, Invite into a Circle and Contact, each obeying their settings.
+- Requests: open briefs as cards or a list, the brief panel (offer one you hold, ask in its circle, make a WeO for it), your own brief's offers and closing it. `/requests/:id` opens that brief. "Make a WeO for this" seeds the composer and posts to that ask.
+- Tracking: the WeOs you track with what changed since you started, and the creators you track; a WeO is tracked from its page.
+- Backend (`redesign/m08-people-requests`): the tracking watchlist with notes and drop alerts, circle invites, brief fields (who asked, who offered, its circle, open / yours / offered) and closing a brief, creator WeO counts, weeks live and circles.
+
 ## M07 — Create (2026-10-05)
 
 - Create: the O with eight formats on its ring (Sell, Pool, Bid and Request live; Hunt, Drop, Gift and Subscription "coming soon" with Notify me), the edges playing each section's stage, docks for your drafts, templates, open asks and tracking, the template shelf and sheet.
