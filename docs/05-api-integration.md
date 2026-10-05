@@ -101,6 +101,17 @@ Backend: `weo-3.0`, local base URL **`http://localhost:3002/api`**. Full endpoin
 | M08 | Offer one you hold | `POST /frontend/request-weos/:id/accept` (a regular-WeO body from your WeO, your figure) | wired (`OfferSheet`, D-061) |
 | M08 | Offers on your brief, close it | `GET /frontend/request-weos/:id/accepted-weos`, `POST /frontend/request-weos/:id/close` (new, M08) | wired (`RequestPanel`, D-065) |
 | M08 | Make a WeO for this | `/create?forRequest=:id` → `POST /frontend/weos` with `requestedId` | wired (D-067) |
+| M09 | Passport (hero, standing, tier, orbit, public switches) | `GET /frontend/users/me/passport` (+ `inputs[].do`, `.cap`, M09) | wired (`features/passport`, D-074) |
+| M09 | Your graph | `GET /frontend/users/me/graph` | wired |
+| M09 | Edit profile, photo | `PATCH /frontend/users/me/profile` (+ `avatarUrl`, 409 on a taken handle, M09) · `POST /frontend/media` | wired (`EditProfileSheet`) |
+| M09 | Public page switches, who can reach you | `PATCH /frontend/users/me/public-profile` | wired (passport and settings) |
+| M09 | O-Wallet page | `GET /frontend/wallet/overview` (peg = settlement 99, M09) · `GET /frontend/me/collections` (orbit) | wired (`WalletPage`, D-072, D-077) |
+| M09 | Move Os | `POST /frontend/wallet/transfer` | wired (M05 `WalletRow`) |
+| M09 | Settings | `GET/PATCH /frontend/users/me/settings` (new, M09) | wired (`features/settings`, D-075) |
+| M09 | Deactivate / delete request | `POST/DELETE /frontend/users/me/account-request` (new, M09) | wired (D-070) |
+| M09 | Download your data | `GET /frontend/users/me/export` (new, M09) | wired (a JSON file) |
+| M09 | Appearance | `PATCH /frontend/users/me/preferences` | wired (M02 store) |
+| M09 | Email, phone, password | O-Wallet account page (`manageUrl`) | link out (D-071) |
 | M08 | Creators | `GET /frontend/creators`, `/creators/:id`, `/weos/top-creators` | exists |
 | M08 | Follow / circle a person | `/frontend/users/:id/follow`, `/circle/*` | exists |
 | M08 | Requests | `/frontend/request-weos*` | exists |

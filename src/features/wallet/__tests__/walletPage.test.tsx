@@ -23,7 +23,7 @@ describe('wallet page', () => {
     expect(screen.getAllByText(/99 Os = \$1/).length).toBeGreaterThan(0);
     expect(screen.queryByText(/100 Os = \$1/)).not.toBeInTheDocument();
     // power is null: no figure stands in for it
-    expect(screen.getByText('Not measured yet')).toBeInTheDocument();
+    expect(screen.getByText('· not measured yet')).toBeInTheDocument();
     // the buckets say why nothing is held
     expect(screen.getByText('Nothing on this surface holds O back.')).toBeInTheDocument();
     // the ecosystem, live and at launch

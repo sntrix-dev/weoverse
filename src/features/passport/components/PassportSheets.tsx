@@ -1,6 +1,6 @@
 // design: passport.jsx IsrImproveSheet / EditProfileSheet / TierLadderSheet / PassportSettingsSheet
 // · screens-network.jsx PublicProfileSheet
-import { useRef, useState, type CSSProperties, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { ApiError } from '@/api/client';
 import { Sheet } from '@/components/feedback/Sheet';
@@ -12,6 +12,17 @@ import { openCreator } from '@/stores/flow';
 import { toast } from '@/stores/ui';
 import { useUpdateProfile, useUpdatePublicProfile, type PassportDto } from '../api/passport';
 import { askFromHere, currentRung, nextRung, pct } from '../model/passport';
+
+/** the hand-built sheets close on Escape like `Sheet` does */
+function useEscape(onClose: () => void) {
+  useEffect(() => {
+    const k = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', k);
+    return () => window.removeEventListener('keydown', k);
+  }, [onClose]);
+}
 
 const micro: CSSProperties = {
   display: 'block',
@@ -360,6 +371,7 @@ export function TierLadderSheet({
 }) {
   const mine = currentRung(p);
   const isr = Math.round(p.standing.isr);
+  useEscape(onClose);
   return createPortal(
     <div
       role="presentation"
@@ -618,6 +630,7 @@ export function PublicProfileSheet({ p, onClose }: { p: PassportDto; onClose: ()
   const id = p.identity;
   const setPerm = (patch: Partial<PassportDto['publicProfile']>) =>
     upd.mutate(patch, { onError: () => toast('That did not save — try again') });
+  useEscape(onClose);
   return createPortal(
     <div
       role="presentation"

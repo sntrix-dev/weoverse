@@ -2,6 +2,14 @@
 
 All notable changes per module. Newest first.
 
+## M09 — Identity & money (2026-10-05)
+
+- Passport: who you are and your passport id, your balance as the wallet's front door, ISR, tier and circles; the profile hub (what moved it, your tier, improve, your graph) around your WeOs; standing ("not tracked yet" until the backend keeps an ISR record, with what it never counts and the appeal), the tier ladder with how you reach and lose each rung and what it is worth on a WeO, and who is around you. Sheets: improve your standing, edit your profile (photo, name, handle, bio), the tier ladder, your public page, passport settings with your data download. `/passport#tier` and friends open a section.
+- O-Wallet: the hub with the wallet panel and your passport as a layer, money rows, the four buckets with why nothing is held, where the passport works, the peg (99 Os = $1) and O Power "not measured yet", the apps price list with your advantage (no buttons), and the record.
+- Settings: account (email and phone shown; changes open your O-Wallet account), time zone, privacy, the notification matrix with digest and quiet hours, wallet, appearance, connected apps, download your data, help and legal, and deactivate / delete as requests a person confirms — which you can cancel.
+- Backend (`redesign/m09-identity-money`): the settings store (channels per group, digest, quiet hours, time zone, receipts) applied to In app and Push delivery; account requests; data export; a profile photo and a 409 for a taken handle; the ISR inputs say what they ask and their cap; the wallet peg is the settlement figure.
+- Shell: the section hero no longer squeezes its controls off a phone screen when it carries a feature card.
+
 ## M08 — People & requests (2026-10-05)
 
 - Creators: the snapshot boards (standing, settled, reach, weeks live), creators by standing with Mya as your guide, records that open into their WeOs in orbit (collect one, circle them), and the WeOs from creators you circle. `/creators/:id` opens that record.

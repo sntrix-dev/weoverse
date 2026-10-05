@@ -9,6 +9,7 @@ import { EditProfileSheet } from '@/features/passport/components/PassportSheets'
 import { useLogout } from '@/features/shell/useLogout';
 import { useWalletView } from '@/features/wallet/api/wallet';
 import { osFmt } from '@/lib/format';
+import { glide } from '@/lib/glide';
 import { setPrefs, usePref } from '@/stores/prefs';
 import { openDock, openExternal, setMyaHidden, toast } from '@/stores/ui';
 import {
@@ -165,6 +166,12 @@ function useTimeZones(current: string | undefined) {
   }, [current]);
 }
 
+/** design: scrollIntoView, through the app's own glide (a native smooth scroll is cut short here) */
+function toSection(id: string) {
+  const el = document.getElementById(`set-${id}`);
+  if (el) glide(window, el.getBoundingClientRect().top + window.scrollY - 130);
+}
+
 /** The section you are reading lights its place in the rail. */
 function useActiveSection(ready: boolean) {
   const [active, setActive] = useState(() => window.location.hash.replace(/^#/, '') || 'account');
@@ -172,8 +179,7 @@ function useActiveSection(ready: boolean) {
     if (!ready) return;
     const want = window.location.hash.replace(/^#/, '');
     if (want) {
-      const el = document.getElementById(`set-${want}`);
-      if (el) setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'start' }), 300);
+      setTimeout(() => toSection(want), 300);
     }
     if (typeof IntersectionObserver !== 'function') return;
     const io = new IntersectionObserver(
@@ -188,7 +194,7 @@ function useActiveSection(ready: boolean) {
   }, [ready]);
   const jumpTo = (id: string) => {
     setActive(id);
-    document.getElementById(`set-${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    toSection(id);
   };
   return { active, jumpTo };
 }
@@ -482,7 +488,7 @@ export function SettingsPage() {
                       onChange={(e) =>
                         e.target.value && save({ notifications: { quiet: { from: e.target.value } } })
                       }
-                      style={field(112)}
+                      style={field(124)}
                     />
                     <span style={{ color: 'var(--text-faint)' }}>to</span>
                     <input
@@ -492,7 +498,7 @@ export function SettingsPage() {
                       onChange={(e) =>
                         e.target.value && save({ notifications: { quiet: { to: e.target.value } } })
                       }
-                      style={field(112)}
+                      style={field(124)}
                     />
                   </>
                 )}

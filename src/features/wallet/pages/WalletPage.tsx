@@ -600,17 +600,24 @@ function MoneyRows({
         <OMark size={14} />
         <span style={{ flex: 1, minWidth: 0 }}>
           <span style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
-            <b
-              style={{
-                fontSize: 14,
-                fontWeight: 700,
-                color: w.power == null ? 'var(--text-faint)' : 'var(--o-green)',
-                fontVariantNumeric: 'tabular-nums',
-              }}
-            >
-              {w.power == null ? 'Not measured yet' : `${w.power}×`}
-            </b>
+            {w.power != null && (
+              <b
+                style={{
+                  fontSize: 14,
+                  fontWeight: 700,
+                  color: 'var(--o-green)',
+                  fontVariantNumeric: 'tabular-nums',
+                }}
+              >
+                {`${w.power}×`}
+              </b>
+            )}
             <span style={{ fontSize: 11.5, fontWeight: 600, color: 'var(--text)' }}>O Power</span>
+            {w.power == null && (
+              <span style={{ fontSize: 11.5, fontWeight: 600, color: 'var(--text-faint)' }}>
+                · not measured yet
+              </span>
+            )}
           </span>
           <span style={{ display: 'block', marginTop: 2, fontSize: 10.5, color: 'var(--text-faint)' }}>
             {adv}% off every WeO here · never cash

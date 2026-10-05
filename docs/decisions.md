@@ -4,6 +4,16 @@ Newest first. Each entry: date · decision · why · who decided. Open questions
 
 | # | Date | Decision | Why | By |
 |---|---|---|---|---|
+| D-079 | 2026-10-05 | "Show approximate value in" stays US dollars at the settlement peg (shown, no picker): the backend has no exchange rates, and a euro label on a dollar figure would be wrong. | Real data only. | Claude |
+| D-078 | 2026-10-05 | Reset tours and clear search history wait for M11 (intros) and stored searches. Help is Ask Mya; About and Legal open the company pages (M10). No "Message us" or "Report a problem" row: there is no support channel to send them to. | Real data only. | Claude |
+| D-077 | 2026-10-05 | O Power is "not measured yet" (backend `power: null`); the rate dials show the fixed peg (99 Os = $1, the settlement figure) and O Power empty, and the activity row counts real activity (created, sold, re-sold, earned). | Real data only. | Claude |
+| D-076 | 2026-10-05 | No "Where you are" (D-006), no language picker (the app is English only), no identity check (G-26), no passport QR or card download. The ecosystem cards show live / at launch and the tier honoured, not Os earned per property (not recorded). | Real data only. | Claude |
+| D-075 | 2026-10-05 | Notification choices save and apply now for In app and Push, with quiet hours in your time zone; Email, the digest and receipts are saved for when email delivery ships and say so. Security email stays on. | Delivery the backend can honour today. | Claude |
+| D-074 | 2026-10-05 | ISR moves and the 7-day trace are `null` (no ISR ledger): the standing card says "Not tracked yet" with what moves it and what it never counts; no ISR alerts or weekly standing email. Improve lists the published inputs with what each asks and its cap. | Null is not zero. | Claude |
+| D-073 | 2026-10-05 | Standing and tier are always public (backend policy): no "Show my ISR / tier" switch; Privacy says so. No "show when online" (no presence) and no "search engines" switch (no public web page). | Backend policy. | Claude |
+| D-072 | 2026-10-05 | Apps and plans, Connected apps: the backend's price list (your advantage applied) and ecosystem, marked live / at launch, with no Start or Connect buttons. Answers Q-4 for now. | Surya: "Price list, no buttons". | Surya |
+| D-071 | 2026-10-05 | Email, phone, password and sign-in alerts belong to O-Wallet: shown from the account, Change opens the O-Wallet account page (`manageUrl`) through the external gate. No code-verify flow here. | Surya: "Show + link to O-Wallet". | Surya |
+| D-070 | 2026-10-05 | Deactivate and delete are requests a person confirms, stored on the account and cancellable; nothing is hidden or removed automatically. The confirm step is typing the word (sign-in and its password are O-Wallet's). | Surya: "Request only". | Surya |
 | D-069 | 2026-10-05 | Modules are merged into an integration branch, `develop` (cut from `master` @ `a1c1854`, M01–M07), never into `master`. Feature branches start from `develop`; tags `mNN-done` mark `develop`. | Surya: "Don't merge anything to master. Create a different branch and merge. Never to master." | Surya |
 | D-068 | 2026-10-05 | The creator boards rank the twelve leaders of each figure (the podium and nine behind it); the grid below holds everyone. A board of the whole directory (48) was a wall of rows. | Browser pass (M08-B1). | Claude |
 | D-067 | 2026-10-05 | "Make a WeO for this" opens the composer seeded from the brief — its title, line, category and budget (as your ask, Os), one copy — with no picture (you add your own; the design seeds the circle's cover). Posting opens the post sheet on **One person** with that ask chosen (`requestedId`). An answer to a brief is not autosaved: a draft would lose the ask. `/create?kind=Request` opens a format directly ("Post a request"). | Real data only; an answer belongs to its ask. | Claude |
@@ -80,8 +90,8 @@ Newest first. Each entry: date · decision · why · who decided. Open questions
 |---|---|---|
 | ~~Q-1~~ | Resolved 2026-10-01: previous build env shared (IdP `https://wallet.ocono.me`, scope `profile`, redirect `:5173/callback`); authorize path to confirm in browser. | M01 |
 | ~~Q-3~~ | Resolved 2026-10-03 (D-050): templates are served by the backend; unlock with plans/billing (M09). | M07 |
-| Q-4 | Plans/apps (Wallet "Apps and plans", Simulation Pro) — real billing or display-only for now? | M09 / M11 |
+| ~~Q-4~~ | Resolved 2026-10-05 (D-072): a price list, no buttons, until billing exists. | M09 / M11 |
 | Q-5 | The global rate limit (70 req/min/IP) will throttle local testing. OK to make it configurable via env (default unchanged)? | M01 |
-| Q-6 | Tiers: the design shows Member / Contributor / Steward with an advantage % (`Tier 2 · 10%`); the backend has participant / player / prime (L1–L3) and no %. Which names, and is there an advantage figure? | M09 |
+| ~~Q-6~~ | Resolved in M09: the backend's `standing.config` publishes Member / Contributor / Steward with the advantage. Was — Tiers: the design shows Member / Contributor / Steward with an advantage % (`Tier 2 · 10%`); the backend has participant / player / prime (L1–L3) and no %. Which names, and is there an advantage figure? | M09 |
 | Q-7 | Change the backend `dockPosition` default from `{22, 22}` to the design's `{22, 96}`? (CLAUDE.md §5 needs approval for a changed default; the app works around it, D-023.) | M02 |
 | Q-8 | Real WeO social handles for the footer (the design uses `instagram.com/weo` etc.)? | M10 |

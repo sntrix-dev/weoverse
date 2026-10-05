@@ -2,7 +2,7 @@
 
 | Status | FE branch | BE branch | Report |
 |---|---|---|---|
-| ⏳ in progress | `feat/m09-identity-money` (from `develop`) | `redesign/m09-identity-money` (from `redesign/m08-people-requests`) | `reports/M09-identity-money.md` |
+| ✅ done 2026-10-05 | `feat/m09-identity-money` (from `develop`) | `redesign/m09-identity-money` (from `redesign/m08-people-requests`) | `reports/M09-identity-money.md` |
 
 ## Screens
 
@@ -39,7 +39,8 @@
 - D-075 Notification choices save and apply now for In app and Push (and quiet hours, in your time zone); Email, the digest and receipts are saved for when email delivery ships (G-6x) and say so.
 - D-076 No "Where you are" (fully digital, D-006); no language picker (the app is English only); no identity check (G-26); no passport QR / card download; the passport link is your record in the app.
 - D-077 O Power is "not measured yet" (backend `power: null`); the rate dials show the fixed peg and your own activity instead of invented network rates.
-- D-078 Reset tours / clear search history wait for M11 intros / stored searches; Help centre, support and legal open the company pages (M10) and Mya.
+- D-078 Reset tours / clear search history wait for M11 intros / stored searches; Help is Ask Mya; About and Legal open the company pages (M10). No support / report rows (no channel).
+- D-079 Approximate value stays US dollars at the peg — no FX rates to convert with.
 
 ## Gaps
 
