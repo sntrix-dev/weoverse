@@ -10,8 +10,10 @@ import { WeoActions } from '@/components/weo/WeoCards';
 import { weoCardProps } from '@/components/weo/weoCardProps';
 import { Avatar, Button, Chip, EmptyState, ICO, OMark, Progress, svg, WeOCard } from '@/design-system';
 import { cardModel, type WeoFormat } from '@/lib/cardModel';
+import { useNavSummary } from '@/features/shell/api/navSummary';
+import { useIsTrackingWeo, useTrackWeo } from '@/features/tracking/api/tracking';
 import { osFmt } from '@/lib/format';
-import { openCollect } from '@/stores/flow';
+import { openCollect, openCreator } from '@/stores/flow';
 import { toast } from '@/stores/ui';
 import { useWeo } from '../api/weos';
 import { WeoPriceFeature } from '../components/WeoPriceFeature';
@@ -37,6 +39,9 @@ export function WeoPage() {
   const h = useWeoHandlers();
   const q = useWeo(weoId);
   const w = useMemo(() => (q.data ? cardModel(q.data) : null), [q.data]);
+  const me = useNavSummary().data;
+  const watch = useIsTrackingWeo(weoId);
+  const trackM = useTrackWeo();
 
   if (!w) {
     return (
@@ -83,6 +88,23 @@ export function WeoPage() {
       ? `${w.resalePct}% to the creator`
       : 'Resellable';
   const progressTone = PROGRESS_TONE[w.type];
+  // D-062: a WeO is tracked from its page — tracking never bids, it tells you when the terms change
+  const toggleTrack = () => {
+    const will = !watch.tracked;
+    trackM.mutate(
+      { id: w.id, on: will },
+      {
+        onSuccess: () =>
+          toast(
+            will
+              ? `Tracking ${w.name} · you will hear when the terms change`
+              : `No longer tracking ${w.name}`,
+          ),
+        onError: () => toast('That did not go through — try again'),
+      },
+    );
+  };
+  const mine = !!me?.id && me.id === w.creatorId;
 
   return (
     <main style={page}>
@@ -120,6 +142,22 @@ export function WeoPage() {
         directory={[
           { id: 'weo-card', label: 'The card' },
           { id: 'weo-terms', label: 'Terms', count: w.terms.length },
+          ...(mine || !watch.ready
+            ? []
+            : [
+                {
+                  label: watch.tracked ? 'Tracking' : 'Track it',
+                  note: watch.tracked ? 'You hear when its terms change' : 'Watch its terms without bidding',
+                  icon: (
+                    <>
+                      <circle cx="12" cy="12" r="3.2" />
+                      <circle cx="12" cy="12" r="8.4" />
+                      <path d="M12 1.8v2.6M12 19.6v2.6M1.8 12h2.6M19.6 12h2.6" />
+                    </>
+                  ),
+                  onClick: toggleTrack,
+                },
+              ]),
           ...w.circles.map((c) => ({
             label: c.name,
             note: 'Its Circle',
@@ -128,7 +166,7 @@ export function WeoPage() {
           {
             label: w.creator.handle,
             note: 'The creator',
-            onClick: () => void navigate(routes.creators(w.creator.id)),
+            onClick: () => openCreator(w.creator.id),
           },
         ]}
       />
@@ -241,7 +279,7 @@ export function WeoPage() {
 
             <button
               type="button"
-              onClick={() => void navigate(routes.creators(w.creator.id))}
+              onClick={() => openCreator(w.creator.id)}
               style={{
                 display: 'flex',
                 alignItems: 'center',

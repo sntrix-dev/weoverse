@@ -22,7 +22,17 @@ export const qk = {
     interests: () => ['discover', 'interests'] as const,
   },
   creators: {
+    all: ['creators'] as const,
     list: (params: Record<string, string | number | undefined>) => ['creators', 'list', params] as const,
+    detail: (id: string) => ['creators', 'detail', id] as const,
+  },
+  requests: {
+    all: ['requests'] as const,
+    list: (params: Record<string, string | number | undefined>) => ['requests', 'list', params] as const,
+    detail: (id: string) => ['requests', 'detail', id] as const,
+  },
+  tracking: {
+    all: ['tracking'] as const,
   },
   circles: {
     all: ['circles'] as const,

@@ -107,6 +107,9 @@ export const creatorsFixture: S['CreatorListRow'][] = [
     collectors: 12,
     circledBy: 40,
     circled: false,
+    weos: 6,
+    weeksLive: 14,
+    circlesLed: 2,
   },
 ];
 

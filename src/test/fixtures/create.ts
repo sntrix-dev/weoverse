@@ -1,4 +1,4 @@
-import type { AskDto, CategoryDto, TemplateDto, TemplatesDto } from '@/features/create/api/create';
+import type { CategoryDto, TemplateDto, TemplatesDto } from '@/features/create/api/create';
 
 export const pegFixture = { usdAgainstO: 99, usdPerO: 1 / 99 };
 
@@ -45,15 +45,3 @@ export const templatesFixture = (): TemplatesDto => ({
   plans: [{ tier: 1, name: 'Maker', unlockOs: 900, requiresTier: 'player' }],
   locked: 1,
 });
-
-export const asksFixture: AskDto[] = [
-  {
-    _id: '651f8c2a3b9c0d12e45678a1',
-    title: 'a hand-bound sketchbook',
-    price: { min: 500, max: 1200 },
-    deadline: '2099-01-01T00:00:00.000Z',
-    status: 'active',
-    userId: 'someone-else',
-    creator: { _id: 'someone-else', name: 'Ada', profileImage: null },
-  },
-];

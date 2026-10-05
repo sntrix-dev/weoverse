@@ -8,6 +8,7 @@ import { FlowBar, FlowFoot } from '@/components/shell/FlowBar';
 import { PathBar } from '@/components/shell/PathBar';
 import { useCommunityCircles, useDrafts, type DraftDto } from '@/features/community/api/community';
 import { useNavSummary } from '@/features/shell/api/navSummary';
+import { sentence } from '@/features/requests/model/briefs';
 import { osFmt } from '@/lib/format';
 import { usePref } from '@/stores/prefs';
 import { openPush } from '@/stores/flow';
@@ -47,10 +48,13 @@ export function CreateFlow({
   seed,
   draftId,
   editId,
+  forRequest = null,
 }: {
   seed: ComposerForm | null;
   draftId: string | null;
   editId: string | null;
+  /** made for a brief (M08): the post sheet opens on "One person", that ask chosen */
+  forRequest?: PostAsk | null;
 }) {
   const navigate = useNavigate();
   const dark = usePref('theme') === 'dark';
@@ -199,22 +203,24 @@ export function CreateFlow({
       .map((c) => ({ id: c.id, name: c.name, img: c.coverImage || null, joined: c.isJoined }));
     return [...mine, ...sug].slice(0, 6);
   }, [circlesQ, circles, f]);
-  const postAsks: PostAsk[] = (asksQ?.requestOffers ?? [])
+  const openAsks: PostAsk[] = (asksQ?.requestOffers ?? [])
     .filter(
       (r) =>
         (r.status ?? 'active') === 'active' &&
         (!r.deadline || Date.parse(r.deadline) > now) &&
-        r.userId !== me?.id,
+        !r.mine &&
+        r.userId !== me?.id &&
+        r._id !== forRequest?.id,
     )
-    .slice(0, 4)
     .map((r) => ({
       id: r._id,
-      title: r.title,
-      who: r.creator?.name || 'Someone',
-      avatar: r.creator?.profileImage ?? null,
+      title: sentence(r.title),
+      who: r.by?.name || r.creator?.name || 'Someone',
+      avatar: r.by?.avatarUrl ?? r.creator?.profileImage ?? null,
       budget: r.price?.max ?? r.price?.min ?? 0,
       closes: daysLeft(r.deadline, now),
     }));
+  const postAsks: PostAsk[] = (forRequest ? [forRequest, ...openAsks] : openAsks).slice(0, 4);
   const onSheetPost = async (_d: PostDest, circleId: string | null, askId: string | null) => {
     const res = await pub.publish(f, circleId, askId);
     setPosted({ id: res._id });
@@ -416,6 +422,7 @@ export function CreateFlow({
           circles={postCircles}
           asks={postAsks}
           direct={f.kind === 'Listing' || f.kind === 'Bid'}
+          initial={forRequest && (f.kind === 'Listing' || f.kind === 'Bid') ? 'direct' : undefined}
           onPost={onSheetPost}
           onDone={onSheetDone}
           onClose={() => setSheet(false)}

@@ -1610,6 +1610,30 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/frontend/community/circles/{id}/invite": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Ask someone into a circle you are in (redesign M08)
+         * @description The invite is a notification (category `general`, entity
+         *     `circle`) that opens the circle; nothing else is stored. The
+         *     caller must be a member; the invitee's
+         *     `publicProfile.invites` is obeyed. Repeating an invite the
+         *     invitee has not read within a week is a no-op.
+         */
+        post: operations["inviteToCommunityCircle"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/frontend/community/circles/{id}/leave": {
         parameters: {
             query?: never;
@@ -2244,6 +2268,30 @@ export interface paths {
          *     Backed by `src/modules/user/creators/creators.controller.ts#list`.
          */
         get: operations["listCreators"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/frontend/creators/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Somebody's public profile, as far as they permit
+         * @description The creator record and sheet. Permissions (`publicProfile`) are
+         *     obeyed and stated on `shows`; figures they hide are `null`.
+         *     `viewer` is the caller's relationship to them.
+         *
+         *     Backed by `src/modules/user/creators/creators.controller.ts#get`.
+         */
+        get: operations["getCreator"];
         put?: never;
         post?: never;
         delete?: never;
@@ -3896,8 +3944,10 @@ export interface paths {
         };
         /**
          * Public-ish list of buyer RFQs
-         * @description Despite `authenticate` being applied, the controller does NOT use
-         *     the caller's id. Treat as a global feed of active RFQs.
+         * @description The global feed of RFQs, newest first. The caller's id only
+         *     decides `mine` / `offered` on each row (redesign M08).
+         *     `status=open` keeps the briefs still taking offers (active,
+         *     deadline ahead).
          */
         get: operations["listRequestOffers"];
         put?: never;
@@ -3984,6 +4034,28 @@ export interface paths {
          *       * Seller's tier re-eval
          */
         post: operations["acceptRequestOffer"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/frontend/request-weos/{id}/close": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Requester stops taking offers (redesign M08)
+         * @description Requester only. Sets `status: closed`; idempotent. Offers already
+         *     made stay visible to the requester; `POST /:id/accept` then
+         *     answers 400.
+         */
+        post: operations["closeRequestOffer"];
         delete?: never;
         options?: never;
         head?: never;
@@ -4137,6 +4209,82 @@ export interface paths {
         put?: never;
         post?: never;
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/frontend/me/tracking": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Your tracking watchlist — WeOs and creators you watch without bidding
+         * @description Redesign M08. Tracked WeOs come back as the same card every list
+         *     returns, with a one-line `note` on what changed since you started
+         *     tracking (stopped, price, what is left, closing within two days, or
+         *     "Terms unchanged since you started tracking"). Tracked creators come
+         *     back as their directory row with how many WeOs they have open and
+         *     a note on what they listed since. Newest first. Blocked WeOs and
+         *     deleted people drop out.
+         */
+        get: operations["getMyTracking"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/frontend/me/tracking/weos/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Track a WeO
+         * @description Idempotent. The figures the note is read against are taken now. A blocked WeO, or one made for someone else's request, answers 404.
+         */
+        post: operations["trackWeo"];
+        /**
+         * Stop tracking a WeO
+         * @description Idempotent.
+         */
+        delete: operations["untrackWeo"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/frontend/me/tracking/creators/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Track a creator's drops
+         * @description Idempotent. When they list a new WeO, everyone tracking them gets a
+         *     notification (category `weo`, `actionUrl` `/weos/:id`; requests'
+         *     private answers excluded). You cannot track yourself (400).
+         */
+        post: operations["trackCreator"];
+        /**
+         * Stop tracking a creator
+         * @description Idempotent.
+         */
+        delete: operations["untrackCreator"];
         options?: never;
         head?: never;
         patch?: never;
@@ -12011,8 +12159,43 @@ export interface components {
             createdAt?: string;
             /** Format: date-time */
             updatedAt?: string;
+            /** @description How many WeOs have been offered in answer (list and detail). */
+            acceptedCount?: number;
+            /** @description Redesign M08 — who asked (list and detail). */
+            by?: components["schemas"]["BriefPerson"] | null;
+            /** @description Redesign M08 — up to six people who have offered, first offer first. */
+            offerers?: components["schemas"]["BriefPerson"][];
+            /** @description Redesign M08 — the community circle for the brief's category, when there is one. */
+            circle?: components["schemas"]["BriefCircle"] | null;
+            /** @description Redesign M08 — still taking offers (`status` active and the deadline ahead). */
+            open?: boolean;
+            /** @description Redesign M08 — the caller asked it. */
+            mine?: boolean;
+            /** @description Redesign M08 — the caller has already offered a WeO in answer. */
+            offered?: boolean;
         } & {
             [key: string]: unknown;
+        };
+        BriefPerson: {
+            id: components["schemas"]["ObjectId"];
+            /** @example Mira Okafor */
+            name: string;
+            avatarUrl: string | null;
+        };
+        BriefCircle: {
+            id: components["schemas"]["ObjectId"];
+            /** @example Prints */
+            name: string;
+            image: string | null;
+            /** @example #1F2937 */
+            coverColor: string;
+        };
+        RequestCloseResult: {
+            id: components["schemas"]["ObjectId"];
+            /** @enum {string} */
+            status: "closed";
+            /** @enum {boolean} */
+            open: false;
         };
         /** @description Validated by `CREATE_REQUEST_OFFER_SCHEMA`. `deadline` is a numeric epoch (NOT an ISO string). */
         RequestOfferCreateRequest: {
@@ -12057,6 +12240,11 @@ export interface components {
             /** @enum {boolean} */
             success?: true;
             data?: {
+                requestOffers?: components["schemas"]["RequestOffer"][];
+                total?: number;
+                page?: number;
+                totalPages?: number;
+            } & {
                 [key: string]: unknown;
             };
         };
@@ -14744,6 +14932,82 @@ export interface components {
             circledBy: number;
             /** @description The caller circles them */
             circled: boolean;
+            /** @description Redesign M08 — WeOs they have published (not archived, not made for a request). `null` when their collections are hidden. */
+            weos: number | null;
+            /** @description Redesign M08 — whole weeks since their first WeO went up */
+            weeksLive: number;
+            /** @description Redesign M08 — circles they have joined (the record's `circlesLed`) */
+            circlesLed: number;
+        };
+        CreatorPermissions: {
+            collections: boolean;
+            activity: boolean;
+            /** @description They accept circle invitations */
+            invites: boolean;
+            /** @enum {string} */
+            contact: "anyone" | "circles" | "off";
+        };
+        CreatorWeoRow: {
+            id: components["schemas"]["ObjectId"];
+            title: string;
+            weoType: string;
+            format: string;
+            img: string | null;
+            os: number;
+        };
+        CreatorActivityRow: {
+            /** @enum {string} */
+            kind: "weo" | "thread" | "answer";
+            id: string;
+            label: string;
+            note: string;
+            /** Format: date-time */
+            when: string;
+            tone: string;
+        };
+        /** @description Somebody's public profile with their permissions applied — a hidden section is an explicit `false` on `shows`, and a hidden figure is `null`. */
+        CreatorView: {
+            id: components["schemas"]["ObjectId"];
+            name: string;
+            handle: string;
+            avatarUrl: string | null;
+            bio: string | null;
+            formats: string[];
+            isr: number;
+            tier: {
+                key: string;
+                label: string;
+                tone: string;
+            };
+            /** Format: date-time */
+            joinedAt: string | null;
+            shows: components["schemas"]["CreatorPermissions"];
+            stats: {
+                settled7d: number;
+                collectors: number;
+                weos: number | null;
+                acceptRate: number | null;
+                circlesLed: number;
+                circledBy: number;
+            };
+            /** @description Empty when `shows.collections` is false */
+            weos: components["schemas"]["CreatorWeoRow"][];
+            /** @description Empty when `shows.activity` is false */
+            activity: components["schemas"]["CreatorActivityRow"][];
+            viewer: {
+                circled: boolean;
+                /** @description Redesign M08 — the caller tracks their drops */
+                tracked: boolean;
+                sharedCircles: {
+                    id: string;
+                    name: string;
+                }[];
+                canContact: boolean;
+                isSelf: boolean;
+            };
+        };
+        CreatorViewResponse: components["schemas"]["BaseResponse"] & {
+            data?: components["schemas"]["CreatorView"];
         };
         CreatorsPage: {
             items: components["schemas"]["CreatorListRow"][];
@@ -14753,6 +15017,38 @@ export interface components {
         };
         CreatorsPageResponse: components["schemas"]["BaseResponse"] & {
             data?: components["schemas"]["CreatorsPage"];
+        };
+        TrackedWeo: {
+            weo: components["schemas"]["WeoCardView"];
+            /** Format: date-time */
+            trackedAt: string;
+            /** @description What changed since you started tracking */
+            note: string;
+        };
+        TrackedCreator: {
+            creator: components["schemas"]["CreatorListRow"];
+            /** Format: date-time */
+            trackedAt: string;
+            /** @description Their live WeOs */
+            openWeos: number;
+            /** @description What they listed since you started tracking */
+            note: string;
+        };
+        TrackingList: {
+            weos: components["schemas"]["TrackedWeo"][];
+            creators: components["schemas"]["TrackedCreator"][];
+            counts: {
+                weos: number;
+                creators: number;
+            };
+        };
+        TrackingListResponse: components["schemas"]["BaseResponse"] & {
+            data?: components["schemas"]["TrackingList"];
+        };
+        TrackStateResponse: components["schemas"]["BaseResponse"] & {
+            data?: {
+                tracked: boolean;
+            };
         };
         /**
          * @description The rater (populated from User). v1 has no anonymous ratings, so
@@ -18566,6 +18862,85 @@ export interface operations {
             500: components["responses"]["ServerError"];
         };
     };
+    inviteToCommunityCircle: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The circle's Mongoose `_id`. */
+                id: components["schemas"]["ObjectId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                /**
+                 * @example {
+                 *       "userId": "651f8c2a3b9c0d12e4567890"
+                 *     }
+                 */
+                "application/json": {
+                    userId: components["schemas"]["ObjectId"];
+                };
+            };
+        };
+        responses: {
+            /** @description Invited (or already invited this week). */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BaseResponse"] & {
+                        data?: {
+                            /** @enum {boolean} */
+                            invited: true;
+                            circleId: components["schemas"]["ObjectId"];
+                            userId: components["schemas"]["ObjectId"];
+                        };
+                    };
+                };
+            };
+            /** @description Inviting yourself. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            /** @description The caller is not a member, or the invitee does not take invites. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Circle or person not found. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description They are already in the circle. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            422: components["responses"]["ValidationError"];
+        };
+    };
     leaveCommunityCircle: {
         parameters: {
             query?: never;
@@ -19492,7 +19867,10 @@ export interface operations {
                      *             ],
                      *             "collectors": 12,
                      *             "circledBy": 40,
-                     *             "circled": false
+                     *             "circled": false,
+                     *             "weos": 6,
+                     *             "weeksLive": 14,
+                     *             "circlesLed": 2
                      *           }
                      *         ],
                      *         "total": 1,
@@ -19505,6 +19883,42 @@ export interface operations {
                 };
             };
             401: components["responses"]["Unauthorized"];
+        };
+    };
+    getCreator: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description Resource ObjectId (24-char hex).
+                 * @example 651f8c2a3b9c0d12e4567890
+                 */
+                id: components["parameters"]["IdPathParam"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The profile */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CreatorViewResponse"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            /** @description No such creator */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
         };
     };
     listCrowdfunds: {
@@ -23012,6 +23426,8 @@ export interface operations {
         parameters: {
             query?: {
                 query?: string;
+                /** @description Redesign M08 — `open` keeps briefs still taking offers. Anything else lists every brief. */
+                status?: "open";
                 /**
                  * @description 1-based page number.
                  * @example 1
@@ -23209,6 +23625,65 @@ export interface operations {
             };
             422: components["responses"]["ValidationError"];
             500: components["responses"]["ServerError"];
+        };
+    };
+    closeRequestOffer: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description Resource ObjectId (24-char hex).
+                 * @example 651f8c2a3b9c0d12e4567890
+                 */
+                id: components["parameters"]["IdPathParam"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Closed. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "success": true,
+                     *       "message": "Request closed",
+                     *       "data": {
+                     *         "id": "651f8c2a3b9c0d12e4567892",
+                     *         "status": "closed",
+                     *         "open": false
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["BaseResponse"] & {
+                        data?: components["schemas"]["RequestCloseResult"];
+                    };
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            /** @description Caller is not the requester. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request not found. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            422: components["responses"]["ValidationError"];
         };
     };
     listAcceptedWeosForRequest: {
@@ -23536,6 +24011,198 @@ export interface operations {
             };
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
+        };
+    };
+    getMyTracking: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The watchlist */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "success": true,
+                     *       "message": "Tracking retrieved successfully",
+                     *       "data": {
+                     *         "weos": [],
+                     *         "creators": [],
+                     *         "counts": {
+                     *           "weos": 0,
+                     *           "creators": 0
+                     *         }
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["TrackingListResponse"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+        };
+    };
+    trackWeo: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description Resource ObjectId (24-char hex).
+                 * @example 651f8c2a3b9c0d12e4567890
+                 */
+                id: components["parameters"]["IdPathParam"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Tracked */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "success": true,
+                     *       "message": "Tracking",
+                     *       "data": {
+                     *         "tracked": true
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["TrackStateResponse"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            /** @description WeO not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            422: components["responses"]["ValidationError"];
+        };
+    };
+    untrackWeo: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description Resource ObjectId (24-char hex).
+                 * @example 651f8c2a3b9c0d12e4567890
+                 */
+                id: components["parameters"]["IdPathParam"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Not tracked */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "success": true,
+                     *       "message": "Stopped tracking",
+                     *       "data": {
+                     *         "tracked": false
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["TrackStateResponse"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            422: components["responses"]["ValidationError"];
+        };
+    };
+    trackCreator: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description Resource ObjectId (24-char hex).
+                 * @example 651f8c2a3b9c0d12e4567890
+                 */
+                id: components["parameters"]["IdPathParam"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Tracked */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TrackStateResponse"];
+                };
+            };
+            /** @description Tracking yourself */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            /** @description Creator not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            422: components["responses"]["ValidationError"];
+        };
+    };
+    untrackCreator: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description Resource ObjectId (24-char hex).
+                 * @example 651f8c2a3b9c0d12e4567890
+                 */
+                id: components["parameters"]["IdPathParam"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Not tracked */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TrackStateResponse"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            422: components["responses"]["ValidationError"];
         };
     };
     adminGetAllTransactionLogs: {

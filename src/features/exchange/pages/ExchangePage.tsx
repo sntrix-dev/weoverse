@@ -18,7 +18,7 @@ import { useDrafts, useFollow } from '@/features/community/api/community';
 import { useNavSummary } from '@/features/shell/api/navSummary';
 import { formatHex } from '@/lib/cardModel';
 import { pulseMap } from '@/lib/snapshotModel';
-import { openPush } from '@/stores/flow';
+import { openCreator, openPush } from '@/stores/flow';
 import { toast } from '@/stores/ui';
 import { useCircleCreators, useListingsSnapshot, useSetListingStatus } from '../api/listings';
 import { CircleCreatorsOrbit, type OrbitPerson } from '../components/CircleCreatorsOrbit';
@@ -232,7 +232,7 @@ export function ExchangePage() {
                   list={people}
                   shared={creatorsQ.data?.shared ?? false}
                   me={{ avatar: me?.avatarUrl ?? null, isr: me?.isr ?? 0, tier: me?.tier?.label ?? null }}
-                  onOpen={(p) => void navigate(routes.creators(p.id))}
+                  onOpen={(p) => openCreator(p.id)}
                   onCircle={(p) =>
                     follow.mutate(
                       { userId: p.id, follow: !p.circled },

@@ -34,6 +34,9 @@ export interface AskDto {
   status?: string;
   userId?: string;
   creator?: { _id?: string; name?: string; profileImage?: string | null } | null;
+  /** who asked (M08) */
+  by?: { id: string; name: string; avatarUrl: string | null } | null;
+  mine?: boolean;
 }
 
 /** The O ↔ dollar peg every price conversion uses (D-051). */
@@ -66,7 +69,9 @@ export function useAsks() {
   return useQuery({
     queryKey: qk.create.asks(),
     queryFn: () =>
-      api.get<{ requestOffers: AskDto[]; total: number }>('/frontend/request-weos', { query: { limit: 20 } }),
+      api.get<{ requestOffers: AskDto[]; total: number }>('/frontend/request-weos', {
+        query: { status: 'open', limit: 20 },
+      }),
     staleTime: 60_000,
   });
 }

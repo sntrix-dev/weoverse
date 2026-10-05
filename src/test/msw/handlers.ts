@@ -22,7 +22,13 @@ import {
   threadFixture,
   walletFixture,
 } from '../fixtures/community';
-import { asksFixture, categoriesFixture, pegFixture, templatesFixture } from '../fixtures/create';
+import { categoriesFixture, pegFixture, templatesFixture } from '../fixtures/create';
+import {
+  briefOffersFixture,
+  briefsFixture,
+  creatorViewFixture,
+  trackingFixture,
+} from '../fixtures/people';
 import { collectionsSnapshotFixture, listingsSnapshotFixture, resellQuoteFixture } from '../fixtures/holdings';
 
 /** Wraps data in the backend envelope (weo-3.0 ResponseHandler.success). */
@@ -91,7 +97,30 @@ export const handlers = [
   http.get(url('/frontend/templates'), () => ok(templatesFixture())),
   // the categories read answers in the envelope like every other read
   http.get(url('/frontend/categories'), () => ok(categoriesFixture)),
-  http.get(url('/frontend/request-weos'), () => ok({ requestOffers: asksFixture, total: asksFixture.length, page: 1, totalPages: 1 })),
+  http.get(url('/frontend/request-weos'), () => {
+    const rows = briefsFixture();
+    return ok({ requestOffers: rows, total: rows.length, page: 1, totalPages: 1 });
+  }),
+  http.get(url('/frontend/request-weos/:id'), ({ params }) => {
+    const r = briefsFixture().find((b) => b._id === params.id);
+    return r ? ok(r) : fail(404, 'Request offer not found');
+  }),
+  http.get(url('/frontend/request-weos/:id/accepted-weos'), () => ok(briefOffersFixture)),
+  http.post(url('/frontend/request-weos/:id/accept'), () => ok({ _id: 'weo-answer' }, 'Request accepted')),
+  http.post(url('/frontend/request-weos/:id/close'), ({ params }) =>
+    ok({ id: String(params.id), status: 'closed', open: false }),
+  ),
+  http.get(url('/frontend/creators/:id'), ({ params }) =>
+    params.id === 'c-1' ? ok(creatorViewFixture()) : fail(404, 'Creator not found'),
+  ),
+  http.post(url('/frontend/users/:id/follow'), () => ok(null)),
+  http.delete(url('/frontend/users/:id/unfollow'), () => ok(null)),
+  http.get(url('/frontend/me/tracking'), () => ok(trackingFixture())),
+  http.post(url('/frontend/me/tracking/:kind/:id'), () => ok({ tracked: true })),
+  http.delete(url('/frontend/me/tracking/:kind/:id'), () => ok({ tracked: false })),
+  http.post(url('/frontend/community/circles/:id/invite'), ({ params }) =>
+    ok({ invited: true, circleId: String(params.id), userId: 'c-1' }),
+  ),
   http.post(url('/frontend/media'), ({ request }) => {
     const type = request.headers.get('content-type') ?? '';
     return HttpResponse.json(

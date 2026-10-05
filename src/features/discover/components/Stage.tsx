@@ -1,11 +1,9 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router';
-import { routes } from '@/app/routes';
 import { OsRun } from '@/components/text/OsRun';
 import { Avatar, OButton, OMark, Orb, svg } from '@/design-system';
 import type { WeoCardModel } from '@/lib/cardModel';
 import { osFmt } from '@/lib/format';
-import { openCollect } from '@/stores/flow';
+import { openCollect, openCreator } from '@/stores/flow';
 
 /** design: discover.jsx StageDeck — every candidate present, neutral until it is the one on stage. */
 export function StageDeck({ list }: { list: WeoCardModel[] }) {
@@ -99,7 +97,6 @@ export function StageDeck({ list }: { list: WeoCardModel[] }) {
  * poster. Rehearse it (M11) and Ask about it (M05) arrive with their modules.
  */
 export function StageWeo({ w }: { w: WeoCardModel }) {
-  const navigate = useNavigate();
   const [hov, setHov] = useState(false);
   const tone = w.hex;
   const cr = w.creator;
@@ -324,7 +321,10 @@ export function StageWeo({ w }: { w: WeoCardModel }) {
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 18 }}>
           <button
             type="button"
-            onClick={() => void navigate(routes.creators(cr.id))}
+            onClick={(e) => {
+              e.stopPropagation();
+              openCreator(cr.id);
+            }}
             title={`Open ${cr.handle}`}
             style={{
               display: 'inline-flex',

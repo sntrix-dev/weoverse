@@ -16,7 +16,7 @@ import { useWalletView } from '@/features/wallet/api/wallet';
 import { WalletRow } from '@/features/wallet/components/WalletRow';
 import { FORMATS } from '@/lib/cardModel';
 import { pulseMap } from '@/lib/snapshotModel';
-import { openRelist } from '@/stores/flow';
+import { openCreator, openRelist } from '@/stores/flow';
 import { ack, openExternal, toast } from '@/stores/ui';
 import { useCollectionsSnapshot, useDispute, useRedeem } from '../api/holdings';
 import { HoldingRow, type HoldingRowHandlers } from '../components/HoldingRow';
@@ -140,7 +140,7 @@ export function CollectPage() {
       return;
     }
     if (r.id.startsWith('creator:')) {
-      void navigate(routes.creators(r.id.slice('creator:'.length)));
+      openCreator(r.id.slice('creator:'.length));
       return;
     }
     const h = byId.get(r.id);

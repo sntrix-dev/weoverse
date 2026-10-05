@@ -62,6 +62,7 @@ export function PostSheet({
   circles,
   asks,
   direct,
+  initial,
   onPost,
   onDone,
   onClose,
@@ -72,12 +73,14 @@ export function PostSheet({
   asks: PostAsk[];
   /** answering an ask is a regular WeO only */
   direct: boolean;
+  /** where the sheet opens (made for a brief: "One person") */
+  initial?: PostDest;
   /** does the posting; rejects when it did not go through (the sheet stays open) */
   onPost: (dest: PostDest, circleId: string | null, askId: string | null) => Promise<void>;
   onDone: (dest: PostDest, circleId: string | null, askId: string | null) => void;
   onClose: () => void;
 }) {
-  const [dest, setDest] = useState<PostDest>('network');
+  const [dest, setDest] = useState<PostDest>(initial ?? 'network');
   const [circlePick, setCircle] = useState<string | null>(null);
   const [askPick, setAsk] = useState<string | null>(null);
   // the first of each is chosen until you choose (the lists can arrive after the sheet opens)

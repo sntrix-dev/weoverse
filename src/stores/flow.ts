@@ -54,11 +54,15 @@ interface FlowState {
   /** push a WeO of yours; `circleId` when opened from inside a circle */
   push: { weo: PushTarget; circleId: string | null } | null;
   report: ReportTarget | null;
+  /** answer a brief with one of your WeOs (M08) — the request id */
+  offer: string | null;
+  /** the creator sheet, over any page and over the flows (design `app.openCreator`) */
+  creator: string | null;
 }
 
-const closed = { collect: null, relist: null, compose: null, push: null, report: null };
+const closed = { collect: null, relist: null, compose: null, push: null, report: null, offer: null };
 
-export const useFlow = create<FlowState>(() => ({ ...closed }));
+export const useFlow = create<FlowState>(() => ({ ...closed, creator: null }));
 
 export const openCollect = (weoId: string) => useFlow.setState({ ...closed, collect: weoId });
 /** design `app.openRelist(h)` */
@@ -70,3 +74,8 @@ export const openPush = (weo: PushTarget, circleId: string | null = null) =>
 export const askAbout = (w: WeoCardModel, circleId: string | null = null) => openPush(pushTargetOf(w), circleId);
 export const openReport = (target: ReportTarget) => useFlow.setState({ ...closed, report: target });
 export const closeFlow = () => useFlow.setState({ ...closed });
+/** design `app.openOffer(r)` */
+export const openOffer = (requestId: string) => useFlow.setState({ ...closed, offer: requestId });
+/** design `app.openCreator(id)` — one creator surface, reachable from any face or name */
+export const openCreator = (creatorId: string) => useFlow.setState({ creator: creatorId });
+export const closeCreator = () => useFlow.setState({ creator: null });

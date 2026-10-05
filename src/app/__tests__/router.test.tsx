@@ -23,8 +23,6 @@ describe('routing', () => {
   });
 
   it.each([
-    ['/creators/mya', 'M08'],
-    ['/requests/rq-1', 'M08'],
     ['/passport', 'M09'],
     ['/wallet', 'M09'],
     ['/settings', 'M09'],
@@ -48,6 +46,15 @@ describe('routing', () => {
     renderApp(path);
     expect(await screen.findByRole('heading', { level: 1, name })).toBeInTheDocument();
     expect(document.documentElement.style.getPropertyValue('--focus-tint')).toBe(tint);
+  });
+
+  it.each([
+    ['/creators', 'Who is trading, and how well'],
+    ['/requests', 'Someone wants it made'],
+    ['/tracking', 'What you are watching, and why it matters this week'],
+  ])('%s is its M08 screen', async (path, name) => {
+    renderApp(path);
+    expect(await screen.findByRole('heading', { level: 1, name })).toBeInTheDocument();
   });
 
   it('/weos/:id is the WeO page', async () => {
