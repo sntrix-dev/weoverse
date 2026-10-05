@@ -254,7 +254,9 @@ export function SectionHero({
           <div
             style={{
               flex: '1 1 0',
-              minWidth: 0,
+              // a zero basis lets a short feature (the passport balance) squeeze this column to
+              // nothing on a phone; a floor makes the feature wrap onto its own line instead
+              minWidth: 'min(100%, 260px)',
               maxWidth: '100%',
               display: 'flex',
               flexDirection: 'column',

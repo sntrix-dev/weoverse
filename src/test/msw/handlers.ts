@@ -29,6 +29,7 @@ import {
   creatorViewFixture,
   trackingFixture,
 } from '../fixtures/people';
+import { fullWalletFixture, graphFixture, passportFixture, settingsFixture } from '../fixtures/identity';
 import { collectionsSnapshotFixture, listingsSnapshotFixture, resellQuoteFixture } from '../fixtures/holdings';
 
 /** Wraps data in the backend envelope (weo-3.0 ResponseHandler.success). */
@@ -83,7 +84,11 @@ export const handlers = [
   http.get(url('/frontend/community/my-weos'), () => ok({ items: myWeosFixture, nextBefore: null })),
   http.get(url('/frontend/me/drafts'), () => ok({ items: draftsFixture, total: 1 })),
   http.get(url('/frontend/me/collections'), () => ok({ items: [], pagination: { total: 0, page: 1, limit: 3, totalPages: 0 } })),
-  http.get(url('/frontend/wallet/overview'), () => ok(walletFixture)),
+  http.get(url('/frontend/wallet/overview'), () => ok({ ...fullWalletFixture(), ...walletFixture })),
+  // M09 identity & money
+  http.get(url('/frontend/users/me/passport'), () => ok(passportFixture())),
+  http.get(url('/frontend/users/me/graph'), () => ok(graphFixture)),
+  http.get(url('/frontend/users/me/settings'), () => ok(settingsFixture())),
   // M06 reads — Collect and Exchange
   http.get(url('/frontend/me/collections/snapshot'), () => ok(collectionsSnapshotFixture())),
   http.get(url('/frontend/me/listings/snapshot'), () => ok(listingsSnapshotFixture())),

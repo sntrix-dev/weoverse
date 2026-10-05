@@ -191,11 +191,7 @@ export const isrTone = (n: number) => stageOf(n)[1];
 export const isrStage = (n: number) => stageOf(n)[2];
 
 /** design: CONTACT_NOTE — how they may be reached, said as a fact. */
-export const CONTACT_NOTE: Record<'anyone' | 'circles' | 'off', string> = {
-  anyone: 'Open to anyone',
-  circles: 'Only through a shared Circle',
-  off: 'Closed — they answer in threads instead',
-};
+export { CONTACT_NOTE } from '@/components/people/PublicPageButton';
 
 /** "answers accepted" — a share, or a dash when they have answered nothing. */
 export const acceptLabel = (rate: number | null | undefined) =>

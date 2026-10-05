@@ -30,6 +30,34 @@ export function useHoldingFaces(limit = 3) {
   });
 }
 
+/** What you hold, as the wallet's orbit: one face per WeO, newest first. */
+export function useHoldingOrbit(limit = 6) {
+  return useQuery({
+    queryKey: ['wallet', 'orbit', limit],
+    queryFn: () =>
+      api.get<{ items: CollectionRow[] }>('/frontend/me/collections', { query: { limit: limit * 2 } }),
+    select: (d) => {
+      const seen = new Set<string>();
+      const out: { id: string; weoId: string; name: string; img: string | null; type: string }[] = [];
+      for (const c of d.items) {
+        const weoId = String(c.weoId);
+        if (seen.has(weoId)) continue;
+        seen.add(weoId);
+        const m = c.weo?.media?.find((x) => x.url);
+        out.push({
+          id: String(c._id),
+          weoId,
+          name: c.weo?.title ?? 'A WeO',
+          img: m?.thumbnail ?? m?.url ?? null,
+          type: String(c.collectionType),
+        });
+      }
+      return out.slice(0, limit);
+    },
+    staleTime: 60_000,
+  });
+}
+
 /** `POST /frontend/wallet/transfer` — move earned Os to another passport. */
 export function useMoveOs() {
   const qc = useQueryClient();

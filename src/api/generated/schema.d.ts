@@ -4905,6 +4905,82 @@ export interface paths {
         patch: operations["updateMyPublicProfile"];
         trace?: never;
     };
+    "/frontend/users/me/settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * The settings screen in one read (redesign M09)
+         * @description Self-scoped. Email, phone and password belong to O-Wallet (the sign-in
+         *     provider): they come back read-only, with `manageUrl` — the place to
+         *     change them. Notification channels are the stored choices laid over
+         *     the defaults (today's delivery: everything in app and by push). Email
+         *     is saved but not delivered yet (`emailDelivery: false`).
+         */
+        get: operations["getMySettings"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Change settings (partial)
+         * @description Send only what changed; an empty object is rejected. In-app and push
+         *     choices apply to notifications from now on; quiet hours hold push in
+         *     your `timezone`. The security group's email cannot be turned off and
+         *     is ignored if sent.
+         */
+        patch: operations["updateMySettings"];
+        trace?: never;
+    };
+    "/frontend/users/me/account-request": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Ask to deactivate or delete your account (redesign M09)
+         * @description Records the request on the account; a person confirms it by email.
+         *     Nothing is hidden or removed automatically. A new request replaces
+         *     an open one.
+         */
+        post: operations["requestAccountChange"];
+        /** Withdraw an open deactivate / delete request */
+        delete: operations["cancelAccountRequest"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/frontend/users/me/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Download your data (redesign M09)
+         * @description Your own records as one JSON document: profile and settings, the WeOs
+         *     you made, what you collected, money in and out, who you follow, your
+         *     circles and threads. Each list is capped at 2,000. Three a minute.
+         */
+        get: operations["exportMyData"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/admin/wallets": {
         parameters: {
             query?: never;
@@ -11266,6 +11342,10 @@ export interface components {
             inputs: {
                 k: string;
                 w: number;
+                /** @description Redesign M09 — what to do about it */
+                do: string;
+                /** @description Redesign M09 — how often it can count */
+                cap: string;
             }[];
             /**
              * @description What the score never counts. Published, because an exclusion
@@ -11417,6 +11497,13 @@ export interface components {
             identity: components["schemas"]["PassportIdentity"];
             standing: components["schemas"]["StandingView"];
             tier: components["schemas"]["TierView"];
+            /** @description Your WeOs, newest first, for the ring around your face (documented in M09; always sent). */
+            orbit: {
+                id: string;
+                title: string;
+                weoType: string;
+                img: string | null;
+            }[];
             totals: {
                 /** @description O the caller can actually spend. */
                 available: number;
@@ -12973,13 +13060,17 @@ export interface components {
             balance: components["schemas"]["WalletBuckets"];
             commitments: components["schemas"]["WalletCommitments"];
             standing: components["schemas"]["WalletStanding"];
-            /** @description Fixed at 100 Os = $1 for everyone. Does not vary by ISR or tier. */
+            /**
+             * @description The settlement peg — the same figure `GET /config/o` returns and
+             *     collect charges with (redesign M09; it used to print the policy
+             *     file's round 100 while settlement used 99). Does not vary by ISR or tier.
+             */
             peg: {
-                /** @enum {integer} */
-                osPerDollar: 100;
-                /** @enum {number} */
-                rate: 0.01;
-                /** @example 100 Os = $1 */
+                /** @example 99 */
+                osPerDollar: number;
+                /** @example 0.0101 */
+                rate: number;
+                /** @example 99 Os = $1 */
                 label: string;
                 note: string;
             };
@@ -15049,6 +15140,82 @@ export interface components {
             data?: {
                 tracked: boolean;
             };
+        };
+        ChannelRow: {
+            app: boolean;
+            email: boolean;
+            push: boolean;
+        };
+        ChannelMatrix: {
+            sales: components["schemas"]["ChannelRow"];
+            bids: components["schemas"]["ChannelRow"];
+            circles: components["schemas"]["ChannelRow"];
+            mentions: components["schemas"]["ChannelRow"];
+            mya: components["schemas"]["ChannelRow"];
+            news: components["schemas"]["ChannelRow"];
+            security: components["schemas"]["ChannelRow"];
+        };
+        QuietHours: {
+            on: boolean;
+            /** @example 22:00 */
+            from: string;
+            /** @example 07:00 */
+            to: string;
+        };
+        SettingsView: {
+            account: {
+                name: string;
+                /** @example @samr */
+                handle: string;
+                email: string | null;
+                phone: string | null;
+                passportId: string | null;
+                /** @description The O-Wallet account, where email, phone and password change */
+                manageUrl: string;
+            };
+            /** @example UTC */
+            timezone: string;
+            receipts: boolean;
+            notifications: {
+                channels: components["schemas"]["ChannelMatrix"];
+                /** @enum {string} */
+                digest: "off" | "daily" | "weekly";
+                quiet: components["schemas"]["QuietHours"];
+                /** @description false — email is saved, not sent yet */
+                emailDelivery: boolean;
+            };
+            accountRequest: {
+                /** @enum {string} */
+                kind: "deactivate" | "delete";
+                reason: string | null;
+                /** Format: date-time */
+                requestedAt: string;
+            } | null;
+        };
+        SettingsPatch: {
+            /** @description An IANA time zone */
+            timezone?: string;
+            receipts?: boolean;
+            notifications?: {
+                /** @description Any of the seven groups, each with any of app / email / push. */
+                channels?: {
+                    [key: string]: {
+                        app?: boolean;
+                        email?: boolean;
+                        push?: boolean;
+                    };
+                };
+                /** @enum {string} */
+                digest?: "off" | "daily" | "weekly";
+                quiet?: {
+                    on?: boolean;
+                    from?: string;
+                    to?: string;
+                };
+            };
+        };
+        SettingsResponse: components["schemas"]["BaseResponse"] & {
+            data?: components["schemas"]["SettingsView"];
         };
         /**
          * @description The rater (populated from User). v1 has no anonymous ratings, so
@@ -25866,6 +26033,11 @@ export interface operations {
                     where?: string;
                     bio?: string;
                     formats?: ("Bid" | "Pool" | "Hunt" | "Drop" | "Listing")[];
+                    /**
+                     * Format: uri
+                     * @description Redesign M09 — the profile photo, an https URL from `POST /frontend/media`.
+                     */
+                    avatarUrl?: string;
                 };
             };
         };
@@ -25881,6 +26053,15 @@ export interface operations {
             };
             400: components["responses"]["ValidationError"];
             401: components["responses"]["Unauthorized"];
+            /** @description Redesign M09 — the handle belongs to another account (any case). */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
         };
     };
     updateMyPublicProfile: {
@@ -25919,6 +26100,163 @@ export interface operations {
             };
             400: components["responses"]["ValidationError"];
             401: components["responses"]["Unauthorized"];
+        };
+    };
+    getMySettings: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Your settings */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SettingsResponse"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+        };
+    };
+    updateMySettings: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                /**
+                 * @example {
+                 *       "timezone": "Europe/Lisbon",
+                 *       "notifications": {
+                 *         "channels": {
+                 *           "circles": {
+                 *             "push": false
+                 *           }
+                 *         },
+                 *         "digest": "daily",
+                 *         "quiet": {
+                 *           "on": true,
+                 *           "from": "22:00",
+                 *           "to": "07:00"
+                 *         }
+                 *       },
+                 *       "receipts": true
+                 *     }
+                 */
+                "application/json": components["schemas"]["SettingsPatch"];
+            };
+        };
+        responses: {
+            /** @description Your settings, after the change */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SettingsResponse"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            422: components["responses"]["ValidationError"];
+        };
+    };
+    requestAccountChange: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                /**
+                 * @example {
+                 *       "kind": "deactivate",
+                 *       "reason": "Taking a break"
+                 *     }
+                 */
+                "application/json": {
+                    /** @enum {string} */
+                    kind: "deactivate" | "delete";
+                    reason?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Recorded — your settings with `accountRequest` */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SettingsResponse"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            422: components["responses"]["ValidationError"];
+        };
+    };
+    cancelAccountRequest: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Withdrawn — `accountRequest` is null */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SettingsResponse"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+        };
+    };
+    exportMyData: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Your data */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BaseResponse"] & {
+                        data?: {
+                            [key: string]: unknown;
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            /** @description Too many exports in a minute */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
         };
     };
     adminListWallets: {
