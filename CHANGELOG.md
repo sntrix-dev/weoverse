@@ -2,6 +2,14 @@
 
 All notable changes per module. Newest first.
 
+## M07 — Create (2026-10-05)
+
+- Create: the O with eight formats on its ring (Sell, Pool, Bid and Request live; Hunt, Drop, Gift and Subscription "coming soon" with Notify me), the edges playing each section's stage, docks for your drafts, templates, open asks and tracking, the template shelf and sheet.
+- The composer: module rails, the WeO named and priced on itself, uploads (a cover and up to two more, one video), Draft with Mya, tags, terms per format, the card view, and drafts that save themselves.
+- Preflight shows what goes live and what you receive; posting asks where — the whole network, a Circle, or one person's open ask. A Request goes straight to the asks board. "Edit WeO" in Exchange reopens a live WeO in the composer.
+- Backend (`redesign/m07-create`): the O rate for the client, media upload, Mya's description draft, the templates catalogue; a regular WeO now keeps the format its creator chose (a small-edition Sell no longer reads as a Drop).
+- Shell: a sign-in link no longer wraps itself.
+
 ## M06 — Collect & Exchange (2026-10-03)
 
 - Collect: what you hold in Os (what you put in, value now, if you resold today), Needs you (confirm it arrived / something is wrong / it would fetch more / read the pool's report), your WeOs by format with Resell, Track and Circle, the snapshot (movers, formats, creators, awaiting) with "Where your Os sit", and the wallet.

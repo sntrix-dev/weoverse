@@ -2,7 +2,7 @@
 
 | Status | FE branch | BE branch | Report |
 |---|---|---|---|
-| ⏳ in progress | `feat/m07-create` | `redesign/m07-create` (from `redesign/m06-collect-exchange`) | `reports/M07-create.md` |
+| ✅ done 2026-10-05 | `feat/m07-create` | `redesign/m07-create` (from `redesign/m06-collect-exchange`) | `reports/M07-create.md` |
 
 The largest page (`create.jsx`, ~1,400 lines). Split into feature components; no file over ~300 lines.
 
@@ -57,6 +57,7 @@ Prices are entered in Os; a regular WeO stores US dollars, so the composer conve
 - D-055 Fees: the preflight shows what settlement takes (nothing today), not the design's 2 % Flow fee.
 - D-056 Post sheet: network = create; a Circle = create then push (title as the question); one person = create with `requestedId` (Listing / Bid). A Request posts straight to the asks board. Bid reserve = the floor. `?edit=` saves in place.
 - D-057 A Request has no Media module (the request endpoint stores none).
+- D-058 A regular WeO stores the format its creator chose (`format`); the card reads the backend's `format`, so a 60-copy Listing is a Listing and a Listing that takes offers stays a Listing. Editing a WeO that reads as a Drop keeps it a Drop.
 
 ## Components
 

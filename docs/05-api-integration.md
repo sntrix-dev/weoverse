@@ -91,6 +91,7 @@ Backend: `weo-3.0`, local base URL **`http://localhost:3002/api`**. Full endpoin
 | M07 | Drafts (autosave, carry on) | `/frontend/me/drafts*` | wired (`useAutosave`, 2.5 s quiet) |
 | M07 | Categories, asks | `GET /frontend/categories`, `GET /frontend/request-weos` | wired |
 | M07 | Post into a circle | `POST /frontend/community/push` after the create (D-056) | wired |
+| M07 | Format a WeO was made as | `format` on regular create / update and on every WeO card (additive, M07, D-058) | wired (`lib/cardModel.ts formatOf`, composer payload) |
 | M08 | Creators | `GET /frontend/creators`, `/creators/:id`, `/weos/top-creators` | exists |
 | M08 | Follow / circle a person | `/frontend/users/:id/follow`, `/circle/*` | exists |
 | M08 | Requests | `/frontend/request-weos*` | exists |
