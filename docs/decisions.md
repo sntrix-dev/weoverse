@@ -4,6 +4,7 @@ Newest first. Each entry: date · decision · why · who decided. Open questions
 
 | # | Date | Decision | Why | By |
 |---|---|---|---|---|
+| D-069 | 2026-10-05 | Modules are merged into an integration branch, `develop` (cut from `master` @ `a1c1854`, M01–M07), never into `master`. Feature branches start from `develop`; tags `mNN-done` mark `develop`. | Surya: "Don't merge anything to master. Create a different branch and merge. Never to master." | Surya |
 | D-068 | 2026-10-05 | The creator boards rank the twelve leaders of each figure (the podium and nine behind it); the grid below holds everyone. A board of the whole directory (48) was a wall of rows. | Browser pass (M08-B1). | Claude |
 | D-067 | 2026-10-05 | "Make a WeO for this" opens the composer seeded from the brief — its title, line, category and budget (as your ask, Os), one copy — with no picture (you add your own; the design seeds the circle's cover). Posting opens the post sheet on **One person** with that ask chosen (`requestedId`). An answer to a brief is not autosaved: a draft would lose the ask. `/create?kind=Request` opens a format directly ("Post a request"). | Real data only; an answer belongs to its ask. | Claude |
 | D-066 | 2026-10-05 | The creators snapshot reads the directory as it stands: each tile's headline is the best (or total) figure and its bars are the seven leaders low to high; no delta, because the backend keeps no history of standing, settlement or reach. | Real data only (no fabricated 7-day series). | Claude |

@@ -9,7 +9,7 @@ React + Vite + TypeScript build of the **WeOverse v3** design, integrated with t
 | Folder (siblings under `~/Documents/projects/weoverse/`) | Role | Rule |
 |---|---|---|
 | `redesign/project/WeOverse v3 - HTML/` | Design prototype — UI source of truth | **read-only**, never edit |
-| `v2-redesign-app/` (this repo) | The app | repo `github.com/sntrix-dev/weoverse` (**public**), base branch `master` |
+| `v2-redesign-app/` (this repo) | The app | repo `github.com/sntrix-dev/weoverse` (**public**), integration branch `develop` (never merge into `master`, D-069) |
 | `weo-3.0/` | Backend (Express 5, Mongoose 8.16.1 pinned, Zod 3) | obey **its own `CLAUDE.md`**, especially §4 envelope, §5 wire-shape preservation, §13 git rules, §16 redesign workflow |
 
 ## 2. Non-negotiables
@@ -61,7 +61,7 @@ Code tests in both repos + a browser pass in the user's Chrome (Claude in Chrome
 
 ## 7. Git
 
-- Frontend: `feat/mNN-<slug>` from `master` → push → fast-forward `master` → push → tag `mNN-done`.
+- Frontend: `feat/mNN-<slug>` from `develop` → push → merge into `develop` → push → tag `mNN-done`. **Never merge or push into `master`** (Surya, D-069).
 - Backend: `redesign/mNN-<slug>` → push the branch. Never merge into `phase1/v3`/`main` unasked.
 - The user has authorised commit + push at the end of each module in both repos after all checks pass. Never `--no-verify`, never amend pushed commits, never force-push; stage by path in the backend.
 - Git from the Linux VM needs delete permission on the repo folder (lock files). If an `index.lock` is left behind, remove only that file.

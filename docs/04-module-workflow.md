@@ -15,7 +15,7 @@ Every module follows these ten steps in order. Skill: `skills/module-delivery/SK
 
 ## 2 · Frontend port
 
-- Frontend branch: `feat/mNN-<slug>` from up-to-date `master`.
+- Frontend branch: `feat/mNN-<slug>` from up-to-date `develop` (never `master`, D-069).
 - Port in order: DS primitives → shared components → feature components → page (`02-design-port-guide.md` §4).
 - Build data hooks against **MSW fixtures shaped like the backend DTO** first (copy real responses when the endpoint exists).
 - Keep components dumb; adapters in `features/<f>/model/`.
@@ -71,7 +71,7 @@ See `06-testing-strategy.md`. Summary:
 
 - Update docs: module spec (status ✅, final API map), `03-module-plan.md` status, `05-api-integration.md` endpoint table, `decisions.md` for any decision, `CHANGELOG.md`.
 - Backend: commit on `redesign/mNN-<slug>` (specific files, message `feat(redesign-mNN): …`), push the branch. Never `--no-verify`, never amend, never force-push.
-- Frontend: commit on `feat/mNN-<slug>`, push, then fast-forward merge into `master` and push `master`.
+- Frontend: commit on `feat/mNN-<slug>`, push, then merge into `develop` and push `develop`. Never merge into `master` (D-069).
 - Save the module summary to the claude.ai project (`qa/` or `modules/` doc) so it is readable anywhere.
 
 The user has authorised commit + push at the end of each module in both repos once tests pass. Anything outside this workflow (e.g. force-push, merging into the backend's `main`/`phase1/v3`) still needs an explicit ask.

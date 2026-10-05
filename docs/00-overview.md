@@ -7,7 +7,7 @@ WeOverse v2 redesign app: a production React + Vite + TypeScript build of the **
 | Role | Folder (on the Mac, under `~/Documents/projects/weoverse/`) | What it is | Git |
 |---|---|---|---|
 | **Design (read-only)** | `redesign/project/WeOverse v3 - HTML/` | Static React/JSX prototype. **Source of truth for UI.** Pages in `src/pages/*.jsx`, shared UI in `src/components/*.jsx`, tokens in `css/ds/tokens/`, global CSS in `css/app.css`, design-system components compiled in `js/ds/_ds_bundle.js`. | none — never edit |
-| **Frontend (this repo)** | `v2-redesign-app/` | The app we are building. | `github.com/sntrix-dev/weoverse` (public), default branch `master` |
+| **Frontend (this repo)** | `v2-redesign-app/` | The app we are building. | `github.com/sntrix-dev/weoverse` (public), integration branch `develop` (`master` is never merged into, D-069) |
 | **Backend** | `weo-3.0/` | Express 5 + Mongoose 8.16.1 + Zod 3 API. Has its own `CLAUDE.md` — obey it. | `github.com/ksanjiv05/weo-3.0`, redesign work branches `redesign/mNN-*` |
 
 ## Sources of truth, in order

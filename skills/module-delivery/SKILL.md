@@ -18,7 +18,7 @@ The master procedure for a module. Source of truth: `docs/04-module-workflow.md`
 Fill the module spec: screens, blocks (design order), components (DS / shared / feature), API map, gaps, acceptance criteria. Mark ⏳ in the plan.
 
 ## 2. Frontend port
-`git switch master && git pull --ff-only && git switch -c feat/mNN-<slug>`. Use the `design-port` skill per component/page. Data via MSW fixtures first (`api-integration` skill).
+`git switch develop && git pull --ff-only && git switch -c feat/mNN-<slug>` (never from or into `master`, D-069). Use the `design-port` skill per component/page. Data via MSW fixtures first (`api-integration` skill).
 
 ## 3. Backend audit
 For each API-map row: confirm in code (`weo-3.0/src/routes/frontend/index.ts` → module route), curl it with the dev token, save a trimmed sample into the spec and `src/test/fixtures/`, classify: OK / FE adapter / BE additive / BE breaking (breaking → ask user).
@@ -41,7 +41,7 @@ Write `docs/reports/MNN-<slug>.md` from `_TEMPLATE.md`. Fix all High/Medium bugs
 ## 10. Commit, push, docs
 - Docs: spec status ✅ + final API map; `03-module-plan.md`; `05-api-integration.md` endpoint table; `decisions.md`; `CHANGELOG.md`; backend `docs/redesign/*`.
 - Backend: `git add <paths>`; `git commit -m "feat(redesign-mNN): <summary>"`; `git push -u origin redesign/mNN-<slug>`.
-- Frontend: commit, `git push -u origin feat/mNN-<slug>`, then `git switch master && git merge --ff-only feat/mNN-<slug> && git push && git tag mNN-done && git push --tags`.
+- Frontend: commit, `git push -u origin feat/mNN-<slug>`, then `git switch develop && git merge --ff-only feat/mNN-<slug> && git push && git tag mNN-done && git push --tags`. Never merge or push into `master` (D-069).
 - Save a short module summary to the claude.ai project (Projects tool, `modules/MNN-<slug>.md`).
 - Tell the user: what shipped, test result, open issues, next module.
 

@@ -4,7 +4,7 @@
 
 | Repo | Remote | Base | Work branches |
 |---|---|---|---|
-| Frontend `v2-redesign-app` | `github.com/sntrix-dev/weoverse` (**public**) | `master` | `feat/mNN-<slug>` → fast-forward into `master` |
+| Frontend `v2-redesign-app` | `github.com/sntrix-dev/weoverse` (**public**) | `develop` (integration; `master` is never merged into, D-069) | `feat/mNN-<slug>` → merged into `develop` |
 | Backend `weo-3.0` | `github.com/ksanjiv05/weo-3.0` | branch chain starting at `phase1/v3` | `redesign/mNN-<slug>`, each cut from the previous module's branch |
 
 Backend chain: `phase1/v3 → redesign/m00-setup → redesign/m01-foundation → …`. Merging the chain into `phase1/v3`/`main` is the user's call (open a PR when asked).
@@ -27,5 +27,5 @@ Backend chain: `phase1/v3 → redesign/m00-setup → redesign/m01-foundation →
 
 1. Both repos green (see `04-module-workflow.md` §7–8).
 2. Backend: commit on `redesign/mNN-<slug>`, `git push -u origin redesign/mNN-<slug>`.
-3. Frontend: commit on `feat/mNN-<slug>`, push it, `git switch master && git merge --ff-only feat/mNN-<slug> && git push`.
+3. Frontend: commit on `feat/mNN-<slug>`, push it, `git switch develop && git merge --ff-only feat/mNN-<slug> && git push` (a `--no-ff` merge when `develop` moved on). Never merge or push into `master` (Surya, D-069).
 4. Tag the frontend: `git tag mNN-done && git push --tags`.

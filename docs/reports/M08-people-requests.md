@@ -7,7 +7,7 @@
 | Backend | branch `redesign/m08-people-requests` |
 | Environment (automated) | Linux workspace · Node 22 · jsdom (Vitest) · backend suite in the Cowork VM |
 | Environment (browser pass) | macOS · Chrome + Claude in Chrome · frontend `npm run dev` :5173 · backend `redesign/m08-people-requests` :3002 · Surya's O-Wallet session · design reference at `/design/` |
-| Result | ⚠️ pass with open items — creators, the creator sheet, tracking and your own brief tested live; offering on someone else's brief and inviting into a circle are covered by tests only (no other member's open brief to answer; an invite notifies a real person) |
+| Result | ⚠️ pass with open items — light and dark checked; creators, the creator sheet, tracking and your own brief tested live; offering on someone else's brief and inviting into a circle are covered by tests only (no other member's open brief to answer; an invite notifies a real person) |
 
 ## 1. Automated checks
 
@@ -48,10 +48,10 @@
 
 | Part | Light | Dark | 390 | Notes |
 |---|---|---|---|---|
-| Creators (hero, boards, grid, record orbit) | ✅ | ⏳ | ✅ | no horizontal overflow at 390 |
-| Creator sheet | ✅ | ⏳ | — | |
-| Requests (hero, cards, panel) | ✅ | ⏳ | ✅ | compared with `/design/requests.html` — same hero, card grid and panel placement |
-| Tracking | ✅ | ⏳ | ✅ | |
+| Creators (hero, boards, grid, record orbit) | ✅ | ✅ | ✅ | no horizontal overflow at 390 |
+| Creator sheet | ✅ | ✅ | — | |
+| Requests (hero, cards, panel) | ✅ | ✅ | ✅ | compared with `/design/requests.html` — same hero, card grid and panel placement |
+| Tracking | ✅ | ✅ | ✅ | |
 
 ## 4. Browser — interactions
 
@@ -78,7 +78,6 @@
 ## 6. Open issues & follow-ups
 
 - Offer one you hold and Invite were not run live: no other member has an open brief, and an invite notifies a real person. Both are covered by tests; try them with a second account.
-- Dark-mode parity of the three screens is still to look at (the session signed out during the phone check, M08-B4).
 - G-58: `GET /request-weos/:id` returns requested-WeO documents to any member — trimming is breaking for old callers (ask).
 - Test data: "M07 test ask" is now closed; "M07 test print" stays paused.
 
@@ -86,4 +85,4 @@
 
 - [x] All High/Medium fixed and re-tested
 - [x] Docs updated (spec, plan, decisions D-059…D-068, API map, changelog, backend log, gaps)
-- [ ] Commits pushed (backend `redesign/m08-people-requests` ✅; frontend `feat/m08-people-requests` → `master`, tag `m08-done`)
+- [x] Commits pushed (backend `redesign/m08-people-requests`; frontend `feat/m08-people-requests` → `develop`, tag `m08-done` — never `master`, D-069)
