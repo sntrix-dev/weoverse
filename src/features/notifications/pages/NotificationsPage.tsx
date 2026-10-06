@@ -75,6 +75,7 @@ export function NotificationsPage() {
             <Button
               size="sm"
               variant={unreadOnly ? 'primary' : 'ghost'}
+              selected={unreadOnly}
               tone="violet"
               aria-pressed={unreadOnly}
               onClick={() => setUnreadOnly((u) => !u)}

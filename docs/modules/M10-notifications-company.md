@@ -2,7 +2,7 @@
 
 | Status | FE branch | BE branch | Report |
 |---|---|---|---|
-| ⏳ in progress | `feat/m10-notifications-company` (from `develop`) | `redesign/m10-notifications-company` (from `redesign/m09-identity-money`) | `reports/M10-notifications-company.md` |
+| ✅ done 2026-10-06 | `feat/m10-notifications-company` (from `develop`) | `redesign/m10-notifications-company` (from `redesign/m09-identity-money`) | `reports/M10-notifications-company.md` |
 
 ## Screens
 
