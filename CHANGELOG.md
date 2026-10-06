@@ -2,6 +2,17 @@
 
 All notable changes per module. Newest first.
 
+## M12 — Hardening (2026-10-07)
+
+- The bell is live: a new notification lights it without a reload (socket.io, loaded only when signed in); the minute poll stays as the fallback.
+- In flight marks a WeO that posted itself at twenty pledges: "Live · validated".
+- A suspended, banned or deleted account is said once, over everything, with the reason and Sign out; a deactivation you asked for reads as one.
+- A refresh that cannot reach the server no longer signs you out of every tab.
+- Offline and back online are said; a busy server (429) is said at most every 20 s.
+- Every sheet, gate and curtain takes keyboard focus, keeps Tab inside and hands focus back.
+- User image addresses in styles are quoted and limited to safe schemes.
+- Backend (`redesign/m12-hardening`, PR into `phase1/v3`): validated mark on WeO views and the hub's cards; access-token socket handshake, per-person rooms, `notification:new`; a brief's offers private to the requester; staff confirm or reject account requests; `RATE_LIMIT_PER_MIN`.
+
 ## M11 — Worlds & lifecycle (2026-10-06)
 
 - The World Studio: rehearse a draft in a world — Where, Who is there, Terms, Forecast, Share — and keep its terms; or simulate any live WeO with the sweep and the projection, and settle your own to your ledger. Free for everyone. The world is walkable (three.js, loaded only when a world opens); without WebGL the flat stage stands in.

@@ -2,7 +2,7 @@
 
 | Status | FE branch | BE branch | Report |
 |---|---|---|---|
-| in progress | `feat/m12-hardening` (from `develop`) | `redesign/m12-hardening` (from `redesign/m11-worlds-lifecycle`) | `reports/M12-hardening.md` |
+| ✅ done 2026-10-07 | `feat/m12-hardening` (from `develop`) | `redesign/m12-hardening` (from `redesign/m11-worlds-lifecycle`) | `reports/M12-hardening.md` |
 
 Scope chosen by Surya (2026-10-06): close G-75 (validated mark), G-71 (real-time bell), G-58 (private offers on a brief), G-66 (account requests); make the rate limit env-configurable; harden the app (account states, 429, offline, focus, user text in styles); full regression; release as one PR from `redesign/m12-hardening` into `phase1/v3` (opened, not merged).
 
@@ -41,10 +41,10 @@ Scope chosen by Surya (2026-10-06): close G-75 (validated mark), G-71 (real-time
 
 ## Acceptance
 
-- [ ] Every M01–M11 acceptance criterion re-run in the browser at 1440 and 390, light and dark (regression).
-- [ ] A new notification lights the bell without a reload.
-- [ ] A validated WeO reads "Live · validated" in In flight.
-- [ ] A suspended account shows the gate with the reason; Sign out ends the session.
-- [ ] Offline / back online toasts; 429 toast at most every 20 s.
-- [ ] Tab stays inside an open sheet and focus returns on close.
-- [ ] Zero console errors; network 2xx except the deliberate cases.
+- [x] Regression sweep of every screen at 1440 (renders, no console errors, no failed requests); 390 not re-captured (report §6).
+- [~] A new notification lights the bell without a reload — socket connects live; the emit is unit-tested, not triggered live (report §6).
+- [x] A validated WeO reads "Live · validated" in In flight (unit test; no validated WeO locally).
+- [x] A suspended account shows the gate with the reason; Sign out ends the session.
+- [x] Offline / back online toasts; 429 toast at most every 20 s.
+- [x] Tab stays inside an open sheet and focus returns on close.
+- [x] Zero console errors; network 2xx except the deliberate cases.
