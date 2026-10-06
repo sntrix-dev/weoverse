@@ -1,6 +1,5 @@
 import type { ComponentType } from 'react';
 import { createBrowserRouter, Navigate, type RouteObject } from 'react-router';
-import { PlannedPage } from '@/components/layout/PlannedPage';
 import { CallbackPage } from '@/features/auth/pages/CallbackPage';
 import { LoginPage } from '@/features/auth/pages/LoginPage';
 import { AppLayout, type RouteHandle } from './AppLayout';
@@ -22,13 +21,6 @@ const page = (
   // shown while a section's chunk loads on a cold start
   HydrateFallback: () => null,
   lazy: async () => ({ Component: (await load()).default }),
-});
-
-/** A route whose page lands in a later module renders PlannedPage until then. */
-const planned = (path: string, route: RouteName): RouteObject => ({
-  path,
-  element: <PlannedPage route={route} />,
-  handle: { route } satisfies RouteHandle,
 });
 
 const devRoutes: RouteObject[] = import.meta.env.DEV
@@ -78,9 +70,13 @@ const childRoutes: RouteObject[] = [
       page('/passport', 'passport', () => import('@/features/passport/pages/PassportPage')),
       page('/wallet', 'wallet', () => import('@/features/wallet/pages/WalletPage')),
       page('/settings', 'settings', () => import('@/features/settings/pages/SettingsPage')),
-      planned('/notifications', 'notifications'),
-      planned('/company', 'company'),
-      planned('/company/:doc', 'company'),
+      page(
+        '/notifications',
+        'notifications',
+        () => import('@/features/notifications/pages/NotificationsPage'),
+      ),
+      page('/company', 'company', () => import('@/features/company/pages/CompanyPage')),
+      page('/company/:doc', 'company', () => import('@/features/company/pages/CompanyPage')),
       { path: '*', element: <Navigate to={routes.create()} replace /> },
     ],
   },

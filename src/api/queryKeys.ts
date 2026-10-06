@@ -37,6 +37,13 @@ export const qk = {
   tracking: {
     all: ['tracking'] as const,
   },
+  notifications: {
+    all: ['notifications'] as const,
+    list: (category: string, unreadOnly: boolean) => ['notifications', 'list', category, unreadOnly] as const,
+  },
+  company: {
+    all: ['company'] as const,
+  },
   circles: {
     all: ['circles'] as const,
     list: (filter: string) => ['circles', 'list', filter] as const,
