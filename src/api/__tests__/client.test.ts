@@ -194,6 +194,20 @@ describe('api client', () => {
     expect(tokens.hasSession()).toBe(false);
   });
 
+  it('keeps the session when the refresh cannot reach the backend (M12)', async () => {
+    tokens.set('expired', 'refresh-1');
+    const expired = vi.fn();
+    setSessionExpiredHandler(expired);
+    server.use(
+      http.get(url('/frontend/wallet'), () => new HttpResponse('Invalid token', { status: 401 })),
+      http.post(url('/frontend/auth/new_access_token'), () => HttpResponse.error()),
+    );
+    const err = (await api.get('/frontend/wallet').catch((e: unknown) => e)) as ApiError;
+    expect(err.status).toBe(401);
+    expect(expired).not.toHaveBeenCalled();
+    expect(tokens.getRefresh()).toBe('refresh-1');
+  });
+
   it('never sends a token or refreshes on auth:false calls', async () => {
     tokens.set('access-1', 'refresh-1');
     let auth: string | null = 'unset';

@@ -98,6 +98,8 @@ function toError(res: Response, body: unknown): ApiError {
 /* ---------- refresh (single flight, across tabs) ---------- */
 
 let refreshing: Promise<boolean> | null = null;
+/** The last refresh could not reach the backend (offline, restarting): the session is kept. */
+let refreshUnreachable = false;
 let onSessionExpired: (() => void) | null = null;
 
 /** The auth layer registers what to do when a refresh fails (clear state, go to /login). */
@@ -141,10 +143,13 @@ async function refreshFromStorage(): Promise<boolean> {
 export function refreshAccessToken(): Promise<boolean> {
   if (!tokens.getRefresh()) return Promise.resolve(false);
   refreshing ??= (async () => {
+    refreshUnreachable = false;
     try {
       const locks = typeof navigator !== 'undefined' ? navigator.locks : undefined;
       return locks ? await locks.request(REFRESH_LOCK, refreshFromStorage) : await refreshFromStorage();
     } catch {
+      // fetch threw: no answer at all, so nothing says the refresh token is bad (M12)
+      refreshUnreachable = true;
       return false;
     } finally {
       refreshing = null;
@@ -181,8 +186,11 @@ async function request<T>(
   if (res.status === 401 && auth && !retried) {
     const ok = await refreshAccessToken();
     if (ok) return request<T>(method, path, opts, true);
-    tokens.clear();
-    onSessionExpired?.();
+    // only a refused refresh ends the session; an unreachable backend keeps it for the next try
+    if (!refreshUnreachable) {
+      tokens.clear();
+      onSessionExpired?.();
+    }
   }
   if (!res.ok || (isEnvelope(payload) && !payload.success)) {
     const err = toError(res, payload);
