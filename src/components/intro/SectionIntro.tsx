@@ -88,6 +88,13 @@ function Curtain({ k, recall }: { k: IntroKey; recall: boolean }) {
         muted
         loop
         playsInline
+        // React does not reflect `muted` to the DOM, and an unmuted video may not autoplay
+        ref={(el) => {
+          if (!el) return;
+          el.muted = true;
+          const playing = el.play() as Promise<void> | undefined;
+          playing?.catch(() => undefined);
+        }}
         preload="auto"
         aria-hidden="true"
         style={{
@@ -338,7 +345,8 @@ function Curtain({ k, recall }: { k: IntroKey; recall: boolean }) {
         </button>
       </div>
     </div>,
-    document.body,
+    // inside #root: the global intro rule hides everything else there and outside it
+    document.getElementById('root') ?? document.body,
   );
 }
 

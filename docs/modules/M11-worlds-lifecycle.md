@@ -2,7 +2,7 @@
 
 | Status | FE branch | BE branch | Report |
 |---|---|---|---|
-| ⏳ in progress | `feat/m11-worlds-lifecycle` (from `develop`) | `redesign/m11-worlds-lifecycle` (from `redesign/m10-notifications-company`) | `reports/M11-worlds-lifecycle.md` |
+| ✅ done 2026-10-06 | `feat/m11-worlds-lifecycle` (from `develop`) | `redesign/m11-worlds-lifecycle` (from `redesign/m10-notifications-company`) | `reports/M11-worlds-lifecycle.md` |
 
 ## Scope
 

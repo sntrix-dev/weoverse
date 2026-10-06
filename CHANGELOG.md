@@ -2,6 +2,15 @@
 
 All notable changes per module. Newest first.
 
+## M11 — Worlds & lifecycle (2026-10-06)
+
+- The World Studio: rehearse a draft in a world — Where, Who is there, Terms, Forecast, Share — and keep its terms; or simulate any live WeO with the sweep and the projection, and settle your own to your ledger. Free for everyone. The world is walkable (three.js, loaded only when a world opens); without WebGL the flat stage stands in.
+- The way to live: Draft → Rehearsed → Reacting (12) → Reacted → Pledging (20) → Live. In flight shows every stage with its next step; opening to reactions asks once and names who is told; a pledge is a promise, nothing is held; at twenty it posts itself, validated.
+- The vetting sheet: say what you would pay and why, or pledge — from the notification, the Circle page ("Waiting on this circle") or your In flight.
+- Section intros and Mya's walkthrough, once per account; replay from the hero's Intro mark or the flow bar's ?, reset in Settings.
+- Rehearse from the WeO page, Discover's stage, Exchange rows, Create's dock and preflight, briefs, creators and the O nav's Worlds; "Enter a world" in the flow bar.
+- Backend (`redesign/m11-worlds-lifecycle`): the draft lifecycle (`vetting`), reactions and pledges, posting at twenty with the validated mark and the rehearsal receipt, notifications that open the vetting sheet, `seen` preferences.
+
 ## M10 — Notifications & company (2026-10-06)
 
 - Notifications: what waits on you, Unread only, Mark all read and a way to your notification settings; chips per category with their counts; rows grouped by day with their picture, tone and time; opening one marks it read and takes you where it points (a WeO, a request, your collection, your listings, the wallet, a creator, a thread, a circle).

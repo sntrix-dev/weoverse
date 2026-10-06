@@ -6,7 +6,7 @@ import { OsRun } from '@/components/text/OsRun';
 import { WeoTile } from '@/components/weo/WeoCards';
 import { Button, CommitReview, FlowReceipt, ICO, OButton, OMark, Spinner, svg } from '@/design-system';
 import { useCommunityCircles } from '@/features/community/api/community';
-import { useDraft, useSaveDraft, type DraftWrite } from '@/features/create/api/create';
+import { useDraft, useOPeg, useSaveDraft, type DraftWrite } from '@/features/create/api/create';
 import { draftBody, formFromDraft } from '@/features/create/model/composer';
 import { CREATE_TEMPLATES, createTone, type LiveKind } from '@/features/create/model/formats';
 import { useInterests } from '@/features/discover/api/discover';
@@ -121,6 +121,8 @@ export function WorldStudio({ seed }: { seed: WorldSeed }) {
   const draftId = seed.draftId ?? null;
   const v3 = !!draftId;
   const draftQ = useDraft(draftId);
+  // the settlement peg, for the review's dollar line
+  const pegQ = useOPeg();
   const form = useMemo(() => (draftQ.data ? formFromDraft(draftQ.data) : null), [draftQ.data]);
   const me = useNavSummary().data;
   const floorQ = useWeos({ status: 'active', sort: 'trending', limit: 24 });
@@ -1826,6 +1828,7 @@ export function WorldStudio({ seed }: { seed: WorldSeed }) {
                 </span>
               }
               amountOs={price}
+              rate={pegQ.data?.usdPerO}
               when={`Nothing posts yet · when it does, it runs ${days} days`}
               to={
                 <span>

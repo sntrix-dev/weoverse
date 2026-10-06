@@ -104,6 +104,11 @@ Backend: `weo-3.0`, local base URL **`http://localhost:3002/api`**. Full endpoin
 | M10 | Notifications list, chips, day groups | `GET /frontend/notifications?limit=50&page&category&read=false` (+ `target`, `categories`, sender without email — M10) | wired (`features/notifications`, D-082, D-084) |
 | M10 | Open a row, Mark all read | `PATCH /frontend/notifications/:id/read`, `PATCH /frontend/notifications/read-all` | wired (the bell refreshes) |
 | M10 | Company pages | `GET /frontend/company` (new, public, M10) | wired (`features/company`, D-080) |
+| M11 | World Studio — keep a draft's terms | `POST /frontend/me/drafts/:id/rehearsal` (new) | wired (`features/worlds`) |
+| M11 | Flow simulation — settle | `POST /frontend/weos/:id/rehearsals`; contexts `GET /frontend/weos/interests`; floor `GET /frontend/weos?status=active` | wired (D-094) |
+| M11 | In flight | `GET /frontend/me/drafts` (+ `vetting`), `POST /frontend/me/drafts/:id/open-reactions`, `/open-pledges` (new) | wired (D-091) |
+| M11 | Vetting sheet, Circle "Waiting" | `GET /frontend/vetting/:id`, `GET /frontend/vetting?circleId=`, `POST /frontend/vetting/:id/reactions`, `POST/DELETE /frontend/vetting/:id/pledges` (new) | wired (D-086, D-090) |
+| M11 | Intros seen | `PATCH /frontend/users/me/preferences` (`seen`) | wired (D-088) |
 | M10 | Careers interest | `POST /weo-website/careers-module` | wired (`CareersSheet`, D-083) |
 | M09 | Passport (hero, standing, tier, orbit, public switches) | `GET /frontend/users/me/passport` (+ `inputs[].do`, `.cap`, M09) | wired (`features/passport`, D-074) |
 | M09 | Your graph | `GET /frontend/users/me/graph` | wired |
