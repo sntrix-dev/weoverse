@@ -2139,6 +2139,47 @@ export interface paths {
         patch: operations["adminRestoreCommunityThread"];
         trace?: never;
     };
+    "/frontend/company": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * The company and legal pages (public)
+         * @description About, Careers, Privacy, Terms and Cookies, in footer order (M10).
+         *     The copy names live figures — the settlement peg, the network's live
+         *     and announced properties — filled in on read. Privacy, Terms and
+         *     Cookies are `draft` until reviewed. Careers lists no openings and
+         *     takes interest through `POST /weo-website/careers-module`.
+         */
+        get: operations["listCompanyPages"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/frontend/company/{key}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** One company page (public) */
+        get: operations["getCompanyPage"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/frontend/config/o": {
         parameters: {
             query?: never;
@@ -3340,7 +3381,12 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** My notifications (paginated, filterable) */
+        /**
+         * My notifications (paginated, filterable)
+         * @description Newest first. Each row carries `target` — where it opens in the app —
+         *     and the sender as a name and a face (no email). The page carries
+         *     `categories`: every category's total and unread count (M10).
+         */
         get: operations["getNotifications"];
         put?: never;
         post?: never;
@@ -3448,14 +3494,7 @@ export interface paths {
         get?: never;
         put?: never;
         post?: never;
-        /**
-         * Delete one notification
-         * @description **Routing gotcha:** the route file also declares `DELETE
-         *     /notifications/read` AFTER this one. In Express, the `:id` route
-         *     is matched first, so a DELETE to `/notifications/read` is treated
-         *     as `id=read` and 404s. Treat `DELETE /notifications/read` as
-         *     effectively broken.
-         */
+        /** Delete one notification */
         delete: operations["deleteNotification"];
         options?: never;
         head?: never;
@@ -3473,11 +3512,9 @@ export interface paths {
         put?: never;
         post?: never;
         /**
-         * Delete all read notifications (likely broken)
-         * @description **Likely unreachable** — the more-general `DELETE
-         *     /notifications/:id` route is registered first, so this path is
-         *     captured as `id=read`. Documented for completeness; fix route
-         *     order before relying on it.
+         * Delete all read notifications
+         * @description Registered before `DELETE /notifications/:id` since M10 — it used to
+         *     be captured as `id=read` and answer 404.
          */
         delete: operations["deleteAllReadNotifications"];
         options?: never;
@@ -10782,16 +10819,54 @@ export interface components {
             data?: components["schemas"]["NegotiationAttemptData"];
         };
         /** @enum {string} */
-        NotificationCategory: "weo" | "weo-request" | "collection" | "payment" | "resell" | "wallet" | "general" | "system";
+        NotificationCategory: "weo" | "weo-request" | "collection" | "payment" | "resell" | "wallet" | "general" | "community" | "system";
         /** @enum {string} */
         NotificationType: "info" | "success" | "warning" | "error";
         /** @enum {string} */
         NotificationPriority: "low" | "medium" | "high";
         /** @enum {string} */
-        NotificationEntityType: "offer" | "collection" | "payment" | "resell" | "topup" | "withdrawal" | "user" | "installment" | "negotiation" | "event" | "report";
+        NotificationEntityType: "offer" | "collection" | "payment" | "resell" | "topup" | "withdrawal" | "user" | "installment" | "negotiation" | "event" | "report" | "thread" | "answer" | "circle";
         NotificationRelatedEntity: {
             entityType?: components["schemas"]["NotificationEntityType"];
+            /** @description A finer kind, e.g. `listed`, `tracked-listed`, `circle-invite`. */
+            subEntity?: string;
             entityId?: components["schemas"]["ObjectId"];
+        };
+        /**
+         * @description The person behind a notification, as the list shows them: a name and a
+         *     face. Never contact details — the email is no longer populated (M10,
+         *     Surya).
+         */
+        NotificationSender: {
+            _id?: components["schemas"]["ObjectId"];
+            /** @example Ada Obi */
+            fullName?: string | null;
+            /** @example ada */
+            creatorName?: string | null;
+            /** Format: uri */
+            profileImage?: string | null;
+        } | null;
+        /**
+         * @description Where the row opens in the app (M10), resolved by the backend from
+         *     `relatedEntity` so the client never parses the previous app's
+         *     `actionUrl`. `null` when the row has nowhere to go (a report update,
+         *     an admin notice). `id` is `null` for a whole screen (wallet, collected,
+         *     listed, passport).
+         * @example {
+         *       "kind": "weo",
+         *       "id": "665f1c2b9a1e4b0012ab34cd"
+         *     }
+         */
+        NotificationTarget: {
+            /** @enum {string} */
+            kind: "weo" | "request" | "collected" | "listed" | "wallet" | "creator" | "passport" | "thread" | "circle";
+            id: string | null;
+        } | null;
+        NotificationCategoryCount: {
+            /** @example 4 */
+            total: number;
+            /** @example 1 */
+            unread: number;
         };
         /** @description One notification (`src/modules/notification/notification.model.ts`). */
         Notification: {
@@ -10804,7 +10879,8 @@ export interface components {
             category: components["schemas"]["NotificationCategory"];
             priority?: components["schemas"]["NotificationPriority"];
             recipient: components["schemas"]["ObjectId"];
-            sender?: string | null;
+            /** @description Populated on the list (`NotificationSender`); an id elsewhere. */
+            sender?: components["schemas"]["NotificationSender"] | (string | null);
             relatedEntity?: components["schemas"]["NotificationRelatedEntity"];
             /** Format: uri */
             image?: string | null;
@@ -10822,8 +10898,36 @@ export interface components {
         } & {
             [key: string]: unknown;
         };
-        /** @description Service-shaped — typically `{ notifications, pagination }`. */
+        NotificationListRow: components["schemas"]["Notification"] & {
+            target: components["schemas"]["NotificationTarget"];
+        };
         NotificationListData: {
+            notifications: components["schemas"]["NotificationListRow"][];
+            /** @description Rows matching the filter. */
+            total: number;
+            page: number;
+            /** @description Unread rows matching the filter. */
+            unReadCount: number;
+            totalPages: number;
+            /**
+             * @description Every category with its total and unread count, regardless of the
+             *     filter (M10) — the screen's chips. Every known category is present,
+             *     at zero when empty.
+             * @example {
+             *       "weo": {
+             *         "total": 6,
+             *         "unread": 2
+             *       },
+             *       "wallet": {
+             *         "total": 1,
+             *         "unread": 0
+             *       }
+             *     }
+             */
+            categories: {
+                [key: string]: components["schemas"]["NotificationCategoryCount"];
+            };
+        } & {
             [key: string]: unknown;
         };
         FcmTokenRequest: {
@@ -10839,7 +10943,7 @@ export interface components {
          */
         UnreadCountData: number;
         /**
-         * @description Counts per category (sparse — categories with 0 unread may be omitted).
+         * @description Unread counts per category; every known category is present (`community` since M10).
          * @example {
          *       "weo": 2,
          *       "collection": 3,
@@ -14996,6 +15100,61 @@ export interface components {
             createdAt: string | null;
             /** Format: date-time */
             updatedAt: string | null;
+        };
+        CompanyPage: {
+            /** @enum {string} */
+            key: "about" | "careers" | "privacy" | "terms" | "cookies";
+            /** @example About WeO */
+            label: string;
+            /** @example O is the protocol. WeO is a network built on it. */
+            lead: string;
+            body: string[];
+            /**
+             * @description `[label, value]` pairs.
+             * @example [
+             *       [
+             *         "Peg",
+             *         "99 Os = $1"
+             *       ],
+             *       [
+             *         "Live today",
+             *         "WeOverse · WeO Flow"
+             *       ]
+             *     ]
+             */
+            facts?: string[][];
+            /** @description Open roles. Empty — none are listed. */
+            roles?: {
+                title: string;
+                where: string;
+                note: string;
+            }[];
+            /** @description How to express interest when no role is listed — the values `POST /weo-website/careers-module` accepts. */
+            apply?: {
+                note: string;
+                roles: ("engineering" | "design" | "marketing" | "operations" | "other")[];
+                experience: ("0-2years" | "2-5years" | "5-10years" | "10+years")[];
+            };
+            /**
+             * @description `draft` until the text is reviewed; the page says so.
+             * @enum {string}
+             */
+            status: "published" | "draft";
+            /**
+             * Format: date
+             * @example 2026-10-06
+             */
+            updatedAt: string;
+        };
+        CompanyPageResponse: components["schemas"]["BaseResponse"] & {
+            /** @enum {boolean} */
+            success?: true;
+            data?: components["schemas"]["CompanyPage"];
+        };
+        CompanyPageListResponse: components["schemas"]["BaseResponse"] & {
+            /** @enum {boolean} */
+            success?: true;
+            data?: components["schemas"]["CompanyPage"][];
         };
         CreatorListRow: {
             id: components["schemas"]["ObjectId"];
@@ -19780,6 +19939,59 @@ export interface operations {
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
+            500: components["responses"]["ServerError"];
+        };
+    };
+    listCompanyPages: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Pages */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CompanyPageListResponse"];
+                };
+            };
+            500: components["responses"]["ServerError"];
+        };
+    };
+    getCompanyPage: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                key: "about" | "careers" | "privacy" | "terms" | "cookies";
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Page */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CompanyPageResponse"];
+                };
+            };
+            /** @description No such page */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
             500: components["responses"]["ServerError"];
         };
     };

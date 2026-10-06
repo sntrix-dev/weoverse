@@ -29,6 +29,8 @@ import {
   creatorViewFixture,
   trackingFixture,
 } from '../fixtures/people';
+import { companyFixture } from '../fixtures/company';
+import { notificationsFixture } from '../fixtures/notifications';
 import { fullWalletFixture, graphFixture, passportFixture, settingsFixture } from '../fixtures/identity';
 import { collectionsSnapshotFixture, listingsSnapshotFixture, resellQuoteFixture } from '../fixtures/holdings';
 
@@ -85,6 +87,9 @@ export const handlers = [
   http.get(url('/frontend/me/drafts'), () => ok({ items: draftsFixture, total: 1 })),
   http.get(url('/frontend/me/collections'), () => ok({ items: [], pagination: { total: 0, page: 1, limit: 3, totalPages: 0 } })),
   http.get(url('/frontend/wallet/overview'), () => ok({ ...fullWalletFixture(), ...walletFixture })),
+  // M10 notifications & company
+  http.get(url('/frontend/notifications'), () => ok(notificationsFixture())),
+  http.get(url('/frontend/company'), () => ok(companyFixture)),
   // M09 identity & money
   http.get(url('/frontend/users/me/passport'), () => ok(passportFixture())),
   http.get(url('/frontend/users/me/graph'), () => ok(graphFixture)),

@@ -2,6 +2,13 @@
 
 All notable changes per module. Newest first.
 
+## M10 — Notifications & company (2026-10-06)
+
+- Notifications: what waits on you, Unread only, Mark all read and a way to your notification settings; chips per category with their counts; rows grouped by day with their picture, tone and time; opening one marks it read and takes you where it points (a WeO, a request, your collection, your listings, the wallet, a creator, a thread, a circle).
+- Company: About, Careers, Privacy, Terms and Cookies from the backend — the peg is the real 99 Os = $1, nothing invented; the legal pages say they are drafts under review; Careers takes a note of interest.
+- Every screen is now built: the "built in a later module" placeholder is gone.
+- Backend (`redesign/m10-notifications-company`): each notification names where it opens; the list counts every category; a notification no longer carries the sender's email; clearing read notifications works (it answered 404); the company pages.
+
 ## M09 — Identity & money (2026-10-05)
 
 - Passport: who you are and your passport id, your balance as the wallet's front door, ISR, tier and circles; the profile hub (what moved it, your tier, improve, your graph) around your WeOs; standing ("not tracked yet" until the backend keeps an ISR record, with what it never counts and the appeal), the tier ladder with how you reach and lose each rung and what it is worth on a WeO, and who is around you. Sheets: improve your standing, edit your profile (photo, name, handle, bio), the tier ladder, your public page, passport settings with your data download. `/passport#tier` and friends open a section.

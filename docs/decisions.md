@@ -4,6 +4,12 @@ Newest first. Each entry: date · decision · why · who decided. Open questions
 
 | # | Date | Decision | Why | By |
 |---|---|---|---|---|
+| D-085 | 2026-10-06 | The bell stays a dot fed by the nav summary; a real-time bell waits for a socket emit on new notifications (G-71). | No emit exists. | Claude |
+| D-084 | 2026-10-06 | Notifications group by `createdAt` in local time — Today, Yesterday, This week, Earlier — fifty a page with "Show earlier". Chips count everything in a category (the design's count); Community and System appear when they hold something. | Design behaviour, backend's own categories. | Claude |
+| D-083 | 2026-10-06 | Careers lists no openings; "Tell us about you" sends the website's careers form (`POST /weo-website/careers-module`), name and email from your account. | No real openings to list. | Claude |
+| D-082 | 2026-10-06 | Where a notification goes is resolved by the backend (`target {kind, id}`); a row with nowhere to go is marked read and stays. | The stored `actionUrl`s are the previous app's paths. | Claude |
+| D-081 | 2026-10-06 | A notification's sender is a name and a face; the email is no longer sent. | Surya: "Remove it". | Surya |
+| D-080 | 2026-10-06 | Company pages: the design's copy corrected — the settlement peg, no invented figures or openings, Privacy / Terms / Cookies matched to what the app does — served by the backend; the legal pages say they are drafts until reviewed. | Surya: "Corrected copy". | Surya |
 | D-079 | 2026-10-05 | "Show approximate value in" stays US dollars at the settlement peg (shown, no picker): the backend has no exchange rates, and a euro label on a dollar figure would be wrong. | Real data only. | Claude |
 | D-078 | 2026-10-05 | Reset tours and clear search history wait for M11 (intros) and stored searches. Help is Ask Mya; About and Legal open the company pages (M10). No "Message us" or "Report a problem" row: there is no support channel to send them to. | Real data only. | Claude |
 | D-077 | 2026-10-05 | O Power is "not measured yet" (backend `power: null`); the rate dials show the fixed peg (99 Os = $1, the settlement figure) and O Power empty, and the activity row counts real activity (created, sold, re-sold, earned). | Real data only. | Claude |

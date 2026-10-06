@@ -101,6 +101,10 @@ Backend: `weo-3.0`, local base URL **`http://localhost:3002/api`**. Full endpoin
 | M08 | Offer one you hold | `POST /frontend/request-weos/:id/accept` (a regular-WeO body from your WeO, your figure) | wired (`OfferSheet`, D-061) |
 | M08 | Offers on your brief, close it | `GET /frontend/request-weos/:id/accepted-weos`, `POST /frontend/request-weos/:id/close` (new, M08) | wired (`RequestPanel`, D-065) |
 | M08 | Make a WeO for this | `/create?forRequest=:id` → `POST /frontend/weos` with `requestedId` | wired (D-067) |
+| M10 | Notifications list, chips, day groups | `GET /frontend/notifications?limit=50&page&category&read=false` (+ `target`, `categories`, sender without email — M10) | wired (`features/notifications`, D-082, D-084) |
+| M10 | Open a row, Mark all read | `PATCH /frontend/notifications/:id/read`, `PATCH /frontend/notifications/read-all` | wired (the bell refreshes) |
+| M10 | Company pages | `GET /frontend/company` (new, public, M10) | wired (`features/company`, D-080) |
+| M10 | Careers interest | `POST /weo-website/careers-module` | wired (`CareersSheet`, D-083) |
 | M09 | Passport (hero, standing, tier, orbit, public switches) | `GET /frontend/users/me/passport` (+ `inputs[].do`, `.cap`, M09) | wired (`features/passport`, D-074) |
 | M09 | Your graph | `GET /frontend/users/me/graph` | wired |
 | M09 | Edit profile, photo | `PATCH /frontend/users/me/profile` (+ `avatarUrl`, 409 on a taken handle, M09) · `POST /frontend/media` | wired (`EditProfileSheet`) |
@@ -119,7 +123,7 @@ Backend: `weo-3.0`, local base URL **`http://localhost:3002/api`**. Full endpoin
 | M09 | Passport, graph, profile | `/frontend/users/me/passport`, `/graph`, `/profile`, `/public-profile`, `/me/tier` | exists |
 | M09 | Wallet | `/frontend/wallet/overview`, `/transfer`, `/topup`, `/withdraw`, `/transaction-logs`, `/owallet/overview` | exists |
 | M09 | ISR / activity | `/frontend/activity/me`, `/me/history`, `/leaderboard` | exists |
-| M10 | Notifications | `/frontend/notifications*` | exists (one route bug) |
+| M10 | Notifications | `/frontend/notifications*` | exists (route order fixed in M10) |
 | M11 | Rehearsals | `POST/GET /frontend/weos/:id/rehearsals`, `GET /frontend/me/rehearsals` | exists |
 | M11 | Reactions / pledges lifecycle | — | **gap** |
 

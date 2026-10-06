@@ -5,7 +5,6 @@ import { renderApp } from '@/test/renderApp';
 
 afterEach(() => tokens.clear());
 
-const planned = (module: string) => screen.findByText(`This screen is built in module ${module}.`);
 const wallet = () =>
   screen.findByRole('heading', { level: 1, name: 'One standing, honoured everywhere the network runs' });
 
@@ -25,11 +24,11 @@ describe('routing', () => {
   });
 
   it.each([
-    ['/notifications', 'M10'],
-    ['/company/about', 'M10'],
-  ])('%s renders its planned screen (%s)', async (path, module) => {
+    ['/notifications', /waiting on you|Nothing waiting/],
+    ['/company/about', 'O is the protocol. WeO is a network built on it.'],
+  ])('%s is its M10 screen', async (path, name) => {
     renderApp(path);
-    expect(await planned(module)).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { level: 1, name })).toBeInTheDocument();
   });
 
   it('/discover is the Discover screen, in the Discover section', async () => {
