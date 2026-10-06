@@ -31,6 +31,7 @@ import {
 } from '../fixtures/people';
 import { companyFixture } from '../fixtures/company';
 import { notificationsFixture } from '../fixtures/notifications';
+import { fullDraft, vettingCard } from '../fixtures/worlds';
 import { fullWalletFixture, graphFixture, passportFixture, settingsFixture } from '../fixtures/identity';
 import { collectionsSnapshotFixture, listingsSnapshotFixture, resellQuoteFixture } from '../fixtures/holdings';
 
@@ -148,6 +149,29 @@ export const handlers = [
   http.post(url('/frontend/request-weos'), () => ok({ _id: 'rq-new' })),
   http.post(url('/frontend/me/drafts'), () => ok({ _id: 'draft-new' })),
   http.put(url('/frontend/me/drafts/:id'), ({ params }) => ok({ _id: String(params.id) })),
+  // M11: worlds and the way to live
+  http.get(url('/frontend/me/drafts/:id'), ({ params }) => ok(fullDraft(String(params.id)))),
+  http.post(url('/frontend/me/drafts/:id/rehearsal'), ({ params }) =>
+    ok({ id: String(params.id), stage: 'rehearsed', reactions: { count: 0, need: 12 }, pledges: { count: 0, threshold: 20, promisedOs: 0 } }),
+  ),
+  http.post(url('/frontend/me/drafts/:id/open-reactions'), ({ params }) =>
+    ok({ id: String(params.id), stage: 'reacting', reactions: { count: 0, need: 12 }, pledges: { count: 0, threshold: 20, promisedOs: 0 }, notified: 3 }),
+  ),
+  http.post(url('/frontend/me/drafts/:id/open-pledges'), ({ params }) =>
+    ok({ id: String(params.id), stage: 'pledging', reactions: { count: 12, need: 12 }, pledges: { count: 0, threshold: 20, promisedOs: 0 } }),
+  ),
+  http.get(url('/frontend/vetting'), () => ok({ items: [], total: 0 })),
+  http.get(url('/frontend/vetting/:id'), ({ params }) => ok(vettingCard({ id: String(params.id) }))),
+  http.post(url('/frontend/vetting/:id/reactions'), ({ params }) =>
+    ok(vettingCard({ id: String(params.id), mine: { isOwner: false, reaction: { os: null, note: '' }, pledge: null } })),
+  ),
+  http.post(url('/frontend/vetting/:id/pledges'), ({ params }) =>
+    ok(vettingCard({ id: String(params.id), stage: 'pledging', mine: { isOwner: false, reaction: null, pledge: { os: 1200 } } })),
+  ),
+  http.delete(url('/frontend/vetting/:id/pledges'), ({ params }) => ok(vettingCard({ id: String(params.id), stage: 'pledging' }))),
+  http.post(url('/frontend/weos/:id/rehearsals'), ({ params }) =>
+    ok({ _id: 'r-1', weoId: String(params.id), receiptId: 'WEO-SIM-1A2B-7Q', settledAt: '2026-09-28T10:00:00.000Z' }),
+  ),
   http.delete(url('/frontend/me/drafts/:id'), () => ok(null)),
   http.post(url('/frontend/community/push'), () => ok({ id: 't-push' })),
 ];

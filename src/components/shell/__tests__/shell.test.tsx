@@ -216,7 +216,7 @@ describe('O nav', () => {
       within(fan)
         .getAllByRole('menuitem')
         .map((b) => b.textContent),
-    ).toEqual(['Create', 'Exchange', 'Ask', 'Discover', 'Collect', 'You', 'Mya']);
+    ).toEqual(['Create', 'Exchange', 'Ask', 'Discover', 'Collect', 'You', 'Worlds', 'Mya']);
     await user.click(within(fan).getByRole('button', { name: 'Float the O again' }));
     await act(() => new Promise((r) => setTimeout(r, 700)));
     expect(await screen.findByLabelText('Floating O navigation')).toBeInTheDocument();

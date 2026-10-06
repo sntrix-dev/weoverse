@@ -6,7 +6,7 @@ import { Button, OMark, Orb } from '@/design-system';
 import { MYA_STARTERS } from '@/features/shell/model/myaFaq';
 import { compact, osFmt } from '@/lib/format';
 import { askMya } from '@/stores/mya';
-import { openCollect } from '@/stores/flow';
+import { openCollect, openWorld } from '@/stores/flow';
 import { openDock } from '@/stores/ui';
 import { useCreator } from '../api/creators';
 import { acceptLabel, orbitOf, type CreatorModel } from '../model/creators';
@@ -230,7 +230,9 @@ export function MyaPanelProfile({ onCollapse }: { onCollapse: () => void }) {
           <Button size="sm" variant="primary" tone="violet" onClick={ask}>
             Ask Mya
           </Button>
-          {/* "Rehearse with her" arrives with worlds (M11, D-064) */}
+          <Button size="sm" variant="ghost" tone="blue" onClick={() => openWorld()}>
+            Rehearse with her
+          </Button>
           <Button size="sm" variant="ghost" tone="blue" onClick={onCollapse}>
             Close
           </Button>
@@ -461,7 +463,14 @@ export function CreatorPanel({
               </Button>
             </>
           )}
-          {/* "Rehearse a pairing" arrives with worlds (M11, D-064) */}
+          <Button
+            size="sm"
+            variant="ghost"
+            tone="violet"
+            onClick={() => openWorld(first ? { weoId: first.id } : {})}
+          >
+            Rehearse a pairing
+          </Button>
           <Button size="sm" variant="ghost" tone="blue" onClick={onCollapse}>
             Close
           </Button>

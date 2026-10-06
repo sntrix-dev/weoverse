@@ -1,57 +1,148 @@
 import { useState, type CSSProperties } from 'react';
 import { StageRing } from '@/components/weo/StageRing';
 import { Orb, svg } from '@/design-system';
+import { NEED_REACT, STAGE_RING, STAGE_TONE, THRESHOLD } from '@/features/worlds/model/lifecycle';
+import { osFmt } from '@/lib/format';
 import type { FlightItem } from '../model/community';
 
-/** design: v3-spine.jsx V3.RING / V3_WORD — the five rings and the word for each stage. */
 const RING = ['Draft', 'Rehearsed', 'Reacted', 'Pledged', 'Live'];
-const WORD: Record<FlightItem['stage'], string> = { draft: 'Draft', live: 'Live' };
-const TONE: Record<FlightItem['stage'], string> = { draft: '#22C55E', live: '#F7C62B' };
+const WORD: Record<FlightItem['stage'], string> = {
+  draft: 'Draft',
+  rehearsed: 'Rehearsed',
+  reacting: 'Reacting',
+  reacted: 'Reacted',
+  pledging: 'Pledging',
+  live: 'Live',
+};
 
 export interface FlightAct {
   stage: FlightItem['stage'];
   index: number;
   tone: string;
   fill: number;
-  verb: string;
+  /** the community holds this step: the O breathes and carries no verb */
+  waiting: boolean;
+  verb: string | null;
   note: string;
   get: string | null;
   act: () => void;
+  /** the direct path, always one tap away (design `postNow`) */
+  alt: { label: string; act: () => void } | null;
+  count?: number;
+  of?: number;
+  unit?: string;
 }
 
 export interface FlightHandlers {
-  /** a draft: the composer, with the draft (M07) */
+  /** a draft: the composer, with the draft (M07) — "Post it" */
   onPost: (it: FlightItem) => void;
+  /** a draft: the World Studio's rehearsal (M11) */
+  onRehearse: (it: FlightItem) => void;
+  /** rehearsed: open it to the audience chosen in the studio (D-091) */
+  onOpenReactions: (it: FlightItem) => void;
+  /** reacted: open pledges */
+  onOpenPledges: (it: FlightItem) => void;
+  /** reacting / pledging: its vetting card, with every note */
+  onWatch: (it: FlightItem) => void;
   /** a live WeO: the floor */
   onMarket: (it: FlightItem) => void;
   onOpen: (it: FlightItem) => void;
   onCreate: () => void;
 }
 
-/**
- * design: v3-spine.jsx nextAct — the one derivation of what a WeO needs next. Until worlds,
- * reactions and pledges exist (M11) there are two stages (D-037): a draft's step is "Post it"
- * (the design's always-there direct path; Rehearse arrives with worlds), a live WeO's is
- * "Move with the market".
- */
+/** design: v3-spine.jsx nextAct — the one derivation of what a WeO needs next. */
 export function nextAct(it: FlightItem, h: FlightHandlers): FlightAct {
-  if (it.stage === 'draft') {
-    return { stage: 'draft', index: 0, tone: TONE.draft, fill: 0, verb: 'Post it', note: 'Draft', get: null, act: () => h.onPost(it) };
-  }
-  return {
-    stage: 'live',
-    index: 4,
-    tone: TONE.live,
-    fill: 1,
-    verb: 'Move with the market',
-    note: 'Live in Exchange',
-    get: 'On the floor, earning',
-    act: () => h.onMarket(it),
+  const s = it.stage;
+  const base = {
+    stage: s,
+    index: STAGE_RING[s] ?? 0,
+    tone: STAGE_TONE[s] ?? '#22C55E',
+    fill: 0,
+    waiting: false,
+    alt: null,
   };
+  const postNow = { label: 'Post it', act: () => h.onPost(it) };
+  switch (s) {
+    case 'draft':
+      // a Request is a buy: it posts, it is not vetted
+      return it.buy
+        ? { ...base, verb: 'Post it', note: 'Draft', get: null, act: () => h.onPost(it) }
+        : {
+            ...base,
+            verb: 'Rehearse',
+            note: 'Try its terms in a world',
+            get: 'A tested price and a collect-through forecast',
+            act: () => h.onRehearse(it),
+            alt: postNow,
+          };
+    case 'rehearsed':
+      return {
+        ...base,
+        verb: 'Open to reactions',
+        note: it.world ? `Rehearsed in ${it.world}` : 'Rehearsed',
+        get: `${NEED_REACT} collectors say what they’d pay — before you commit`,
+        act: () => h.onOpenReactions(it),
+        alt: postNow,
+      };
+    case 'reacting':
+      return {
+        ...base,
+        waiting: true,
+        fill: it.reactions / NEED_REACT,
+        verb: null,
+        count: it.reactions,
+        of: NEED_REACT,
+        unit: 'reactions',
+        note: it.audience ? `Open to ${it.audience}` : '',
+        get: 'Their notes, as they land',
+        act: () => h.onWatch(it),
+      };
+    case 'reacted':
+      return {
+        ...base,
+        verb: 'Open pledges',
+        note: `${it.reactions} reactions in`,
+        get: `${THRESHOLD} pledges pre-sell it — it posts itself, validated`,
+        act: () => h.onOpenPledges(it),
+        alt: postNow,
+      };
+    case 'pledging':
+      return {
+        ...base,
+        waiting: true,
+        fill: it.pledges / THRESHOLD,
+        verb: null,
+        count: it.pledges,
+        of: THRESHOLD,
+        unit: 'pledges',
+        note: `Posts itself at ${THRESHOLD}`,
+        get: `Pre-sold · O ${osFmt(it.promisedOs)} committed`,
+        act: () => h.onWatch(it),
+      };
+    default:
+      return {
+        ...base,
+        fill: 1,
+        verb: 'Move with the market',
+        note: 'Live in Exchange',
+        get: 'On the floor, earning',
+        act: () => h.onMarket(it),
+      };
+  }
 }
 
-/** design: v3-spine.jsx NextO — the WeO's orb in its stage ring, the one verb beneath. */
-export function NextO({ item, h, size, dense }: { item: FlightItem; h: FlightHandlers; size?: number; dense?: boolean }) {
+/** design: community.jsx NextO — the WeO's orb in its stage ring, the one verb beneath. */
+export function NextO({
+  item,
+  h,
+  size,
+  dense,
+}: {
+  item: FlightItem;
+  h: FlightHandlers;
+  size?: number;
+  dense?: boolean;
+}) {
   const S = size || 148;
   const [hov, setHov] = useState(false);
   const n = nextAct(item, h);
@@ -60,12 +151,18 @@ export function NextO({ item, h, size, dense }: { item: FlightItem; h: FlightHan
     <div
       onMouseEnter={() => setHov(true)}
       onMouseLeave={() => setHov(false)}
-      style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: dense ? 8 : 12, minWidth: 0 }}
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: dense ? 8 : 12,
+        minWidth: 0,
+      }}
     >
       <span style={{ position: 'relative', display: 'grid', placeItems: 'center', padding: 14 }}>
         <button
           onClick={n.act}
-          aria-label={`${item.name} — ${n.verb}`}
+          aria-label={n.verb ? `${item.name} — ${n.verb}` : `${item.name} — ${n.count} of ${n.of} ${n.unit}`}
           title={n.note}
           style={{
             display: 'grid',
@@ -75,38 +172,96 @@ export function NextO({ item, h, size, dense }: { item: FlightItem; h: FlightHan
             padding: 0,
             cursor: 'pointer',
             borderRadius: '50%',
-            transform: hov ? 'scale(1.03)' : 'none',
+            transform: hov && n.verb ? 'scale(1.03)' : 'none',
             transition: 'transform .3s var(--ease-portal)',
           }}
         >
-          <StageRing size={S} index={n.index} fill={n.fill} tone={tone}>
+          <StageRing size={S} index={n.index} fill={n.fill} tone={tone} waiting={n.waiting}>
             <Orb size={Math.round(S * 0.66)} fill={item.img ? 'image' : tone} src={item.img} matcap breathe />
           </StageRing>
         </button>
       </span>
-      <button
-        onClick={n.act}
-        style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: 8,
-          border: 'none',
-          cursor: 'pointer',
-          borderRadius: 999,
-          minHeight: dense ? 36 : 42,
-          padding: dense ? '0 14px' : '0 18px',
-          font: 'inherit',
-          fontSize: dense ? 12.5 : 13.5,
-          fontWeight: 700,
-          color: '#fff',
-          background: tone,
-          boxShadow: `0 12px 26px -10px color-mix(in srgb, ${tone} 85%, transparent)`,
-          whiteSpace: 'nowrap',
-        }}
-      >
-        {n.verb}
-        {svg(<polyline points="9 6 15 12 9 18" />, 14, 'currentColor', 2.4)}
-      </button>
+      {n.verb ? (
+        <button
+          onClick={n.act}
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 8,
+            border: 'none',
+            cursor: 'pointer',
+            borderRadius: 999,
+            minHeight: dense ? 36 : 42,
+            padding: dense ? '0 14px' : '0 18px',
+            font: 'inherit',
+            fontSize: dense ? 12.5 : 13.5,
+            fontWeight: 700,
+            color: '#fff',
+            background: tone,
+            boxShadow: `0 12px 26px -10px color-mix(in srgb, ${tone} 85%, transparent)`,
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {n.verb}
+          {svg(<polyline points="9 6 15 12 9 18" />, 14, 'currentColor', 2.4)}
+        </button>
+      ) : (
+        <span style={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
+          <span
+            style={{
+              display: 'inline-flex',
+              alignItems: 'baseline',
+              gap: 5,
+              fontSize: dense ? 13 : 15,
+              fontWeight: 700,
+              color: 'var(--text)',
+              fontVariantNumeric: 'tabular-nums',
+            }}
+          >
+            {n.count}
+            <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-faint)' }}>
+              of {n.of} {n.unit}
+            </span>
+          </span>
+          {!dense && (
+            <button
+              onClick={n.act}
+              style={{
+                border: 'none',
+                background: 'transparent',
+                cursor: 'pointer',
+                font: 'inherit',
+                fontSize: 12,
+                fontWeight: 600,
+                color: tone,
+                padding: '4px 10px',
+                borderRadius: 999,
+              }}
+            >
+              See the notes
+            </button>
+          )}
+        </span>
+      )}
+      {n.verb && n.alt && !dense && (
+        <button
+          onClick={n.alt.act}
+          style={{
+            border: 'none',
+            background: 'transparent',
+            cursor: 'pointer',
+            font: 'inherit',
+            fontSize: 12,
+            fontWeight: 600,
+            color: 'var(--text-dim)',
+            padding: '2px 10px',
+            borderRadius: 999,
+            marginTop: -4,
+          }}
+        >
+          {n.alt.label}
+        </button>
+      )}
     </div>
   );
 }

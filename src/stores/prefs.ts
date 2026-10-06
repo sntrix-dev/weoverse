@@ -34,6 +34,8 @@ export const DEFAULT_PREFS: UiPreferences = {
   navSections: 'one',
   flowBar: 'full',
   flowBarTools: false,
+  /** intros and walkthrough steps already shown, once per account (M11, D-088) */
+  seen: [],
 };
 
 const CACHE_KEY = 'weo.prefs';

@@ -4,6 +4,9 @@ import { useNavigate } from 'react-router';
 import { ICO, Icon, O_SECTION_ICONS, type PortalEdge } from '@/design-system';
 import { routes } from '@/app/routes';
 import { setPrefs, usePref } from '@/stores/prefs';
+import { isIntroKey } from '@/components/intro/sections';
+import { openWorld, useWorld } from '@/stores/flow';
+import { replayIntro, replayWalk } from '@/stores/intro';
 import { openDock, parkNav, parkNavQuiet } from '@/stores/ui';
 import s from './FlowBar.module.css';
 
@@ -77,6 +80,10 @@ export interface FlowBarProps {
   secondary?: FlowAction;
   disabled?: boolean;
   back?: { label: string; go: () => void };
+  /** the studio's own bar (M11): it stays up while a world is open; a page's bar stands down */
+  overlay?: boolean;
+  /** the ? — by default this screen's intro and walkthrough again (M11) */
+  onHelp?: () => void;
 }
 
 const chevronRight = <polyline points="9 6 15 12 9 18" />;
@@ -86,7 +93,6 @@ const chevronRight = <polyline points="9 6 15 12 9 18" />;
  * back, and the ONE next action. With the O nav floating it opens a notch for the ring and
  * becomes two capsules; parked, it is one. Folds to a pill (`uiPreferences.flowBar`); the left
  * capsule's tools are remembered separately (`flowBarTools`).
- * Not yet here: the "?" intro replay and "Enter a world" (M11).
  */
 export function FlowBar({
   screen,
@@ -99,8 +105,11 @@ export function FlowBar({
   secondary,
   disabled,
   back,
+  overlay,
+  onHelp,
 }: FlowBarProps) {
   const navigate = useNavigate();
+  const worldOpen = useWorld((w) => !!w.world);
   const at = flowAt(screen);
   const nx = stop(at + 1);
   const t = tone || stop(at).tone;
@@ -156,6 +165,7 @@ export function FlowBar({
     </button>
   );
   const utils = [
+    overlay ? null : util('world', 'Enter a world', '#3A95F2', ICO.world, () => openWorld()),
     util('mya', 'Ask Mya', '#D946EF', ICO.chat, () => openDock('mya')),
     floating ? util('park', 'Park the O nav in the top bar', '#F7C62B', ICO.dock, parkNav) : null,
   ];
@@ -266,10 +276,28 @@ export function FlowBar({
       </Icon>
     </button>
   );
+  const help = onHelp ?? (() => (isIntroKey(screen) ? replayIntro(screen) : replayWalk(screen)));
+  const helpBtn = (
+    <button
+      type="button"
+      onClick={help}
+      title="Show me this screen"
+      aria-label="Replay the intro and walkthrough for this screen"
+      className={`weo-flowbar-util ${s.util}`}
+      style={{ color: 'var(--text-dim)' }}
+    >
+      <Icon size={16} sw={1.7}>
+        <circle cx="12" cy="12" r="8.4" />
+        <path d="M9.6 9.6a2.5 2.5 0 0 1 4.8.8c0 1.6-2.4 2-2.4 3.4" />
+        <circle cx="12" cy="16.8" r=".9" fill="currentColor" />
+      </Icon>
+    </button>
+  );
   const leftGroup = lOpen ? (
     <>
       {backBtn}
       <span aria-hidden="true" className={s.divider} />
+      {helpBtn}
       {utils}
       {chev(true, () => setLOpen(false), 'Fold the tools away')}
     </>
@@ -293,6 +321,7 @@ export function FlowBar({
     </>
   );
   const capVars = { '--t': t } as CSSProperties;
+  if (worldOpen && !overlay) return null;
   return createPortal(
     <div role="region" className={`weo-flowbar-wrap ${s.wrap}`} aria-label="Where you are and what is next">
       {floating ? (

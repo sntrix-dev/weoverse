@@ -25,6 +25,7 @@ import {
 } from '../api/settings';
 import { AccountRequestSheet } from '../components/AccountRequestSheet';
 import { SetCard, SetRow, SetSeg, SetSelect, setField } from '../components/SetParts';
+import { resetTours } from '@/stores/intro';
 
 const SECTIONS: { id: string; label: string; icon: ReactNode; tone?: string }[] = [
   {
@@ -621,9 +622,18 @@ export function SettingsPage() {
               <SetRow
                 label="Download your data"
                 note="Profile, settings, your WeOs, what you collected, transactions, circles and threads — as one JSON file, right here"
-                last
               >
                 {btn(exporter.isPending ? 'Preparing…' : 'Download', doExport, 'blue', exporter.isPending)}
+              </SetRow>
+              <SetRow
+                label="Reset the guided tours"
+                note="See the section intros and Mya’s walkthrough again"
+                last
+              >
+                {btn('Reset', () => {
+                  resetTours();
+                  toast('Tours reset · they play on your next visit');
+                })}
               </SetRow>
             </SetCard>
 

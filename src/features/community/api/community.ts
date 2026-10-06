@@ -30,6 +30,8 @@ export interface DraftDto {
   format?: string;
   ready?: number;
   updatedAt?: string;
+  /** where it is on the way to live (M11) — null for a plain draft */
+  vetting?: components['schemas']['DraftVetting'] | null;
 }
 
 export interface CircleWeoRow {

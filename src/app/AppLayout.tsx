@@ -10,6 +10,8 @@ import { CollectHost } from '@/features/collect/components/CollectHost';
 import { CommunityHost } from '@/features/community/components/modals/CommunityHost';
 import { CreatorHost } from '@/features/creators/components/CreatorHost';
 import { OfferHost } from '@/features/requests/components/OfferHost';
+import { WorldHost } from '@/features/worlds/components/WorldHost';
+import { SectionIntro } from '@/components/intro/SectionIntro';
 import { useNavSummary } from '@/features/shell/api/navSummary';
 import { useLogout } from '@/features/shell/useLogout';
 import { usePref, usePrefs } from '@/stores/prefs';
@@ -141,6 +143,8 @@ export function AppLayout() {
       <CommunityHost />
       <OfferHost />
       <CreatorHost />
+      <WorldHost />
+      <SectionIntro />
     </>
   );
 }

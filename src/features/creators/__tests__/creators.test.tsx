@@ -106,7 +106,8 @@ describe('creators · the page', () => {
     await user.click(await screen.findByRole('button', { name: 'Mya — your guide' }));
     expect(screen.getByText(/Never: Set your price/)).toBeInTheDocument();
     expect(screen.getAllByRole('button', { name: 'Ask Mya' }).length).toBeGreaterThan(0);
-    expect(screen.queryByRole('button', { name: /Rehearse/ })).toBeNull();
+    // her panel can open a world (M11)
+    expect(screen.getByRole('button', { name: 'Rehearse with her' })).toBeInTheDocument();
   });
 });
 

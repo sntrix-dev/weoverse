@@ -77,6 +77,11 @@ export const qk = {
     asks: () => ['create', 'asks'] as const,
     draft: (id: string) => ['create', 'draft', id] as const,
   },
+  vetting: {
+    all: ['vetting'] as const,
+    detail: (id: string) => ['vetting', 'detail', id] as const,
+    circle: (circleId: string) => ['vetting', 'circle', circleId] as const,
+  },
   listings: {
     all: ['listings'] as const,
     snapshot: (window: string) => ['listings', 'snapshot', window] as const,

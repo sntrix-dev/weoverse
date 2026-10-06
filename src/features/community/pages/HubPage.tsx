@@ -10,6 +10,11 @@ import { FlowBar, FlowFoot } from '@/components/shell/FlowBar';
 import { PathBar } from '@/components/shell/PathBar';
 import { useWeoView } from '@/components/weo/WeoView';
 import { Button, ICO, Tabs } from '@/design-system';
+import { ApiError } from '@/api/client';
+import { useOpenPledges } from '@/features/worlds/api/worlds';
+import { OpenReactionsSheet } from '@/features/worlds/components/OpenReactionsSheet';
+import { openVet, openWorld } from '@/stores/flow';
+import { ack, toast } from '@/stores/ui';
 import { WalletRow } from '@/features/wallet/components/WalletRow';
 import { circleView, type CircleView } from '@/lib/circleModel';
 import {
@@ -25,7 +30,7 @@ import { CircleGrid } from '../components/CircleGrid';
 import { LensSegs, StoryGrid, ThreadRow, useHubPath, useOpenStory, type HubLens } from '../components/Hub';
 import { FLIGHT_VIEWS, InFlightGrid, nextAct, type FlightHandlers } from '../components/InFlight';
 import { StewardGrid } from '../components/StewardGrid';
-import { flightItems, stewardModel, storyModel, threadModel } from '../model/community';
+import { flightItems, stewardModel, storyModel, threadModel, type FlightItem } from '../model/community';
 import { useCommunityActions } from '../useCommunity';
 
 const page: CSSProperties = {
@@ -62,8 +67,10 @@ export function HubPage() {
   );
   const inFlight = items.filter((x) => x.stage !== 'live');
   const live = items.filter((x) => x.stage === 'live');
-  // reactions and pledges arrive with M11: nothing waits on the circle yet (D-037)
-  const waiting = 0;
+  // what the circle holds: reacting and pledging
+  const waiting = inFlight.filter((x) => x.stage === 'reacting' || x.stage === 'pledging').length;
+  const [opening, setOpening] = useState<FlightItem | null>(null);
+  const openPledges = useOpenPledges();
 
   const { joined, suggested } = useMemo(() => {
     const d = circlesQ.data;
@@ -80,8 +87,21 @@ export function HubPage() {
 
   const fh: FlightHandlers = {
     onPost: (it) => void navigate(routes.create(it.ref)),
+    onRehearse: (it) => openWorld({ draftId: it.ref }),
+    onOpenReactions: (it) => setOpening(it),
+    onOpenPledges: (it) =>
+      openPledges.mutate(it.ref, {
+        onSuccess: () => ack('Pledges open', '#F7C62B'),
+        onError: (e) => toast(e instanceof ApiError ? e.message : 'Pledges did not open — try again'),
+      }),
+    onWatch: (it) => openVet(it.ref),
     onMarket: () => void navigate(routes.listed()),
-    onOpen: (it) => void navigate(it.stage === 'draft' ? routes.create(it.ref) : routes.weo(it.ref)),
+    onOpen: (it) =>
+      it.isDraft
+        ? it.stage === 'draft'
+          ? void navigate(routes.create(it.ref))
+          : openVet(it.ref)
+        : void navigate(routes.weo(it.ref)),
     onCreate: () => void navigate(routes.create()),
   };
   const circleAct = {
@@ -223,13 +243,25 @@ export function HubPage() {
           tone={next.n.tone}
           label={`${next.x.name} · ${next.n.verb}`}
           note={next.n.get ?? undefined}
-          primary={{ label: next.n.verb, act: next.n.act }}
-          secondary={{ label: 'New WeO', act: () => void navigate(routes.create()) }}
+          primary={{ label: next.n.verb ?? '', act: next.n.act }}
+          secondary={
+            next.n.alt
+              ? { label: next.n.alt.label, act: next.n.alt.act }
+              : { label: 'New WeO', act: () => void navigate(routes.create()) }
+          }
         />
       ) : (
         <FlowFoot
           screen="hub"
           next={{ label: 'Exchange', lead: 'Move with the market', go: () => void navigate(routes.listed()), tone: '#F7C62B' }}
+        />
+      )}
+      {opening && (
+        <OpenReactionsSheet
+          draftId={opening.ref}
+          name={opening.name}
+          audience={opening.audience}
+          onClose={() => setOpening(null)}
         />
       )}
     </main>

@@ -10,6 +10,7 @@ import { cardModel } from '@/lib/cardModel';
 import { circleView } from '@/lib/circleModel';
 import { compact } from '@/lib/format';
 import { relTime } from '@/lib/time';
+import { CircleWaiting } from '@/features/worlds/components/CircleWaiting';
 import { openCompose } from '@/stores/flow';
 import { useCircle, useCircleMembers, useCircleWeos } from '../api/community';
 import { CircleSnapshot, type CircleTab } from '../components/CircleSnapshot';
@@ -200,6 +201,7 @@ export function CirclePage() {
         tab={tab}
         onTab={setTab}
       />
+      {circleId && <CircleWaiting circleId={circleId} />}
 
       {tab === 'discussions' && (
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 22, marginTop: 22, alignItems: 'flex-start' }}>

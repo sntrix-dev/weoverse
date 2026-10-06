@@ -5,6 +5,7 @@ import { SectionMark } from '@/components/layout/SectionMark';
 import { Avatar, Button, ICO, OMark, Orb, svg } from '@/design-system';
 import { useOPeg } from '@/features/create/api/create';
 import { osFmt, oStr } from '@/lib/format';
+import { openWorld } from '@/stores/flow';
 import { useBriefOffers } from '../api/requests';
 import type { BriefModel } from '../model/briefs';
 
@@ -525,7 +526,9 @@ export function RequestPanel({
           <Button size="sm" variant="ghost" tone="violet" onClick={() => h.onAsk(r)}>
             Ask in {circleName}
           </Button>
-          {/* "Rehearse it" arrives with worlds (M11, D-064) */}
+          <Button size="sm" variant="ghost" tone="blue" onClick={() => openWorld()}>
+            Rehearse it
+          </Button>
           <Button size="sm" variant="ghost" tone="blue" onClick={h.onCollapse}>
             Close
           </Button>

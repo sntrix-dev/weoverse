@@ -5,6 +5,7 @@ import { usePref } from '@/stores/prefs';
 import { dismissNavConfirm, floatNav, parkNav, toggleMya, useUi } from '@/stores/ui';
 import { JUMP } from './market';
 import s from './NavDock.module.css';
+import { openWorld } from '@/stores/flow';
 
 // design: chrome.jsx FAN_CONIC — the jumps' colours around one disc
 const FAN_CONIC = `conic-gradient(from -90deg, ${JUMP.map(
@@ -51,9 +52,10 @@ export function NavDockNode({
     document.addEventListener('mousedown', f);
     return () => document.removeEventListener('mousedown', f);
   }, [open]);
-  const pick = (k: SectionKey | 'mya') => {
+  const pick = (k: SectionKey | 'mya' | 'worlds') => {
     setOpen(false);
     if (k === 'mya') toggleMya();
+    else if (k === 'worlds') openWorld();
     else onJump(k);
   };
   return (

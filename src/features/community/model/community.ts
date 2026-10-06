@@ -1,4 +1,4 @@
-import { formatHex, type WeoFormat } from '@/lib/cardModel';
+import { FORMATS, formatHex, type WeoFormat } from '@/lib/cardModel';
 import { formatOfKind } from '@/lib/circleModel';
 import type {
   AnswerDto,
@@ -205,28 +205,60 @@ export const stewardModel = (c: ContributorDto): StewardModel => ({
 });
 
 /**
- * design `V3` item — a WeO of yours on its way (D-037). Until worlds, reactions and pledges
- * exist (M11) a draft is the first stage and a WeO on the floor is the last.
+ * design `V3` item — a WeO of yours on its way. A draft carries its stage on the way to live
+ * (`vetting`, M11): draft → rehearsed → reacting (12) → reacted → pledging (20) → live; a WeO on
+ * the floor is live.
  */
 export interface FlightItem {
   id: string;
   name: string;
   img: string | null;
   format: WeoFormat;
-  stage: 'draft' | 'live';
+  stage: 'draft' | 'rehearsed' | 'reacting' | 'reacted' | 'pledging' | 'live';
   /** the draft's id, or the WeO's */
   ref: string;
+  /** a draft (its id is `ref`) rather than a WeO */
+  isDraft: boolean;
+  /** a Request draft — a buy: it posts, it is not vetted */
+  buy: boolean;
+  reactions: number;
+  pledges: number;
+  promisedOs: number;
+  /** the world it was rehearsed in */
+  world: string | null;
+  /** who it opens to (the Share step) */
+  audience: string | null;
+  /** the rehearsed price, when there is one */
+  os: number | null;
 }
 
+const VET_STAGES = new Set(['rehearsed', 'reacting', 'reacted', 'pledging']);
+
 export function flightItems(drafts: DraftDto[], mine: MyWeoDto[]): FlightItem[] {
-  const d: FlightItem[] = drafts.map((x) => ({
-    id: `draft:${x._id}`,
-    name: x.title?.trim() || 'Untitled WeO',
-    img: x.coverUrl || null,
-    format: formatOfKind(x.weoType) ?? 'Listing',
-    stage: 'draft',
-    ref: x._id,
-  }));
+  const d: FlightItem[] = drafts.map((x) => {
+    const v = x.vetting ?? null;
+    const raw = v?.stage === 'posting' ? 'pledging' : (v?.stage ?? 'draft');
+    const stage = (VET_STAGES.has(raw) ? raw : 'draft') as FlightItem['stage'];
+    const r = (v?.rehearsal ?? null) as { world?: { name?: string }; terms?: { price?: number } } | null;
+    return {
+      id: `draft:${x._id}`,
+      name: x.title?.trim() || 'Untitled WeO',
+      img: x.coverUrl || null,
+      format: (FORMATS as readonly string[]).includes(x.format ?? '')
+        ? (x.format as WeoFormat)
+        : (formatOfKind(x.weoType) ?? 'Listing'),
+      stage,
+      ref: x._id,
+      isDraft: true,
+      buy: x.format === 'Request',
+      reactions: v?.reactions ?? 0,
+      pledges: v?.pledges ?? 0,
+      promisedOs: v?.promisedOs ?? 0,
+      world: r?.world?.name ?? null,
+      audience: v?.audience?.label ?? null,
+      os: typeof r?.terms?.price === 'number' ? r.terms.price : null,
+    };
+  });
   const live: FlightItem[] = mine
     .filter((w) => w.status === 'active')
     .map((w) => ({
@@ -236,6 +268,14 @@ export function flightItems(drafts: DraftDto[], mine: MyWeoDto[]): FlightItem[] 
       format: formatOfKind(w.weoType) ?? 'Listing',
       stage: 'live',
       ref: w.id,
+      isDraft: false,
+      buy: false,
+      reactions: 0,
+      pledges: 0,
+      promisedOs: 0,
+      world: null,
+      audience: null,
+      os: null,
     }));
   return [...d, ...live];
 }

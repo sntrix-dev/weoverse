@@ -47,17 +47,15 @@ export const MARKET: readonly MarketItem[] = [
 ];
 
 export interface JumpItem {
-  key: SectionKey | 'mya';
+  key: SectionKey | 'mya' | 'worlds';
   label: string;
   color: string;
   icon: ReactNode;
 }
 
-/**
- * The O nav's jumps: every section but the hub, then Mya. The design also lists Worlds;
- * worlds arrive in M11, so the jump is hidden until then (M02 spec).
- */
+/** The O nav's jumps: every section but the hub, then Worlds (M11) and Mya. */
 export const JUMP: readonly JumpItem[] = [
   ...MARKET.filter((m) => m.key !== 'hub'),
+  { key: 'worlds', label: 'Worlds', color: '#3A95F2', icon: ICO.world },
   { key: 'mya', label: 'Mya', color: '#D946EF', icon: ICO.chat },
 ];

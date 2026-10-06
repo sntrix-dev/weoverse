@@ -7,6 +7,7 @@ import type { CreateHeroProps } from './CreateHero';
 import { FloatMod, OrbSlider } from './Docks';
 import { MOD_ICO } from './icons';
 import { TemplateShelf } from './TemplateTiles';
+import { openWorld } from '@/stores/flow';
 
 export function HeroDocks({ glimpse, ...p }: CreateHeroProps & { glimpse: boolean }) {
   const [shelf, setShelf] = useState<'tpl' | null>(null);
@@ -71,7 +72,18 @@ export function HeroDocks({ glimpse, ...p }: CreateHeroProps & { glimpse: boolea
       },
     ],
     [
-      // "Rehearse · Enter a world" waits for the worlds (M11, D-054)
+      {
+        tone: 'var(--o-violet)',
+        icon: (
+          <>
+            <circle cx="12" cy="12" r="8.4" />
+            <path d="M3.6 12h16.8M12 3.6c2.4 2.6 2.4 14.2 0 16.8M12 3.6c-2.4 2.6-2.4 14.2 0 16.8" />
+          </>
+        ),
+        label: 'Rehearse',
+        cta: 'Enter a world',
+        onCta: () => openWorld(),
+      },
       {
         tone: 'var(--o-blue)',
         icon: ICO.requests,

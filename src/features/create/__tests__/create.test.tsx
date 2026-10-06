@@ -47,8 +47,8 @@ describe('create · the O', () => {
     const { router } = renderApp('/create');
     expect(await screen.findByRole('button', { name: 'Open Carry on' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Open Asked for' })).toBeInTheDocument();
-    // Rehearse waits for the worlds (D-054)
-    expect(screen.queryByRole('button', { name: 'Open Rehearse' })).not.toBeInTheDocument();
+    // Rehearse enters a world (M11)
+    expect(screen.getByRole('button', { name: 'Open Rehearse' })).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: 'Open Templates' }));
     await user.click(await screen.findByTitle('A whole season, one price'));
     expect(await screen.findByText(/^Season pass · Maker plan, or/)).toBeInTheDocument();

@@ -3,7 +3,7 @@ import { OsRun } from '@/components/text/OsRun';
 import { Avatar, OButton, OMark, Orb, svg } from '@/design-system';
 import type { WeoCardModel } from '@/lib/cardModel';
 import { osFmt } from '@/lib/format';
-import { openCollect, openCreator } from '@/stores/flow';
+import { askAbout, openCollect, openCreator, openWorld } from '@/stores/flow';
 
 /** design: discover.jsx StageDeck — every candidate present, neutral until it is the one on stage. */
 export function StageDeck({ list }: { list: WeoCardModel[] }) {
@@ -94,7 +94,7 @@ export function StageDeck({ list }: { list: WeoCardModel[] }) {
 
 /**
  * design: discover.jsx StageWeo — the loudest thing on the floor: the WeO's own photograph is the
- * poster. Rehearse it (M11) and Ask about it (M05) arrive with their modules.
+ * poster. Rehearse it opens the World Studio (M11); Ask about it, the push sheet (M05).
  */
 export function StageWeo({ w }: { w: WeoCardModel }) {
   const [hov, setHov] = useState(false);
@@ -381,6 +381,32 @@ export function StageWeo({ w }: { w: WeoCardModel }) {
             {w.cta}
             <span style={{ width: 8, height: 8, borderRadius: '50%', background: tone }} />
           </button>
+          {(
+            [
+              ['Rehearse it', () => openWorld({ weoId: w.id })],
+              ['Ask about it', () => askAbout(w)],
+            ] as const
+          ).map(([label, go]) => (
+            <button
+              key={label}
+              type="button"
+              onClick={go}
+              style={{
+                border: 'none',
+                cursor: 'pointer',
+                borderRadius: 999,
+                padding: '12px 18px',
+                font: 'inherit',
+                fontSize: 13,
+                fontWeight: 600,
+                color: '#fff',
+                background: 'rgba(255,255,255,.12)',
+                boxShadow: 'inset 0 0 0 1px rgba(255,255,255,.24)',
+              }}
+            >
+              {label}
+            </button>
+          ))}
         </div>
       </div>
     </div>

@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { svg } from '@/design-system';
+import { isIntroKey } from '@/components/intro/sections';
+import { replayIntro } from '@/stores/intro';
 import { NoteBody, NoteDot, useNote } from '@/components/layout/Note';
 import { glide, glideToId } from '@/lib/glide';
 import {
@@ -65,8 +67,7 @@ export interface SectionHeroProps {
  * now, and the way into everything below it. Rest state holds only what you need to decide;
  * depth arrives on intent. Filters live here rather than scattered down the page.
  *
- * Until M11 the eyebrow mark is the section icon; the design's "Intro" replay chip arrives
- * with the section intros (`V3_SECTIONS`).
+ * In a section with an intro (`V3_SECTIONS`) the eyebrow mark is the "Intro" replay chip (M11).
  */
 export function SectionHero({
   id,
@@ -198,20 +199,60 @@ export function SectionHero({
       >
         <div style={{ flex: '1 1 320px', minWidth: 0, display: 'flex', flexDirection: 'column' }}>
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: 9 }}>
-            {icon && (
-              <span
-                style={{
-                  display: 'grid',
-                  placeItems: 'center',
-                  width: 26,
-                  height: 26,
-                  borderRadius: 999,
-                  background: `color-mix(in srgb, ${t} 13%, var(--surface))`,
-                }}
-              >
-                {svg(icon, 14, t, 1.8)}
-              </span>
-            )}
+            {icon &&
+              (isIntroKey(id) ? (
+                // the section's intro, again (D-088)
+                <button
+                  onClick={() => replayIntro(id)}
+                  title={`Replay the ${title} intro`}
+                  aria-label={`Replay the ${title} intro`}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 6,
+                    height: 26,
+                    padding: '0 10px 0 4px',
+                    borderRadius: 999,
+                    border: 'none',
+                    cursor: 'pointer',
+                    font: 'inherit',
+                    fontSize: 10,
+                    fontWeight: 700,
+                    letterSpacing: '.12em',
+                    textTransform: 'uppercase',
+                    color: t,
+                    background: `color-mix(in srgb, ${t} 13%, var(--surface))`,
+                  }}
+                >
+                  <span
+                    style={{
+                      display: 'grid',
+                      placeItems: 'center',
+                      width: 20,
+                      height: 20,
+                      borderRadius: '50%',
+                      background: t,
+                      color: '#fff',
+                    }}
+                  >
+                    {svg(<path d="M9 6.5v11l9-5.5z" fill="currentColor" />, 10, 'currentColor', 1.5)}
+                  </span>
+                  Intro
+                </button>
+              ) : (
+                <span
+                  style={{
+                    display: 'grid',
+                    placeItems: 'center',
+                    width: 26,
+                    height: 26,
+                    borderRadius: 999,
+                    background: `color-mix(in srgb, ${t} 13%, var(--surface))`,
+                  }}
+                >
+                  {svg(icon, 14, t, 1.8)}
+                </span>
+              ))}
             <span
               style={{
                 fontSize: 10,

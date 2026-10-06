@@ -5,6 +5,7 @@ import { ICO, OMark, Orb, svg } from '@/design-system';
 import { formatHex } from '@/lib/cardModel';
 import { compact, osFmt } from '@/lib/format';
 import type { ListingModel, ListingStateLabel } from '../model/listings';
+import { openWorld } from '@/stores/flow';
 
 /** design: screens-holdings.jsx STATE_TONE (+ Scheduled) */
 export const STATE_TONE: Record<ListingStateLabel, string> = {
@@ -60,7 +61,7 @@ interface MenuItem {
 /**
  * design: screens-holdings.jsx ListingRow (LST-08) — the row opens the WeO; its actions live in
  * one always-visible ⋯ menu, labelled. The preflight bar only means something before posting, so
- * it shows on drafts alone. Rehearse arrives with the worlds (M11, D-027).
+ * it shows on drafts alone. Rehearse opens the World Studio — a draft's rehearsal, a WeO's simulation (M11).
  */
 export function ListingRow({ l, i, act }: { l: ListingModel; i: number; act: ListingRowHandlers }) {
   const [hov, setHov] = useState(false);
@@ -104,6 +105,12 @@ export function ListingRow({ l, i, act }: { l: ListingModel; i: number; act: Lis
         ]
       : []),
     ...(!draft ? [{ k: 'hub', label: 'Push to hub', icon: ICO.hub, go: () => act.onPush(l) }] : []),
+    {
+      k: 'world',
+      label: 'Rehearse',
+      icon: ICO.world,
+      go: () => openWorld(draft ? { draftId: l.id } : { weoId: l.id }),
+    },
   ];
 
   return (

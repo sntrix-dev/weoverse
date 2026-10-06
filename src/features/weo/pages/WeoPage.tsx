@@ -13,7 +13,7 @@ import { cardModel, type WeoFormat } from '@/lib/cardModel';
 import { useNavSummary } from '@/features/shell/api/navSummary';
 import { useIsTrackingWeo, useTrackWeo } from '@/features/tracking/api/tracking';
 import { osFmt } from '@/lib/format';
-import { openCollect, openCreator } from '@/stores/flow';
+import { openCollect, openCreator, openWorld } from '@/stores/flow';
 import { toast } from '@/stores/ui';
 import { useWeo } from '../api/weos';
 import { WeoPriceFeature } from '../components/WeoPriceFeature';
@@ -125,7 +125,9 @@ export function WeoPage() {
         eyebrow={w.weoId ? `${w.type} · # ${w.weoId}` : w.type}
         title={w.name}
         lede={w.points[0] || 'One WeO, its terms at rest and its passport attached.'}
-        feature={<WeoPriceFeature w={w} tone={tone} onAsk={ask} />}
+        feature={
+          <WeoPriceFeature w={w} tone={tone} onAsk={ask} onRehearse={() => openWorld({ weoId: w.id })} />
+        }
         stats={[
           { value: String(w.collectors), label: 'Collectors' },
           { value: w.edition || '—', label: 'Edition' },
@@ -138,6 +140,11 @@ export function WeoPage() {
             onClick: collect,
           },
           { label: 'Ask its Circle', note: w.circles[0]?.name ?? 'Post it as a thread', onClick: ask },
+          {
+            label: 'Rehearse it in a world',
+            note: 'Try the terms before they are real',
+            onClick: () => openWorld({ weoId: w.id }),
+          },
         ]}
         directory={[
           { id: 'weo-card', label: 'The card' },

@@ -55,6 +55,7 @@ export function Preflight({
   editing,
   onBack,
   onPost,
+  onRehearse,
 }: {
   f: ComposerForm;
   mods: ComposerModule[];
@@ -64,6 +65,8 @@ export function Preflight({
   editing: boolean;
   onBack: () => void;
   onPost: () => void;
+  /** try its terms in a world first (M11) — not for a Request, not while editing a live WeO */
+  onRehearse?: () => void;
 }) {
   const checks = [
     {
@@ -214,10 +217,17 @@ export function Preflight({
           <Button variant="primary" selected tone={toneName} onClick={onPost} dot disabled={busy}>
             {busy ? 'Posting…' : editing ? 'Save it' : 'Post it'}
           </Button>
+          {onRehearse && (
+            <Button variant="secondary" tone="blue" onClick={onRehearse} disabled={busy}>
+              Rehearse it
+            </Button>
+          )}
           <span style={{ fontSize: 11, textAlign: 'center', color: 'var(--text-faint)' }}>
             {f.kind === 'Request'
               ? 'Your ask goes to the requests board. Makers answer it with a WeO.'
-              : 'Post it raw and refine it live. Every path ends in Exchange.'}
+              : onRehearse
+                ? 'Post it raw and refine it live, or test it first. Every path ends in Exchange.'
+                : 'Post it raw and refine it live. Every path ends in Exchange.'}
           </span>
         </div>
       </div>

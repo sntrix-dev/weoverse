@@ -5018,6 +5018,153 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/frontend/me/drafts/{id}/rehearsal": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Keep a draft's rehearsed terms
+         * @description The studio's "Keep the terms": the rehearsal (the settle body, plus the
+         *     resale share) and who it opens to next. Moves the draft to `rehearsed`.
+         *     Allowed again while it is only rehearsed; 409 once it is open to people.
+         */
+        post: operations["rehearseDraft"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/frontend/me/drafts/{id}/open-reactions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Open a rehearsed draft to reactions
+         * @description `post` is the create body it will post with — checked against
+         *     `POST /frontend/weos` now, so a WeO that cannot post cannot open.
+         *     Notifies the audience chosen when the terms were kept (at most 500
+         *     people, never the creator) and answers how many were told.
+         */
+        post: operations["openDraftReactions"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/frontend/me/drafts/{id}/open-pledges": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Open pledges, after twelve reactions
+         * @description Tells everyone who reacted. A pledge is a promise — nothing is held.
+         */
+        post: operations["openDraftPledges"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/frontend/vetting": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** What is waiting on a Circle */
+        get: operations["listVettingForCircle"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/frontend/vetting/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * One WeO in vetting
+         * @description For anyone it is open to (a Circle's are readable by any member of the
+         *     network), and for its creator — who also gets every note. 404 when it
+         *     is not open to you.
+         */
+        get: operations["getVettingCard"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/frontend/vetting/{id}/reactions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Say what you would pay, and why
+         * @description Once per person; saying it again replaces it. The twelfth reaction moves it to `reacted` and tells the creator.
+         */
+        post: operations["reactToVetting"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/frontend/vetting/{id}/pledges": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Pledge — a promise to collect once it posts
+         * @description At its rehearsed price unless you name another. Nothing is held from
+         *     your wallet (Surya). The twentieth pledge posts it, validated, and
+         *     tells every pledger.
+         */
+        post: operations["pledgeToVetting"];
+        /** Take your pledge back while pledges are open */
+        delete: operations["withdrawVettingPledge"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/admin/wallets": {
         parameters: {
             query?: never;
@@ -10470,6 +10617,16 @@ export interface components {
              * @example false
              */
             flowBarTools: boolean;
+            /**
+             * @description What has introduced itself already, once per account (M11): section
+             *     intros (`intro.<section>`) and walkthrough steps (`walk.<section>`).
+             *     The whole list is sent on each change; at most 64.
+             * @example [
+             *       "intro.create",
+             *       "walk.hub"
+             *     ]
+             */
+            seen: string[];
         };
         /**
          * @description Partial update. Every key optional; omitted keys keep their stored
@@ -10509,6 +10666,7 @@ export interface components {
             /** @enum {string} */
             flowBar?: "full" | "min";
             flowBarTools?: boolean;
+            seen?: string[];
         };
         UiPreferencesResponse: components["schemas"]["BaseResponse"] & {
             data?: components["schemas"]["UiPreferences"];
@@ -10825,7 +10983,7 @@ export interface components {
         /** @enum {string} */
         NotificationPriority: "low" | "medium" | "high";
         /** @enum {string} */
-        NotificationEntityType: "offer" | "collection" | "payment" | "resell" | "topup" | "withdrawal" | "user" | "installment" | "negotiation" | "event" | "report" | "thread" | "answer" | "circle";
+        NotificationEntityType: "offer" | "collection" | "payment" | "resell" | "topup" | "withdrawal" | "user" | "installment" | "negotiation" | "event" | "report" | "thread" | "answer" | "circle" | "vetting";
         NotificationRelatedEntity: {
             entityType?: components["schemas"]["NotificationEntityType"];
             /** @description A finer kind, e.g. `listed`, `tracked-listed`, `circle-invite`. */
@@ -10859,7 +11017,7 @@ export interface components {
          */
         NotificationTarget: {
             /** @enum {string} */
-            kind: "weo" | "request" | "collected" | "listed" | "wallet" | "creator" | "passport" | "thread" | "circle";
+            kind: "weo" | "request" | "collected" | "listed" | "wallet" | "creator" | "passport" | "thread" | "circle" | "vetting";
             id: string | null;
         } | null;
         NotificationCategoryCount: {
@@ -13794,10 +13952,48 @@ export interface components {
              * @example 0.6
              */
             ready: number;
+            /**
+             * @description Where it is on the way to live when it is vetted with the community
+             *     (M11) — `null` for a plain draft. The create body it will post with
+             *     is kept server-side and not documented here. A draft that posted
+             *     itself (`stage: live`) leaves the list.
+             */
+            vetting?: components["schemas"]["DraftVetting"] | null;
             /** Format: date-time */
             createdAt: string;
             /** Format: date-time */
             updatedAt: string;
+        };
+        DraftVetting: {
+            /** @enum {string} */
+            stage?: "draft" | "rehearsed" | "reacting" | "reacted" | "pledging" | "posting" | "live";
+            /** @description The kept rehearsal — the settle body plus `terms.resale` and `at`. */
+            rehearsal?: {
+                [key: string]: unknown;
+            } | null;
+            audience?: {
+                /** @enum {string} */
+                kind?: "circle" | "network" | "people";
+                circleId?: string | null;
+                /** @example Digital Arts */
+                label?: string;
+            } | null;
+            /** @example 7 */
+            reactions?: number;
+            /** @example 14 */
+            pledges?: number;
+            /**
+             * @description What the pledges promise. Nothing is held.
+             * @example 16800
+             */
+            promisedOs?: number;
+            /** Format: date-time */
+            openedAt?: string | null;
+            /** Format: date-time */
+            pledgingAt?: string | null;
+            /** Format: date-time */
+            liveAt?: string | null;
+            weoId?: string | null;
         };
         /**
          * @description Every field optional — this is a merge. `payload` is the only one that
@@ -15375,6 +15571,116 @@ export interface components {
         };
         SettingsResponse: components["schemas"]["BaseResponse"] & {
             data?: components["schemas"]["SettingsView"];
+        };
+        RehearseDraftBody: components["schemas"]["SettleRehearsalBody"] & {
+            terms?: {
+                /** @description % of each resale to the creator. */
+                resale?: number;
+            };
+            audience: {
+                /** @enum {string} */
+                kind: "circle" | "network" | "people";
+                circleId?: components["schemas"]["ObjectId"];
+                /**
+                 * @example [
+                 *       "@ada"
+                 *     ]
+                 */
+                handles?: string[];
+            };
+        };
+        DraftVettingMine: {
+            id: string;
+            /** @enum {string} */
+            stage: "draft" | "rehearsed" | "reacting" | "reacted" | "pledging" | "posting" | "live";
+            rehearsal?: {
+                [key: string]: unknown;
+            } | null;
+            audience?: {
+                /** @enum {string} */
+                kind?: "circle" | "network" | "people";
+                circleId?: string | null;
+                label?: string;
+            } | null;
+            reactions: {
+                count?: number;
+                /** @example 12 */
+                need?: number;
+            };
+            pledges: {
+                count?: number;
+                /** @example 20 */
+                threshold?: number;
+                promisedOs?: number;
+            };
+            weoId?: string | null;
+        };
+        DraftVettingMineResponse: components["schemas"]["BaseResponse"] & {
+            data?: components["schemas"]["DraftVettingMine"];
+        };
+        VettingCard: {
+            id: string;
+            /** @enum {string} */
+            stage: "draft" | "rehearsed" | "reacting" | "reacted" | "pledging" | "posting" | "live";
+            /** @example Sunrise Loop */
+            title: string;
+            cover?: string | null;
+            /** @example Drop */
+            format?: string | null;
+            weoType?: string | null;
+            /** @description Its rehearsed price, in Os. */
+            os?: number | null;
+            edition?: number | null;
+            days?: number | null;
+            creator: {
+                id?: string;
+                name?: string;
+                handle?: string;
+                avatarUrl?: string | null;
+                isr?: number | null;
+            };
+            audience?: {
+                /** @enum {string} */
+                kind?: "circle" | "network" | "people";
+                label?: string;
+                circleId?: string | null;
+            } | null;
+            rehearsed?: {
+                /** @example Night market */
+                world?: string | null;
+                /** @example 0.62 */
+                through?: number | null;
+            } | null;
+            reactions: {
+                count?: number;
+                need?: number;
+                /** @description The latest three notes (all of them for the creator). Never who wrote them. */
+                notes?: {
+                    note?: string;
+                    os?: number | null;
+                }[];
+            };
+            pledges: {
+                count?: number;
+                threshold?: number;
+                /** @description Promised, not held. */
+                promisedOs?: number;
+            };
+            mine: {
+                isOwner?: boolean;
+                reaction?: {
+                    os?: number | null;
+                    note?: string;
+                } | null;
+                pledge?: {
+                    os?: number;
+                } | null;
+            };
+            /** @description The WeO it became, once live. */
+            weoId?: string | null;
+        };
+        VettingCardResponse: components["schemas"]["BaseResponse"] & {
+            data?: components["schemas"]["VettingCard"];
         };
         /**
          * @description The rater (populated from User). v1 has no anonymous ratings, so
@@ -26052,7 +26358,10 @@ export interface operations {
                      *           "home": "hub",
                      *           "navSections": "one",
                      *           "flowBar": "full",
-                     *           "flowBarTools": false
+                     *           "flowBarTools": false,
+                     *           "seen": [
+                     *             "intro.hub"
+                     *           ]
                      *         }
                      *       }
                      *     }
@@ -26106,7 +26415,10 @@ export interface operations {
                      *         "home": "hub",
                      *         "navSections": "one",
                      *         "flowBar": "full",
-                     *         "flowBarTools": false
+                     *         "flowBarTools": false,
+                     *         "seen": [
+                     *           "intro.hub"
+                     *         ]
                      *       }
                      *     }
                      */
@@ -26163,7 +26475,10 @@ export interface operations {
                      *         "home": "hub",
                      *         "navSections": "one",
                      *         "flowBar": "full",
-                     *         "flowBarTools": false
+                     *         "flowBarTools": false,
+                     *         "seen": [
+                     *           "intro.hub"
+                     *         ]
                      *       }
                      *     }
                      */
@@ -26462,6 +26777,412 @@ export interface operations {
             401: components["responses"]["Unauthorized"];
             /** @description Too many exports in a minute */
             429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    rehearseDraft: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description Resource ObjectId (24-char hex).
+                 * @example 651f8c2a3b9c0d12e4567890
+                 */
+                id: components["parameters"]["IdPathParam"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RehearseDraftBody"];
+            };
+        };
+        responses: {
+            /** @description Kept */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DraftVettingMineResponse"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            /** @description Draft, circle or people not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Already open to people */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            422: components["responses"]["ValidationError"];
+        };
+    };
+    openDraftReactions: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description Resource ObjectId (24-char hex).
+                 * @example 651f8c2a3b9c0d12e4567890
+                 */
+                id: components["parameters"]["IdPathParam"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                /**
+                 * @example {
+                 *       "post": {
+                 *         "weoType": "regular",
+                 *         "title": "Sunrise Loop",
+                 *         "categoryId": "665f1c2b9a1e4b0012ab34cd"
+                 *       }
+                 *     }
+                 */
+                "application/json": {
+                    /** @description A `CreateWeoRequest` (no `requestedId`). */
+                    post: {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+        responses: {
+            /** @description Open */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BaseResponse"] & {
+                        data?: components["schemas"]["DraftVettingMine"] & {
+                            /** @example 42 */
+                            notified?: number;
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            /** @description Draft not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not rehearsed yet */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description The body cannot post */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    openDraftPledges: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description Resource ObjectId (24-char hex).
+                 * @example 651f8c2a3b9c0d12e4567890
+                 */
+                id: components["parameters"]["IdPathParam"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Pledging */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DraftVettingMineResponse"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            /** @description Draft not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not enough reactions yet */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    listVettingForCircle: {
+        parameters: {
+            query: {
+                circleId: components["schemas"]["ObjectId"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Cards, newest opened first (at most 24) */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BaseResponse"] & {
+                        data?: {
+                            items?: components["schemas"]["VettingCard"][];
+                            total?: number;
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            422: components["responses"]["ValidationError"];
+        };
+    };
+    getVettingCard: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description Resource ObjectId (24-char hex).
+                 * @example 651f8c2a3b9c0d12e4567890
+                 */
+                id: components["parameters"]["IdPathParam"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Card */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VettingCardResponse"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            /** @description Not open to you */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    reactToVetting: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description Resource ObjectId (24-char hex).
+                 * @example 651f8c2a3b9c0d12e4567890
+                 */
+                id: components["parameters"]["IdPathParam"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @example 900 */
+                    os?: number | null;
+                    /** @example Would enter at 900 */
+                    note?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Card */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VettingCardResponse"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            /** @description Your own */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not open to you */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Reactions closed */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    pledgeToVetting: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description Resource ObjectId (24-char hex).
+                 * @example 651f8c2a3b9c0d12e4567890
+                 */
+                id: components["parameters"]["IdPathParam"];
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    /** @example 1200 */
+                    os?: number;
+                };
+            };
+        };
+        responses: {
+            /** @description Card */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VettingCardResponse"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            /** @description Your own */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not open to you */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Pledges not open */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    withdrawVettingPledge: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description Resource ObjectId (24-char hex).
+                 * @example 651f8c2a3b9c0d12e4567890
+                 */
+                id: components["parameters"]["IdPathParam"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Card */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VettingCardResponse"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            /** @description Not open to you */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Pledges not open */
+            409: {
                 headers: {
                     [name: string]: unknown;
                 };

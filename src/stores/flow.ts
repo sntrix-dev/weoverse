@@ -79,3 +79,26 @@ export const openOffer = (requestId: string) => useFlow.setState({ ...closed, of
 /** design `app.openCreator(id)` — one creator surface, reachable from any face or name */
 export const openCreator = (creatorId: string) => useFlow.setState({ creator: creatorId });
 export const closeCreator = () => useFlow.setState({ creator: null });
+
+/* ---------- M11: worlds and vetting ---------- */
+
+/** design `app.openWorld({ draft, worldId, weoId })` — the studio over any page. */
+export interface WorldSeed {
+  /** rehearse a draft of yours (keeps its terms, stage Rehearsed) */
+  draftId?: string;
+  /** simulate a live WeO (settles to your ledger when it is yours) */
+  weoId?: string;
+  /** the world to open in */
+  worldId?: string;
+}
+
+interface WorldState {
+  world: WorldSeed | null;
+  /** the vetting sheet: a WeO in vetting, by its draft id (D-090) */
+  vet: string | null;
+}
+export const useWorld = create<WorldState>(() => ({ world: null, vet: null }));
+export const openWorld = (seed: WorldSeed = {}) => useWorld.setState({ world: seed });
+export const closeWorld = () => useWorld.setState({ world: null });
+export const openVet = (id: string) => useWorld.setState({ vet: id });
+export const closeVet = () => useWorld.setState({ vet: null });

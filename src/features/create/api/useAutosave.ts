@@ -78,5 +78,12 @@ export function useAutosave(f: ComposerForm, enabled: boolean, initialId: string
     pending.current = null;
     sent.current = '';
   };
-  return { id, stop };
+  /** a write made elsewhere (the rehearsal, M11) gave this composer its draft: keep saving to it */
+  const adopt = (draftId: string, f: ComposerForm) => {
+    idRef.current = draftId;
+    setId(draftId);
+    pending.current = null;
+    sent.current = JSON.stringify(draftBody(f));
+  };
+  return { id, stop, adopt };
 }

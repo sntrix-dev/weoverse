@@ -8,6 +8,7 @@ import { useHubPath } from '@/components/shell/useHubPath';
 import { Badge, Button, Card, Chip, EmptyState, OMark, Orb } from '@/design-system';
 import { toast } from '@/stores/ui';
 import { useMarkAllRead, useMarkRead, useNotifications, type NotificationRowDto } from '../api/notifications';
+import { openVet } from '@/stores/flow';
 import { atLabel, byDay, NOTIF_CATS, pictureOf, routeOf, TONE_STATUS, toneOf } from '../model/notifications';
 
 const page: CSSProperties = {
@@ -37,6 +38,8 @@ export function NotificationsPage() {
 
   const open = (n: NotificationRowDto) => {
     if (!n.read) markRead.mutate(String(n._id));
+    // a WeO in vetting is a draft, not a page: its sheet opens over this one (D-090)
+    if (n.target?.kind === 'vetting' && n.target.id) return openVet(n.target.id);
     const to = routeOf(n.target);
     if (to) void navigate(to);
   };

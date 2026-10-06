@@ -26,7 +26,7 @@ export function QuickJump({ section, onJump }: { section: SectionKey; onJump: (k
     return () => window.removeEventListener('resize', fit);
   }, [navDock]);
   /* RingNav caps the fan at 7 (protocol §5) */
-  const fanItems = JUMP.filter((j) => j.key !== 'mya').slice(0, 7);
+  const fanItems = JUMP.filter((j) => j.key !== 'mya' && j.key !== 'worlds').slice(0, 7);
   return (
     <>
       {floating && (

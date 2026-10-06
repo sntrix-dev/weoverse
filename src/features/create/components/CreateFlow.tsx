@@ -11,15 +11,24 @@ import { useNavSummary } from '@/features/shell/api/navSummary';
 import { sentence } from '@/features/requests/model/briefs';
 import { osFmt } from '@/lib/format';
 import { usePref } from '@/stores/prefs';
-import { openPush } from '@/stores/flow';
+import { openPush, openWorld } from '@/stores/flow';
 import { toast } from '@/stores/ui';
-import { useAsks, useCategories, useOPeg, useTemplates, type TemplateDto } from '../api/create';
+import {
+  useAsks,
+  useCategories,
+  useOPeg,
+  useSaveDraft,
+  useTemplates,
+  type DraftWrite,
+  type TemplateDto,
+} from '../api/create';
 import { useAutosave } from '../api/useAutosave';
 import { usePublish } from '../api/usePublish';
 import { circleLine, circlesFor, draftCardProps, priceLabelOf } from '../model/card';
 import {
   EMPTY_FORM,
   canPost as canPostOf,
+  draftBody,
   missingOf,
   pickForm,
   templateForm,
@@ -170,6 +179,20 @@ export function CreateFlow({
   const backToHero = () => {
     setStep(1);
     top();
+  };
+
+  /** Rehearse it (M11): the composer is written to its draft now, then the studio opens on it. */
+  const rehearseSave = useSaveDraft();
+  const rehearse = async () => {
+    try {
+      const d = await rehearseSave.mutateAsync({ id: autosave.id, body: draftBody(f) as DraftWrite });
+      if (d?._id) {
+        autosave.adopt(d._id, f);
+        openWorld({ draftId: d._id });
+      }
+    } catch {
+      toast('It could not be saved for the rehearsal — try again');
+    }
   };
 
   const tryPost = () => {
@@ -353,6 +376,7 @@ export function CreateFlow({
               editing={!!editId}
               onBack={() => setStep(2)}
               onPost={tryPost}
+              onRehearse={!editId && !forRequest && f.kind !== 'Request' ? () => void rehearse() : undefined}
             />
           )}
         </>
