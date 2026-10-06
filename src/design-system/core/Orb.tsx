@@ -1,6 +1,7 @@
 // design: js/ds/_ds_bundle.js components/core/Orb.jsx — converted from the compiled bundle (scripts/ds2tsx.mjs), then typed by hand.
 
 import type { CSSProperties, HTMLAttributes, ReactNode } from 'react';
+import { cssUrl } from '@/lib/cssUrl';
 
 export interface OrbProps extends Omit<HTMLAttributes<HTMLDivElement>, 'style'> {
   size?: number | string;
@@ -90,7 +91,7 @@ export function Orb({
           style={{
             position: 'absolute',
             inset: 0,
-            backgroundImage: `url(${src})`,
+            backgroundImage: cssUrl(src),
             backgroundSize: 'cover',
             backgroundPosition: 'center',
           }}

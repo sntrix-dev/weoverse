@@ -5,6 +5,7 @@ import { osFmt } from '@/lib/format';
 import { closeId } from '@/stores/ui';
 import { CopyBtn } from './CopyBtn';
 import s from './IdSheet.module.css';
+import { cssUrl } from '@/lib/cssUrl';
 
 export interface IdSheetProps {
   me: ShellMe;
@@ -131,7 +132,7 @@ export function IdSheet({ me, onWallet, onSettings, onPassport, onLogout }: IdSh
                 className={s.face}
                 style={{
                   background: me.avatarUrl
-                    ? `url('${me.avatarUrl}') center/cover, var(--surface-2)`
+                    ? `${cssUrl(me.avatarUrl)} center/cover, var(--surface-2)`
                     : 'var(--surface-2)',
                 }}
               >

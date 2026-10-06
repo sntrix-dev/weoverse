@@ -1,5 +1,6 @@
 import { useCallback, useEffect } from 'react';
 import { Outlet, useNavigate } from 'react-router';
+import { useLiveNotifications } from '@/api/live';
 import { Footer } from '@/components/shell/Footer';
 import { IdSheet } from '@/components/shell/IdSheet';
 import { MyaDock } from '@/components/shell/MyaDock';
@@ -103,6 +104,7 @@ export function AppLayout() {
 
   useRouteTint(route);
   useFootLift();
+  useLiveNotifications();
 
   useEffect(() => {
     usePrefs.setState({ onSaveError: () => toast('That setting didn’t save — try again') });

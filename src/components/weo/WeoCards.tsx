@@ -4,6 +4,7 @@ import type { WeoCardModel } from '@/lib/cardModel';
 import { osFmt } from '@/lib/format';
 import { WeoPriceAtRest } from './WeoBits';
 import { weoCardProps, type WeoHandlers } from './weoCardProps';
+import { cssUrl } from '@/lib/cssUrl';
 
 /** design: screens-hub.jsx WeoActions — the WeO's own verbs, revealed on approach. */
 export function WeoActions({ w, h, show }: { w: WeoCardModel; h: WeoHandlers; show: boolean }) {
@@ -297,7 +298,7 @@ export function WeoOrbitView({ list, h, me }: { list: WeoCardModel[]; h: WeoHand
                 borderRadius: '50%',
                 overflow: 'hidden',
                 background: me.avatarUrl
-                  ? `url('${me.avatarUrl}') center/cover, var(--surface)`
+                  ? `${cssUrl(me.avatarUrl)} center/cover, var(--surface)`
                   : 'var(--surface)',
                 boxShadow: 'inset 0 0 0 1px var(--border)',
               }}

@@ -6,6 +6,7 @@ import { isrStage } from '../data/ISRRing';
 import { OMark } from '../core/OMark';
 import { Orb } from '../core/Orb';
 import { useQrDataUrl } from './useQrDataUrl';
+import { cssUrl } from '@/lib/cssUrl';
 
 /** A face in a social-proof cluster or people list. */
 export interface WeOCardPerson {
@@ -1534,7 +1535,7 @@ export function WeOCard({
                   style={{
                     position: 'absolute',
                     inset: `-${Math.round(sSize * 0.28)}px`,
-                    backgroundImage: `url(${src})`,
+                    backgroundImage: cssUrl(src),
                     backgroundRepeat: 'repeat',
                     backgroundSize: 'auto 118%',
                     backgroundPosition: `${tilt.y * 1.5}px ${-tilt.x * 1.5}px`,

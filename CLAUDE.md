@@ -50,7 +50,7 @@ Backend (in `weo-3.0`): `npm run dev` (:3002, Swagger `/api/docs`), `npx tsc --n
 ## 5. Backend integration
 
 - Base URL `http://localhost:3002/api`; user routes under `/frontend/*` with `Authorization: Bearer`.
-- Envelope `{ success, message, data, error?, errors? }`; 422 = Zod field errors; some 401s are plain text; global rate limit 70 req/min/IP.
+- Envelope `{ success, message, data, error?, errors? }`; 422 = Zod field errors; some 401s are plain text; global rate limit 70 req/min/IP by default (`RATE_LIMIT_PER_MIN`).
 - Verify endpoints **in backend code**, not in its older docs/Swagger (known drift: `docs/reference/backend-inventory.md` §14).
 - Backend changes: branch `redesign/mNN-<slug>` cut from the previous redesign branch, additive only, Swagger updated, skills `backend-endpoint` + `backend-verify` in `weo-3.0/skills/`.
 - Details: `docs/05-api-integration.md`, skill `api-integration`.

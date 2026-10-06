@@ -197,6 +197,7 @@ export const myWeosFixture: S['CommunityMyWeoCardView'][] = [
     participantsCount: 0,
     createdAt: T0,
     updatedAt: T0,
+    validated: false,
   },
 ];
 

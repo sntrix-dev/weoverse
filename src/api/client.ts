@@ -1,4 +1,5 @@
 import { apiRoot } from '@/lib/env';
+import { accountState } from './accountState';
 import type { components } from './generated/schema';
 import { tokens } from './tokens';
 
@@ -114,7 +115,10 @@ async function exchange(refreshToken: string): Promise<boolean> {
     body: JSON.stringify({ refresh_token: refreshToken }),
   });
   const body = await readBody(res);
-  if (!res.ok || !isEnvelope(body) || !body.success) return false;
+  if (!res.ok || !isEnvelope(body) || !body.success) {
+    if (isEnvelope(body)) accountState.report(res.status, body.message, body.data);
+    return false;
+  }
   const data = body.data as components['schemas']['NewAccessTokenData'];
   tokens.set(data.accessToken, data.refreshToken);
   return true;
@@ -180,9 +184,13 @@ async function request<T>(
     tokens.clear();
     onSessionExpired?.();
   }
-  if (!res.ok) throw toError(res, payload);
+  if (!res.ok || (isEnvelope(payload) && !payload.success)) {
+    const err = toError(res, payload);
+    // a suspended, banned or deleted account: said once, over everything (M12)
+    accountState.report(err.status, err.message, err.data);
+    throw err;
+  }
   if (isEnvelope(payload)) {
-    if (!payload.success) throw toError(res, payload);
     return payload.data as T;
   }
   // a few backend reads (e.g. GET /frontend/categories) return raw JSON with no envelope

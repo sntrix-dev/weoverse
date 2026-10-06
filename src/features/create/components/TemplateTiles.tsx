@@ -5,6 +5,7 @@ import { OMark, svg } from '@/design-system';
 import { osFmt } from '@/lib/format';
 import type { TemplateDto } from '../api/create';
 import { createTone } from '../model/formats';
+import { cssUrl } from '@/lib/cssUrl';
 
 const LOCK = (
   <>
@@ -144,7 +145,7 @@ export function TemplateDrawer({
                   style={{
                     display: 'block',
                     height: 66,
-                    background: `url('${tp.image}') center/cover, color-mix(in srgb, ${tt} 18%, var(--surface-2))`,
+                    background: `${cssUrl(tp.image)} center/cover, color-mix(in srgb, ${tt} 18%, var(--surface-2))`,
                   }}
                 />
                 <span style={{ display: 'block', padding: '8px 10px 10px' }}>

@@ -33,6 +33,7 @@ describe('notifications model', () => {
     expect(routeOf({ kind: 'thread', id: 't1' })).toBe('/community/threads/t1');
     expect(routeOf({ kind: 'collected', id: null })).toBe('/collect');
     expect(routeOf({ kind: 'listed', id: null })).toBe('/exchange');
+    expect(routeOf({ kind: 'settings', id: null })).toBe('/settings#danger');
     expect(routeOf(null)).toBeNull();
   });
 });

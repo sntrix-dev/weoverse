@@ -101,6 +101,9 @@ export function routeOf(t: NotificationRowDto['target']): string | null {
       return id ? routes.thread(id) : null;
     case 'circle':
       return id ? routes.circle(id) : null;
+    case 'settings':
+      // an answer to your deactivate / delete request (M12)
+      return routes.settings('danger');
     default:
       return null;
   }

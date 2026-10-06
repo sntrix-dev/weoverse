@@ -24,7 +24,7 @@ Backend: `weo-3.0`, local base URL **`http://localhost:3002/api`**. Full endpoin
 
 **Non-envelope responses the client must tolerate** (known backend quirks):
 - `authenticate` failures return **plain text** (`No token`, `Invalid token`, `Not an access token`) with 401; deleted/banned/suspended accounts return an envelope with `data.code` `ACCOUNT_DELETED|ACCOUNT_BANNED|ACCOUNT_SUSPENDED` (401/403).
-- Rate limiters return `{message}` with **429**. The global limit is **70 req/min per IP** — batch reads, rely on the query cache, and prefer the screen-shaped endpoints (`nav-summary`, `wallet/overview`, `*/snapshot`, `users/me/passport`).
+- Rate limiters return `{message}` with **429**. The global limit is **70 req/min per IP** by default (`RATE_LIMIT_PER_MIN` in the backend env, M12) — batch reads, rely on the query cache, and prefer the screen-shaped endpoints (`nav-summary`, `wallet/overview`, `*/snapshot`, `users/me/passport`).
 - `GET /frontend/categories` returns raw documents (no envelope).
 - Validation failures are **422** with `errors[]` → map to form field errors.
 
@@ -109,6 +109,10 @@ Backend: `weo-3.0`, local base URL **`http://localhost:3002/api`**. Full endpoin
 | M11 | In flight | `GET /frontend/me/drafts` (+ `vetting`), `POST /frontend/me/drafts/:id/open-reactions`, `/open-pledges` (new) | wired (D-091) |
 | M11 | Vetting sheet, Circle "Waiting" | `GET /frontend/vetting/:id`, `GET /frontend/vetting?circleId=`, `POST /frontend/vetting/:id/reactions`, `POST/DELETE /frontend/vetting/:id/pledges` (new) | wired (D-086, D-090) |
 | M11 | Intros seen | `PATCH /frontend/users/me/preferences` (`seen`) | wired (D-088) |
+| M12 | In flight — validated | `GET /frontend/community/my-weos` (`validated`) | wired (D-095) |
+| M12 | Live bell | socket.io `/authenticated` (`auth.token`), event `notification:new` | wired (`api/live.ts`, D-096) |
+| M12 | Account states | any 403 with `data.code` `ACCOUNT_*` | wired (`api/accountState.ts`, D-097) |
+| M12 | A rejected account request | `GET /frontend/notifications` (`target.kind: settings`) | wired → Settings `#danger` |
 | M10 | Careers interest | `POST /weo-website/careers-module` | wired (`CareersSheet`, D-083) |
 | M09 | Passport (hero, standing, tier, orbit, public switches) | `GET /frontend/users/me/passport` (+ `inputs[].do`, `.cap`, M09) | wired (`features/passport`, D-074) |
 | M09 | Your graph | `GET /frontend/users/me/graph` | wired |

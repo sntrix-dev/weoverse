@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom/vitest';
 import { cleanup, configure } from '@testing-library/react';
-import { afterAll, afterEach, beforeAll } from 'vitest';
+import { afterAll, afterEach, beforeAll, vi } from 'vitest';
 import { closeFlow } from '@/stores/flow';
 import { resetMya } from '@/stores/mya';
 import { usePrefs } from '@/stores/prefs';
@@ -16,6 +16,19 @@ window.open = (() => null) as typeof window.open;
 // …and no media playback: the Create O plays and pauses its clips (jsdom logs "not implemented")
 HTMLMediaElement.prototype.pause = () => {};
 HTMLMediaElement.prototype.play = () => Promise.resolve();
+
+// the live bell's socket (api/live.ts) stays inert: no server to reach (its own test fakes it)
+vi.mock('socket.io-client', () => {
+  const socket = {
+    connected: false,
+    active: false,
+    on: () => socket,
+    connect: () => socket,
+    disconnect: () => socket,
+    io: { on: () => {} },
+  };
+  return { io: () => socket };
+});
 
 beforeAll(() => server.listen({ onUnhandledFrame: 'error' }));
 afterEach(() => {

@@ -15,6 +15,7 @@ import { closeFlow } from '@/stores/flow';
 import { toast } from '@/stores/ui';
 import { useBrief, useOfferOnBrief } from '../api/requests';
 import { briefModel, offerRange, type BriefModel } from '../model/briefs';
+import { cssUrl } from '@/lib/cssUrl';
 
 const GREEN = '#22C55E';
 
@@ -180,7 +181,7 @@ function RequestFront({
                     width: 28,
                     height: 28,
                     borderRadius: 9,
-                    background: w.cover ? `url('${w.cover}') center/cover` : 'var(--surface-2)',
+                    background: w.cover ? `${cssUrl(w.cover)} center/cover` : 'var(--surface-2)',
                   }}
                 />
                 <span

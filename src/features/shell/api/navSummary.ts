@@ -19,7 +19,7 @@ export function useNavSummary() {
     queryFn: fetchNavSummary,
     select: toShellMe,
     staleTime: NAV_SUMMARY_POLL_MS,
-    // the bell's unread dot; real-time arrives with the socket (G-19, M10)
+    // the bell's unread dot; the socket refreshes it live (api/live.ts, M12) — this poll is the fallback
     refetchInterval: NAV_SUMMARY_POLL_MS,
   });
 }

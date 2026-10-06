@@ -16,7 +16,7 @@ Twelve build modules after setup. Each is delivered with the workflow in `04-mod
 | M09 | Identity & money | passport, wallet, settings; profile/tier/ISR sheets, MoveOsSheet, plans | settings store, account request, export, profile photo, peg fix | M03 | ✅ 2026-10-05 |
 | M10 | Notifications & company | notifications, company | fix `DELETE /notifications/read` shadowing, category map | M02 | ✅ 2026-10-06 |
 | M11 | Worlds & lifecycle | WorldStudio + `<weo-world>` (three.js, lazy), V3 lifecycle (rehearse → react → pledge → live), In-flight, arrivals/walkthrough | reactions & pledges endpoints | M07 | ✅ 2026-10-06 |
-| M12 | Hardening | full regression, a11y, perf, error states, final report | as found | all | |
+| M12 | Hardening | full regression, a11y, perf, error states, final report | as found | all | 🔄 in progress |
 
 Legend: ⏳ in progress · ✅ merged · ⛔ blocked
 

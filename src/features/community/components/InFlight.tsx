@@ -124,8 +124,8 @@ export function nextAct(it: FlightItem, h: FlightHandlers): FlightAct {
         ...base,
         fill: 1,
         verb: 'Move with the market',
-        note: 'Live in Exchange',
-        get: 'On the floor, earning',
+        note: it.validated ? 'Live · validated' : 'Live in Exchange',
+        get: it.validated ? 'Validated mark · ahead on the floor' : 'On the floor, earning',
         act: () => h.onMarket(it),
       };
   }

@@ -26,6 +26,7 @@ import {
 import { AccountRequestSheet } from '../components/AccountRequestSheet';
 import { SetCard, SetRow, SetSeg, SetSelect, setField } from '../components/SetParts';
 import { resetTours } from '@/stores/intro';
+import { cssUrl } from '@/lib/cssUrl';
 
 const SECTIONS: { id: string; label: string; icon: ReactNode; tone?: string }[] = [
   {
@@ -358,7 +359,7 @@ export function SettingsPage() {
                     height: 40,
                     borderRadius: '50%',
                     background: p?.identity.avatarUrl
-                      ? `url('${p.identity.avatarUrl}') center/cover, var(--surface-2)`
+                      ? `${cssUrl(p.identity.avatarUrl)} center/cover, var(--surface-2)`
                       : 'var(--surface-2)',
                     boxShadow: 'var(--nm-sm)',
                   }}

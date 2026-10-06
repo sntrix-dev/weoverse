@@ -4,6 +4,7 @@ import { routes } from '@/app/routes';
 import { Avatar, ICO, Orb, svg } from '@/design-system';
 import { relTime } from '@/lib/time';
 import type { StoryModel, ThreadModel } from '../model/community';
+import { cssUrl } from '@/lib/cssUrl';
 
 export { useHubPath } from '@/components/shell/useHubPath';
 
@@ -181,7 +182,7 @@ export function ThreadRow({ t, onOpen }: { t: ThreadModel; onOpen: () => void })
                 width: 18,
                 height: 18,
                 borderRadius: '50%',
-                background: weo.img ? `url('${weo.img}') center/cover` : 'var(--surface-3)',
+                background: weo.img ? `${cssUrl(weo.img)} center/cover` : 'var(--surface-3)',
               }}
             />
             {weo.name}

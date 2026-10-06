@@ -4130,7 +4130,12 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Get a single RFQ */
+        /**
+         * Get a single RFQ
+         * @description `offers` holds every WeO made for this request only when the caller
+         *     is the requester. Anyone else gets only the offers they made (M12,
+         *     G-58) — `acceptedCount`, `offerers` and `offered` stay as before.
+         */
         get: operations["getRequestOfferById"];
         put?: never;
         post?: never;
@@ -4421,6 +4426,56 @@ export interface paths {
         get: operations["adminExportUsers"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/users/account-requests": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Open deactivate / delete requests (redesign M12)
+         * @description People who asked, from Settings, to deactivate or delete their
+         *     account, oldest first. Only open requests (a row written before M12
+         *     has no `status` and counts as open); deleted accounts are left out.
+         *     Registered before `/admin/users/{id}`.
+         */
+        get: operations["adminListAccountRequests"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/users/{id}/account-request": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Confirm or reject a deactivate / delete request (redesign M12)
+         * @description `confirm` on a deactivate request suspends the account (reason
+         *     "Deactivated at your request"; set it `active` again with
+         *     `PATCH /admin/users/{id}/status`). `confirm` on a delete request
+         *     soft-deletes it (`isDeleted`, recoverable with `/restore`). Both close
+         *     every session and write an admin activity log row. `reject` keeps the
+         *     account and notifies the person with the note (category `system`,
+         *     target `settings`). Only an open request can be resolved, once; an
+         *     admin account is never deactivated or deleted this way.
+         */
+        post: operations["adminResolveAccountRequest"];
         delete?: never;
         options?: never;
         head?: never;
@@ -4984,9 +5039,11 @@ export interface paths {
         put?: never;
         /**
          * Ask to deactivate or delete your account (redesign M09)
-         * @description Records the request on the account; a person confirms it by email.
-         *     Nothing is hidden or removed automatically. A new request replaces
-         *     an open one.
+         * @description Records the request on the account; staff confirm or reject it
+         *     (`/admin/users/{id}/account-request`, M12). Nothing is hidden or
+         *     removed automatically. A new request replaces an open one.
+         *     `accountRequest` shows only while the request is open; a rejection
+         *     reaches the person as a notification that opens Settings.
          */
         post: operations["requestAccountChange"];
         /** Withdraw an open deactivate / delete request */
@@ -11017,7 +11074,7 @@ export interface components {
          */
         NotificationTarget: {
             /** @enum {string} */
-            kind: "weo" | "request" | "collected" | "listed" | "wallet" | "creator" | "passport" | "thread" | "circle" | "vetting";
+            kind: "weo" | "request" | "collected" | "listed" | "wallet" | "creator" | "passport" | "thread" | "circle" | "vetting" | "settings";
             id: string | null;
         } | null;
         NotificationCategoryCount: {
@@ -14559,6 +14616,24 @@ export interface components {
                  */
                 points: string[];
                 /**
+                 * @description Set when the WeO posted itself after its community vetted it
+                 *     (M11: twelve reactions, then twenty pledges); `null` for a WeO
+                 *     posted directly. Figures as they stood when it went live.
+                 */
+                validated: {
+                    /**
+                     * Format: date-time
+                     * @example 2026-10-06T12:00:00.000Z
+                     */
+                    at: string;
+                    /** @example 12 */
+                    reactions: number;
+                    /** @example 20 */
+                    pledges: number;
+                    /** @example 24000 */
+                    promisedOs: number;
+                } | null;
+                /**
                  * @description Editorial rarity line, used ONLY where rarity is not
                  *     derivable — a generative drop's "Generative". Empty means the
                  *     computed line ("78% funded", "3 of 100 left") wins.
@@ -15266,6 +15341,8 @@ export interface components {
             createdAt: string | null;
             /** Format: date-time */
             updatedAt: string | null;
+            /** @description Posted itself after twenty pledges (vetting, redesign M11) — the validated mark (M12). */
+            validated: boolean;
         };
         /**
          * @description FE Story projection. Mirrors `weoverse/src/types/community.ts: Story`.
@@ -15494,6 +15571,51 @@ export interface components {
         TrackStateResponse: components["schemas"]["BaseResponse"] & {
             data?: {
                 tracked: boolean;
+            };
+        };
+        AdminAccountRequest: {
+            userId: string;
+            fullName: string | null;
+            creatorName: string | null;
+            emailAddress: string | null;
+            /** @enum {string} */
+            status: "active" | "suspended" | "banned";
+            /** @enum {string} */
+            kind: "deactivate" | "delete";
+            reason: string | null;
+            /** Format: date-time */
+            requestedAt: string;
+        };
+        AdminAccountRequestListResponse: {
+            success: boolean;
+            message: string;
+            data: {
+                requests: components["schemas"]["AdminAccountRequest"][];
+                pagination: {
+                    page: number;
+                    limit: number;
+                    total: number;
+                    totalPages: number;
+                };
+            };
+        };
+        AdminResolveAccountRequestBody: {
+            /** @enum {string} */
+            action: "confirm" | "reject";
+            /** @description Told to the person on a rejection */
+            note?: string;
+        };
+        AdminResolveAccountRequestResponse: {
+            success: boolean;
+            message: string;
+            data: {
+                userId: string;
+                /** @enum {string} */
+                kind: "deactivate" | "delete";
+                /** @enum {string} */
+                status: "confirmed" | "rejected";
+                /** @description Sessions closed (0 on a rejection) */
+                revokedCount: number;
             };
         };
         ChannelRow: {
@@ -25211,6 +25333,127 @@ export interface operations {
             };
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
+            422: components["responses"]["ValidationError"];
+            500: components["responses"]["ServerError"];
+        };
+    };
+    adminListAccountRequests: {
+        parameters: {
+            query?: {
+                page?: number;
+                limit?: number;
+                kind?: "deactivate" | "delete";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description One page of open requests */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "success": true,
+                     *       "message": "Account requests retrieved successfully",
+                     *       "data": {
+                     *         "requests": [
+                     *           {
+                     *             "userId": "651f8c2a3b9c0d12e4567890",
+                     *             "fullName": "Jane Doe",
+                     *             "creatorName": "janed",
+                     *             "emailAddress": "jane@example.com",
+                     *             "status": "active",
+                     *             "kind": "delete",
+                     *             "reason": "Taking a break",
+                     *             "requestedAt": "2026-10-01T09:00:00.000Z"
+                     *           }
+                     *         ],
+                     *         "pagination": {
+                     *           "page": 1,
+                     *           "limit": 20,
+                     *           "total": 1,
+                     *           "totalPages": 1
+                     *         }
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["AdminAccountRequestListResponse"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            422: components["responses"]["ValidationError"];
+            500: components["responses"]["ServerError"];
+        };
+    };
+    adminResolveAccountRequest: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description Resource ObjectId (24-char hex).
+                 * @example 651f8c2a3b9c0d12e4567890
+                 */
+                id: components["parameters"]["IdPathParam"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                /**
+                 * @example {
+                 *       "action": "reject",
+                 *       "note": "You have open pledges; settle them first."
+                 *     }
+                 */
+                "application/json": components["schemas"]["AdminResolveAccountRequestBody"];
+            };
+        };
+        responses: {
+            /** @description Resolved */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "success": true,
+                     *       "message": "Account request resolved successfully",
+                     *       "data": {
+                     *         "userId": "651f8c2a3b9c0d12e4567890",
+                     *         "kind": "delete",
+                     *         "status": "rejected",
+                     *         "revokedCount": 0
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["AdminResolveAccountRequestResponse"];
+                };
+            };
+            /** @description An admin account cannot be deactivated or deleted this way */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            /** @description The account has no open request (none, already resolved, or resolved by someone else just now) */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
             422: components["responses"]["ValidationError"];
             500: components["responses"]["ServerError"];
         };

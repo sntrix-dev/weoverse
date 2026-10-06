@@ -8,6 +8,7 @@ import { osFmt, oStr } from '@/lib/format';
 import { openWorld } from '@/stores/flow';
 import { useBriefOffers } from '../api/requests';
 import type { BriefModel } from '../model/briefs';
+import { cssUrl } from '@/lib/cssUrl';
 
 /* A request IS a WeO waiting to be made, so it takes the WeO card grammar — image first, a
    format badge, the budget at rest with the flow mark — and the same view options every other
@@ -354,7 +355,7 @@ function OffersIn({ r, onCollect }: { r: BriefModel; onCollect: (weoId: string) 
                 height: 40,
                 borderRadius: 12,
                 overflow: 'hidden',
-                background: img ? `url('${img}') center/cover` : 'var(--surface-2)',
+                background: img ? `${cssUrl(img)} center/cover` : 'var(--surface-2)',
               }}
             />
             <span style={{ minWidth: 0, flex: 1 }}>

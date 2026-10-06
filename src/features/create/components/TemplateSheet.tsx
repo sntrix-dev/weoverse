@@ -6,6 +6,7 @@ import { Button, OMark, WeOCard, svg } from '@/design-system';
 import { osFmt } from '@/lib/format';
 import type { TemplateDto } from '../api/create';
 import { CREATE_TEMPLATES, createTone } from '../model/formats';
+import { cssUrl } from '@/lib/cssUrl';
 
 /** What a locked template says when it is pressed. */
 export const lockedLine = (tp: TemplateDto) =>
@@ -333,7 +334,7 @@ export function TemplateSheet({
                 borderRadius: 12,
                 overflow: 'hidden',
                 cursor: 'pointer',
-                background: `url('${x.image}') center/cover, var(--surface-2)`,
+                background: `${cssUrl(x.image)} center/cover, var(--surface-2)`,
                 boxShadow: k === i ? `0 0 0 2px ${createTone(x.format)}` : 'var(--nm-sm)',
                 opacity: k === i ? 1 : 0.58,
                 transition: 'opacity .2s, box-shadow .2s',

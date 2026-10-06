@@ -35,6 +35,7 @@ const weoverse = (
   trendPct: 21,
   priceOs: 1900,
   priceUsd: 19.19,
+  validated: null,
   ...over,
 });
 

@@ -4,7 +4,16 @@ import { ME } from './community';
 type S = components['schemas'];
 
 const H = 36e5;
-const ago = (h: number) => new Date(Date.now() - h * H).toISOString();
+/**
+ * Hours ago, kept on the calendar day the rows are grouped by (local time): under a day stays
+ * today even just after midnight, a day and a bit is yesterday noon.
+ */
+const ago = (h: number) => {
+  const now = Date.now();
+  const today = new Date(now).setHours(0, 0, 0, 0);
+  const t = h < 24 ? Math.max(now - h * H, today) : h < 48 ? today - 12 * H : now - h * H;
+  return new Date(t).toISOString();
+};
 
 const row = (
   over: Partial<S['NotificationListRow']> &

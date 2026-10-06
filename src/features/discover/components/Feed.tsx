@@ -10,6 +10,7 @@ import { FEED_KIND, FEED_KINDS, type FeedKind } from '@/lib/feedKinds';
 import { osFmt } from '@/lib/format';
 import { openCollect } from '@/stores/flow';
 import { coverLine, URGENCY, type FeedItemModel } from '../model/feed';
+import { cssUrl } from '@/lib/cssUrl';
 
 /*
  * design: discover.jsx — FeedCover, FeedCard, FeedRow, FeedBoard (feed-cover.jsx / feed-view.jsx).
@@ -105,7 +106,7 @@ export function FeedCover({ items }: { items: FeedItemModel[] }) {
             position: 'absolute',
             inset: 0,
             zIndex: 0,
-            backgroundImage: `url('${p.img}')`,
+            backgroundImage: cssUrl(p.img),
             backgroundSize: 'cover',
             backgroundPosition: 'center 46%',
             opacity: i === at ? 1 : 0,

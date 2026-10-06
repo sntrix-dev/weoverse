@@ -53,6 +53,7 @@ import {
   type WorldId,
 } from '../model/sim';
 import type { WeoWorld } from '../three/world3d';
+import { cssUrl } from '@/lib/cssUrl';
 
 const ORDER = ['where', 'who', 'terms', 'forecast', 'share'] as const;
 type StepKey = (typeof ORDER)[number];
@@ -1666,7 +1667,7 @@ export function WorldStudio({ seed }: { seed: WorldSeed }) {
                       padding: 0,
                       cursor: 'pointer',
                       background: x.img
-                        ? `url('${x.img}') center/cover, var(--surface-2)`
+                        ? `${cssUrl(x.img)} center/cover, var(--surface-2)`
                         : formatHex(x.type),
                       boxShadow: weoId === x.id ? '0 0 0 2px var(--o-violet)' : 'var(--nm-sm)',
                       opacity: weoId === x.id ? 1 : 0.6,

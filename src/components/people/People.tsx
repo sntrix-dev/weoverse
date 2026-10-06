@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { ISRRing, OMark } from '@/design-system';
+import { cssUrl } from '@/lib/cssUrl';
 
 /** design: screens-network.jsx Spark — a filled sparkline ending in a dot. */
 export function Spark({ values, tone, h, w }: { values: number[]; tone: string; h?: number; w?: number }) {
@@ -62,7 +63,7 @@ export function PersonOi({
           inset: Math.round(S * 0.135),
           borderRadius: '50%',
           overflow: 'hidden',
-          background: p.avatar ? `url('${p.avatar}') center/cover, var(--surface)` : 'var(--surface)',
+          background: p.avatar ? `${cssUrl(p.avatar)} center/cover, var(--surface)` : 'var(--surface)',
           boxShadow: hot ? 'var(--nm-hero)' : 'inset 0 0 0 1px var(--border)',
           transition: 'box-shadow .32s var(--ease-settle)',
         }}
@@ -132,7 +133,7 @@ export function OAvatarOrb({
           height: d * 0.66,
           borderRadius: '50%',
           overflow: 'hidden',
-          background: src ? `url('${src}') center/cover, var(--surface-2)` : 'var(--surface-2)',
+          background: src ? `${cssUrl(src)} center/cover, var(--surface-2)` : 'var(--surface-2)',
           boxShadow: 'var(--nm-sm), inset 0 0 0 1px var(--border)',
         }}
       />

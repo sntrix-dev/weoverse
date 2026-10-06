@@ -230,6 +230,8 @@ export interface FlightItem {
   audience: string | null;
   /** the rehearsed price, when there is one */
   os: number | null;
+  /** live, and posted itself after twenty pledges — the validated mark (M12) */
+  validated: boolean;
 }
 
 const VET_STAGES = new Set(['rehearsed', 'reacting', 'reacted', 'pledging']);
@@ -257,6 +259,7 @@ export function flightItems(drafts: DraftDto[], mine: MyWeoDto[]): FlightItem[] 
       world: r?.world?.name ?? null,
       audience: v?.audience?.label ?? null,
       os: typeof r?.terms?.price === 'number' ? r.terms.price : null,
+      validated: false,
     };
   });
   const live: FlightItem[] = mine
@@ -276,6 +279,7 @@ export function flightItems(drafts: DraftDto[], mine: MyWeoDto[]): FlightItem[] 
       world: null,
       audience: null,
       os: null,
+      validated: w.validated === true,
     }));
   return [...d, ...live];
 }

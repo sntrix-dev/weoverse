@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { circleView } from '@/lib/circleModel';
 import { circleFixture } from '@/test/fixtures/discover';
 import {
@@ -11,6 +11,7 @@ import {
   threadFixture,
 } from '@/test/fixtures/community';
 import { flightItems, person, stewardModel, storyModel, threadDetail, threadModel } from '../model/community';
+import { nextAct, type FlightHandlers } from '../components/InFlight';
 
 describe('community models', () => {
   it('a person falls back from full name to handle to "A member"', () => {
@@ -72,5 +73,20 @@ describe('community models', () => {
       ['draft:d-1', 'draft', 'Untitled WeO'],
       ['weo-mine', 'live', 'Tide Pool'],
     ]);
+  });
+
+  it('in flight: a WeO that posted itself after twenty pledges carries the validated mark (G-75)', () => {
+    const [plain, vetted] = flightItems(
+      [],
+      [myWeosFixture[0]!, { ...myWeosFixture[0]!, id: 'v', validated: true }],
+    );
+    expect(plain!.validated).toBe(false);
+    expect(vetted!.validated).toBe(true);
+    const h = { onMarket: vi.fn() } as unknown as FlightHandlers;
+    expect(nextAct(vetted!, h)).toMatchObject({
+      note: 'Live · validated',
+      get: 'Validated mark · ahead on the floor',
+    });
+    expect(nextAct(plain!, h)).toMatchObject({ note: 'Live in Exchange', get: 'On the floor, earning' });
   });
 });

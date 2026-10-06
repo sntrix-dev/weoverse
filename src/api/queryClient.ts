@@ -1,5 +1,18 @@
-import { QueryClient } from '@tanstack/react-query';
+import { QueryCache, QueryClient } from '@tanstack/react-query';
+import { toast } from '@/stores/ui';
 import { ApiError } from './client';
+
+const BUSY_EVERY_MS = 20_000;
+let lastBusy = 0;
+
+/** A read still refused after its backoff (429): said once in a while, not per screen (M12). */
+function sayBusy(error: unknown) {
+  if (!(error instanceof ApiError) || error.status !== 429) return;
+  const now = Date.now();
+  if (now - lastBusy < BUSY_EVERY_MS) return;
+  lastBusy = now;
+  toast('A lot is happening at once — give it a moment and try again');
+}
 
 /**
  * Defaults tuned for the backend's global 70 req/min/IP limit: data stays fresh for
@@ -8,6 +21,7 @@ import { ApiError } from './client';
  */
 export function createQueryClient() {
   return new QueryClient({
+    queryCache: new QueryCache({ onError: sayBusy }),
     defaultOptions: {
       queries: {
         staleTime: 30_000,
