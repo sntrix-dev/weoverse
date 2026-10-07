@@ -75,7 +75,8 @@ export function useCircle(id: string | undefined) {
 export function useCircleMembers(id: string | undefined, limit = 24) {
   return useQuery({
     queryKey: qk.circles.members(id ?? '', limit),
-    queryFn: () => api.get<Paged<CircleMemberDto>>(`${C}/circles/${enc(id ?? '')}/members`, { query: { limit } }),
+    queryFn: () =>
+      api.get<Paged<CircleMemberDto>>(`${C}/circles/${enc(id ?? '')}/members`, { query: { limit } }),
     enabled: !!id,
     staleTime: 60_000,
   });
@@ -86,7 +87,9 @@ export function useCircleWeos(id: string | undefined) {
     queryKey: qk.circles.weos(id ?? ''),
     // every WeO the circle holds — its format, its category, what was posted in — the set its count counts
     queryFn: () =>
-      api.get<Paged<CircleWeoRow>>(`${C}/circles/${enc(id ?? '')}/weos`, { query: { limit: 24, scope: 'all' } }),
+      api.get<Paged<CircleWeoRow>>(`${C}/circles/${enc(id ?? '')}/weos`, {
+        query: { limit: 24, scope: 'all' },
+      }),
     enabled: !!id,
     staleTime: 60_000,
   });
@@ -184,7 +187,9 @@ function useThreadWrite<V, R>(threadId: string, fn: (v: V) => Promise<R>) {
 }
 
 export const usePostAnswer = (threadId: string) =>
-  useThreadWrite(threadId, (body: string) => api.post<AnswerDto>(`${C}/threads/${enc(threadId)}/answers`, { body }));
+  useThreadWrite(threadId, (body: string) =>
+    api.post<AnswerDto>(`${C}/threads/${enc(threadId)}/answers`, { body }),
+  );
 
 export const usePostReply = (threadId: string) =>
   useThreadWrite(threadId, ({ answerId, body }: { answerId: string; body: string }) =>
@@ -193,7 +198,9 @@ export const usePostReply = (threadId: string) =>
 
 export const useAccept = (threadId: string) =>
   useThreadWrite(threadId, (answerId: string) =>
-    api.post<{ accepted: boolean; threadStatus: 'open' | 'resolved' }>(`${C}/answers/${enc(answerId)}/accept`),
+    api.post<{ accepted: boolean; threadStatus: 'open' | 'resolved' }>(
+      `${C}/answers/${enc(answerId)}/accept`,
+    ),
   );
 
 /** ± vote, optimistic on the thread read; the server's `{ voteScore, userVote }` settles it. */
@@ -202,7 +209,11 @@ export function useVote(threadId: string) {
   const key = qk.community.thread(threadId);
   const patch = (answerId: string, f: (a: AnswerDto) => AnswerDto) => {
     const prev = qc.getQueryData<ThreadDetailDto>(key);
-    if (prev) qc.setQueryData<ThreadDetailDto>(key, { ...prev, answers: prev.answers.map((a) => (a.id === answerId ? f(a) : a)) });
+    if (prev)
+      qc.setQueryData<ThreadDetailDto>(key, {
+        ...prev,
+        answers: prev.answers.map((a) => (a.id === answerId ? f(a) : a)),
+      });
     return prev;
   };
   return useMutation({
@@ -210,7 +221,11 @@ export function useVote(threadId: string) {
       api.post<{ voteScore: number; userVote: -1 | 0 | 1 }>(`${C}/answers/${enc(answerId)}/vote`, { value }),
     onMutate: async ({ answerId, value }) => {
       await qc.cancelQueries({ queryKey: key });
-      const prev = patch(answerId, (a) => ({ ...a, userVote: value, voteScore: a.voteScore - a.userVote + value }));
+      const prev = patch(answerId, (a) => ({
+        ...a,
+        userVote: value,
+        voteScore: a.voteScore - a.userVote + value,
+      }));
       return { prev };
     },
     onError: (_e, _v, ctx) => {
@@ -222,8 +237,13 @@ export function useVote(threadId: string) {
 
 export function useReport() {
   return useMutation({
-    mutationFn: (body: { threadId?: string; answerId?: string; weoId?: string; reportType: ReportType; description?: string }) =>
-      api.post<unknown>('/frontend/report', body),
+    mutationFn: (body: {
+      threadId?: string;
+      answerId?: string;
+      weoId?: string;
+      reportType: ReportType;
+      description?: string;
+    }) => api.post<unknown>('/frontend/report', body),
   });
 }
 
@@ -232,7 +252,10 @@ export function useReport() {
 export function useStories() {
   return useQuery({
     queryKey: qk.community.stories(),
-    queryFn: () => api.get<{ items: StoryDto[]; nextBefore: string | null; total: number }>(`${C}/stories`, { query: { limit: 24 } }),
+    queryFn: () =>
+      api.get<{ items: StoryDto[]; nextBefore: string | null; total: number }>(`${C}/stories`, {
+        query: { limit: 24 },
+      }),
     staleTime: 5 * 60_000,
   });
 }
@@ -262,7 +285,12 @@ export function useFollow() {
   const qc = useQueryClient();
   const flip = (userId: string, on: boolean) =>
     qc.setQueriesData<S['CommunityContributors']>({ queryKey: ['community', 'contributors'] }, (d) =>
-      d ? { ...d, contributors: d.contributors.map((c) => (c.userId === userId ? { ...c, isFollowing: on } : c)) } : d,
+      d
+        ? {
+            ...d,
+            contributors: d.contributors.map((c) => (c.userId === userId ? { ...c, isFollowing: on } : c)),
+          }
+        : d,
     );
   return useMutation({
     mutationFn: ({ userId, follow }: { userId: string; follow: boolean }) =>
@@ -280,7 +308,8 @@ export function useFollow() {
 export function useMyWeos() {
   return useQuery({
     queryKey: qk.community.myWeos(),
-    queryFn: () => api.get<{ items: MyWeoDto[]; nextBefore: string | null }>(`${C}/my-weos`, { query: { limit: 50 } }),
+    queryFn: () =>
+      api.get<{ items: MyWeoDto[]; nextBefore: string | null }>(`${C}/my-weos`, { query: { limit: 50 } }),
     staleTime: 60_000,
   });
 }

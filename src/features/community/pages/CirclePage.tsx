@@ -73,7 +73,9 @@ export function CirclePage() {
     [compact(c.weos), 'WeOs'],
     [compact(c.threads), 'discussions'],
     [String(c.desire), 'desire index'],
-    ...(c.winRate != null ? ([[`${Math.round(c.winRate * 100)}%`, `${c.bestType} win rate`]] as [string, string][]) : []),
+    ...(c.winRate != null
+      ? ([[`${Math.round(c.winRate * 100)}%`, `${c.bestType} win rate`]] as [string, string][])
+      : []),
   ];
   const byType = c.axis === 'By WeO type';
 
@@ -145,18 +147,38 @@ export function CirclePage() {
             </p>
             <CircleChip c={c} />
           </div>
-          <h1 style={{ margin: '7px 0 0', fontSize: 'clamp(24px,3vw,33px)', fontWeight: 700, letterSpacing: '-.03em', color: 'var(--text)' }}>
+          <h1
+            style={{
+              margin: '7px 0 0',
+              fontSize: 'clamp(24px,3vw,33px)',
+              fontWeight: 700,
+              letterSpacing: '-.03em',
+              color: 'var(--text)',
+            }}
+          >
             {c.name}
           </h1>
           <div style={{ marginTop: 7, maxWidth: '54ch' }}>
-            <Clamp lines={2} tone="var(--o-violet)" style={{ fontSize: 14, lineHeight: 1.5, color: 'var(--text-dim)' }}>
+            <Clamp
+              lines={2}
+              tone="var(--o-violet)"
+              style={{ fontSize: 14, lineHeight: 1.5, color: 'var(--text-dim)' }}
+            >
               {c.description}
             </Clamp>
           </div>
           {/* what the old About tab said, in the panel it belongs to */}
-          <p style={{ margin: '9px 0 0', maxWidth: '56ch', fontSize: 12.5, lineHeight: 1.55, color: 'var(--text-faint)' }}>
-            Membership is earned by action — post a WeO of this {byType ? 'type' : 'category'} and you are in. In the last 7
-            days{' '}
+          <p
+            style={{
+              margin: '9px 0 0',
+              maxWidth: '56ch',
+              fontSize: 12.5,
+              lineHeight: 1.55,
+              color: 'var(--text-faint)',
+            }}
+          >
+            Membership is earned by action — post a WeO of this {byType ? 'type' : 'category'} and you are in.
+            In the last 7 days{' '}
             {c.winRate != null
               ? `${c.bestType} WeOs cleared ${Math.round(c.winRate * 100)}% collect-through here, and `
               : ''}
@@ -177,12 +199,17 @@ export function CirclePage() {
                   background: `color-mix(in srgb, ${c.toneHex} 9%, var(--surface))`,
                 }}
               >
-                <span style={{ fontWeight: 700, color: 'var(--text)', fontVariantNumeric: 'tabular-nums' }}>{v}</span> {l}
+                <span style={{ fontWeight: 700, color: 'var(--text)', fontVariantNumeric: 'tabular-nums' }}>
+                  {v}
+                </span>{' '}
+                {l}
               </span>
             ))}
           </div>
         </div>
-        <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', gap: 9, flex: '0 0 auto' }}>
+        <div
+          style={{ position: 'relative', display: 'flex', flexDirection: 'column', gap: 9, flex: '0 0 auto' }}
+        >
           <Button variant="primary" tone="green" selected={c.joined} onClick={() => act.toggleJoin(c)}>
             {c.joined ? '✓ Joined' : 'Join circle'}
           </Button>
@@ -224,13 +251,24 @@ export function CirclePage() {
                     gap: 12,
                     cursor: 'pointer',
                     padding: 16,
-                    background: accent ? `color-mix(in srgb, ${accent} 7%, var(--surface))` : 'var(--surface)',
+                    background: accent
+                      ? `color-mix(in srgb, ${accent} 7%, var(--surface))`
+                      : 'var(--surface)',
                     borderLeft: accent ? `3px solid ${accent}` : 'none',
                   }}
                 >
                   <Avatar src={p.avatar} isr={p.isr} size={40} />
                   <div style={{ minWidth: 0, flex: 1 }}>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 8, fontSize: 11, color: 'var(--text-dim)' }}>
+                    <div
+                      style={{
+                        display: 'flex',
+                        flexWrap: 'wrap',
+                        alignItems: 'center',
+                        gap: 8,
+                        fontSize: 11,
+                        color: 'var(--text-dim)',
+                      }}
+                    >
                       <span style={{ fontWeight: 700, color: 'var(--text)' }}>{p.name}</span>
                       <span>· {t.createdAt ? relTime(t.createdAt) : 'just now'}</span>
                       {t.pinned && (
@@ -262,7 +300,15 @@ export function CirclePage() {
                         </span>
                       )}
                     </div>
-                    <h3 style={{ margin: '6px 0 0', fontSize: 16, fontWeight: 700, letterSpacing: '-.01em', color: 'var(--text)' }}>
+                    <h3
+                      style={{
+                        margin: '6px 0 0',
+                        fontSize: 16,
+                        fontWeight: 700,
+                        letterSpacing: '-.01em',
+                        color: 'var(--text)',
+                      }}
+                    >
                       {t.title}
                     </h3>
                     <p
@@ -295,7 +341,9 @@ export function CirclePage() {
                     }}
                   >
                     {svg(<polyline points="18 15 12 9 6 15" />, 16, 'currentColor', 2)}
-                    <span style={{ fontSize: 14, fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>{t.votes}</span>
+                    <span style={{ fontSize: 14, fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>
+                      {t.votes}
+                    </span>
                   </div>
                 </div>
               );
@@ -339,7 +387,14 @@ export function CirclePage() {
       )}
 
       {tab === 'members' && (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(170px,1fr))', gap: 16, marginTop: 22 }}>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fill,minmax(170px,1fr))',
+            gap: 16,
+            marginTop: 22,
+          }}
+        >
           {members.map((m) => (
             <button
               key={m.id}
@@ -359,7 +414,10 @@ export function CirclePage() {
               <Avatar src={m.avatar} isr={m.isr} size={64} />
               <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--text)' }}>{m.name}</span>
               <span style={{ fontSize: 11, color: 'var(--text-dim)' }}>
-                ISR <span style={{ fontWeight: 700, color: 'var(--text)', fontVariantNumeric: 'tabular-nums' }}>{m.isr}</span>
+                ISR{' '}
+                <span style={{ fontWeight: 700, color: 'var(--text)', fontVariantNumeric: 'tabular-nums' }}>
+                  {m.isr}
+                </span>
               </span>
             </button>
           ))}
@@ -383,11 +441,13 @@ export function CirclePage() {
               w={w}
               h={wh.h}
               width={220}
-             
+
               onEngage={() => wh.engage(w)}
             />
           ))}
-          {weos.length === 0 && <p style={{ ...quiet, gridColumn: '1/-1' }}>No WeOs have been pushed to this Circle yet.</p>}
+          {weos.length === 0 && (
+            <p style={{ ...quiet, gridColumn: '1/-1' }}>No WeOs have been pushed to this Circle yet.</p>
+          )}
         </div>
       )}
     </main>

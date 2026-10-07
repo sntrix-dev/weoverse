@@ -15,7 +15,9 @@ import { nextAct, type FlightHandlers } from '../components/InFlight';
 
 describe('community models', () => {
   it('a person falls back from full name to handle to "A member"', () => {
-    expect(person({ id: 'x', fullName: ' ', creatorName: 'ada', profileImage: null, isr: 140 })).toMatchObject({
+    expect(
+      person({ id: 'x', fullName: ' ', creatorName: 'ada', profileImage: null, isr: 140 }),
+    ).toMatchObject({
       name: 'ada',
       handle: '@ada',
       isr: 100,
@@ -26,7 +28,9 @@ describe('community models', () => {
   it('a thread row: replies are answers and their replies; an accepted answer is the "Top answer"', () => {
     const t = threadModel(threadFixture({ acceptedAnswerId: 'a-1', status: 'resolved' }));
     expect(t).toMatchObject({ replies: 3, resolved: true, pick: true, votes: 5, weo: null });
-    const withWeo = threadModel(threadFixture({ attachedWeoId: 'w', attachedWeoFace: { id: 'w', title: 'Tide', cover: null } }));
+    const withWeo = threadModel(
+      threadFixture({ attachedWeoId: 'w', attachedWeoFace: { id: 'w', title: 'Tide', cover: null } }),
+    );
     expect(withWeo.weo).toEqual({ name: 'Tide', img: null });
   });
 
@@ -40,7 +44,13 @@ describe('community models', () => {
 
   it('a circle: win rate is measured or absent, tags are what the room uses', () => {
     const c = circleView(circleDetailFixture());
-    expect(c).toMatchObject({ winRate: 0.4, tags: ['pricing', 'editions'], resolved: 0.62, active: 4, desire: 62 });
+    expect(c).toMatchObject({
+      winRate: 0.4,
+      tags: ['pricing', 'editions'],
+      resolved: 0.62,
+      active: 4,
+      desire: 62,
+    });
     expect(circleView(circleDetailFixture({ collectThrough7d: null, trendingTags: [] }))).toMatchObject({
       winRate: null,
       tags: ['editions'],

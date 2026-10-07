@@ -23,7 +23,14 @@ const surface: CSSProperties = {
   boxShadow: 'var(--nm-raised), inset 0 0 0 1px var(--border)',
 };
 const h2: CSSProperties = { fontSize: 18, fontWeight: 700, color: 'var(--text)' };
-const bare: CSSProperties = { border: 'none', background: 'transparent', cursor: 'pointer', padding: 0, font: 'inherit', textAlign: 'left' };
+const bare: CSSProperties = {
+  border: 'none',
+  background: 'transparent',
+  cursor: 'pointer',
+  padding: 0,
+  font: 'inherit',
+  textAlign: 'left',
+};
 
 /** design: circles.jsx ManageScreen — your circles (mute, leave) and the open ones (join). */
 export function ManagePage() {
@@ -34,7 +41,10 @@ export function ManagePage() {
   const { mine, other } = useMemo(() => {
     const j = (q.data?.joined ?? []).map(circleView);
     const ids = new Set(j.map((c) => c.id));
-    return { mine: j, other: (q.data?.suggested ?? []).filter((c) => !ids.has(c.id) && !c.isJoined).map(circleView) };
+    return {
+      mine: j,
+      other: (q.data?.suggested ?? []).filter((c) => !ids.has(c.id) && !c.isJoined).map(circleView),
+    };
   }, [q.data]);
   const go = (id: string) => void navigate(routes.circle(id));
 
@@ -51,17 +61,35 @@ export function ManagePage() {
         label="Your circles"
         rule={false}
       />
-      <h1 style={{ margin: '10px 0 0', fontSize: 'clamp(26px,3.4vw,36px)', fontWeight: 700, letterSpacing: '-.035em', color: 'var(--text)' }}>
+      <h1
+        style={{
+          margin: '10px 0 0',
+          fontSize: 'clamp(26px,3.4vw,36px)',
+          fontWeight: 700,
+          letterSpacing: '-.035em',
+          color: 'var(--text)',
+        }}
+      >
         Manage your Circles
       </h1>
       <h2 style={{ ...h2, margin: '30px 0 14px' }}>Your Circles</h2>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
         {mine.map((c) => (
-          <div key={c.id} style={{ ...surface, display: 'flex', alignItems: 'center', gap: 16, padding: '14px 16px' }}>
+          <div
+            key={c.id}
+            style={{ ...surface, display: 'flex', alignItems: 'center', gap: 16, padding: '14px 16px' }}
+          >
             <CircleOi c={c} size={72} />
             <button onClick={() => go(c.id)} style={{ ...bare, flex: 1, minWidth: 0 }}>
               <h3 style={{ margin: 0, fontSize: 15, fontWeight: 700, color: 'var(--text)' }}>{c.name}</h3>
-              <p style={{ margin: '3px 0 0', fontSize: 11.5, color: 'var(--text-dim)', fontVariantNumeric: 'tabular-nums' }}>
+              <p
+                style={{
+                  margin: '3px 0 0',
+                  fontSize: 11.5,
+                  color: 'var(--text-dim)',
+                  fontVariantNumeric: 'tabular-nums',
+                }}
+              >
                 {compact(c.members)} members · {compact(c.weos)} WeOs · {compact(c.threads)} discussions
               </p>
               <span style={{ display: 'inline-flex', marginTop: 8 }}>
@@ -90,14 +118,30 @@ export function ManagePage() {
         )}
       </div>
       <h2 style={{ ...h2, margin: '32px 0 14px' }}>Open Circles</h2>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(min(100%,280px),1fr))', gap: 16 }}>
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fill,minmax(min(100%,280px),1fr))',
+          gap: 16,
+        }}
+      >
         {other.map((c) => (
           <div key={c.id} style={{ ...surface, padding: 16 }}>
-            <button onClick={() => go(c.id)} style={{ ...bare, display: 'flex', alignItems: 'center', gap: 12, width: '100%' }}>
+            <button
+              onClick={() => go(c.id)}
+              style={{ ...bare, display: 'flex', alignItems: 'center', gap: 12, width: '100%' }}
+            >
               <CircleOi c={c} size={64} />
               <span style={{ minWidth: 0 }}>
                 <h3 style={{ margin: 0, fontSize: 15, fontWeight: 700, color: 'var(--text)' }}>{c.name}</h3>
-                <p style={{ margin: '3px 0 0', fontSize: 11, color: 'var(--text-dim)', fontVariantNumeric: 'tabular-nums' }}>
+                <p
+                  style={{
+                    margin: '3px 0 0',
+                    fontSize: 11,
+                    color: 'var(--text-dim)',
+                    fontVariantNumeric: 'tabular-nums',
+                  }}
+                >
                   {compact(c.members)} members · desire {c.desire}
                 </p>
                 <span style={{ display: 'inline-flex', marginTop: 7 }}>

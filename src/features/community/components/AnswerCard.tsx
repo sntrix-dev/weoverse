@@ -17,7 +17,14 @@ const vbtn = (on: boolean, color: string): CSSProperties => ({
 });
 
 const star = (filled: boolean) => (
-  <svg width="13" height="13" viewBox="0 0 24 24" fill={filled ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="1.6">
+  <svg
+    width="13"
+    height="13"
+    viewBox="0 0 24 24"
+    fill={filled ? 'currentColor' : 'none'}
+    stroke="currentColor"
+    strokeWidth="1.6"
+  >
     <path d="M12 2l2.9 6.3 6.9.6-5.2 4.6 1.6 6.8L12 17.3 5.8 20.9l1.6-6.8L2.2 8.9l6.9-.6z" />
   </svg>
 );
@@ -64,11 +71,22 @@ export function AnswerCard({
         borderLeft: a.accepted ? '3px solid var(--o-gold)' : 'none',
       }}
     >
-      <div style={{ flex: '0 0 auto', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3 }}>
-        <button onClick={() => onVote(1)} aria-label="Upvote" aria-pressed={a.vote === 1} style={vbtn(a.vote === 1, 'var(--o-green)')}>
+      <div
+        style={{ flex: '0 0 auto', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3 }}
+      >
+        <button
+          onClick={() => onVote(1)}
+          aria-label="Upvote"
+          aria-pressed={a.vote === 1}
+          style={vbtn(a.vote === 1, 'var(--o-green)')}
+        >
           {svg(<polyline points="18 15 12 9 6 15" />, 18, 'currentColor', 2)}
         </button>
-        <span style={{ fontSize: 15, fontWeight: 700, color: 'var(--text)', fontVariantNumeric: 'tabular-nums' }}>{a.score}</span>
+        <span
+          style={{ fontSize: 15, fontWeight: 700, color: 'var(--text)', fontVariantNumeric: 'tabular-nums' }}
+        >
+          {a.score}
+        </span>
         <button
           onClick={() => onVote(-1)}
           aria-label="Downvote"
@@ -82,7 +100,9 @@ export function AnswerCard({
         <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 8 }}>
           <Avatar src={p.avatar} isr={p.isr} size={38} />
           <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--text)' }}>{name}</span>
-          <span style={{ fontSize: 11, color: 'var(--text-faint)' }}>· {a.createdAt ? relTime(a.createdAt) : 'just now'}</span>
+          <span style={{ fontSize: 11, color: 'var(--text-faint)' }}>
+            · {a.createdAt ? relTime(a.createdAt) : 'just now'}
+          </span>
           {(canAccept || a.accepted) && (
             <button
               onClick={canAccept ? onAccept : undefined}
@@ -112,8 +132,28 @@ export function AnswerCard({
             </button>
           )}
         </div>
-        <p style={{ margin: '10px 0 0', fontSize: 14.5, lineHeight: 1.6, color: 'var(--text)', whiteSpace: 'pre-line' }}>{a.body}</p>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginTop: 10, fontSize: 11.5, fontWeight: 600, color: 'var(--text-dim)' }}>
+        <p
+          style={{
+            margin: '10px 0 0',
+            fontSize: 14.5,
+            lineHeight: 1.6,
+            color: 'var(--text)',
+            whiteSpace: 'pre-line',
+          }}
+        >
+          {a.body}
+        </p>
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 16,
+            marginTop: 10,
+            fontSize: 11.5,
+            fontWeight: 600,
+            color: 'var(--text-dim)',
+          }}
+        >
           <button
             onClick={onToggleReply}
             style={{
@@ -149,12 +189,16 @@ export function AnswerCard({
               <div key={r.id} style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
                 <Avatar src={r.author.avatar} isr={r.author.isr} size={26} />
                 <div style={{ minWidth: 0, flex: 1 }}>
-                  <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--text)' }}>{r.mine ? 'You' : r.author.name}</span>
+                  <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--text)' }}>
+                    {r.mine ? 'You' : r.author.name}
+                  </span>
                   <span style={{ marginLeft: 6, fontSize: 11, color: 'var(--text-faint)' }}>
                     {r.createdAt ? relTime(r.createdAt) : 'just now'}
                   </span>
                   <p style={{ margin: '2px 0 0', fontSize: 13.5, lineHeight: 1.5, color: 'var(--text)' }}>
-                    {r.mention && <span style={{ fontWeight: 700, color: 'var(--o-violet)' }}>{r.mention} </span>}
+                    {r.mention && (
+                      <span style={{ fontWeight: 700, color: 'var(--o-violet)' }}>{r.mention} </span>
+                    )}
                     {r.body}
                   </p>
                 </div>
@@ -163,7 +207,15 @@ export function AnswerCard({
           </div>
         )}
         {composing && (
-          <div style={{ marginTop: 12, borderRadius: 16, padding: 12, background: 'var(--surface)', boxShadow: 'var(--nm-inset)' }}>
+          <div
+            style={{
+              marginTop: 12,
+              borderRadius: 16,
+              padding: 12,
+              background: 'var(--surface)',
+              boxShadow: 'var(--nm-inset)',
+            }}
+          >
             <textarea
               value={replyText}
               onChange={(e) => onReplyText(e.target.value)}

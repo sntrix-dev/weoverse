@@ -23,17 +23,16 @@ import {
   walletFixture,
 } from '../fixtures/community';
 import { categoriesFixture, pegFixture, templatesFixture } from '../fixtures/create';
-import {
-  briefOffersFixture,
-  briefsFixture,
-  creatorViewFixture,
-  trackingFixture,
-} from '../fixtures/people';
+import { briefOffersFixture, briefsFixture, creatorViewFixture, trackingFixture } from '../fixtures/people';
 import { companyFixture } from '../fixtures/company';
 import { notificationsFixture } from '../fixtures/notifications';
 import { fullDraft, vettingCard } from '../fixtures/worlds';
 import { fullWalletFixture, graphFixture, passportFixture, settingsFixture } from '../fixtures/identity';
-import { collectionsSnapshotFixture, listingsSnapshotFixture, resellQuoteFixture } from '../fixtures/holdings';
+import {
+  collectionsSnapshotFixture,
+  listingsSnapshotFixture,
+  resellQuoteFixture,
+} from '../fixtures/holdings';
 
 /** Wraps data in the backend envelope (weo-3.0 ResponseHandler.success). */
 export const ok = <T>(data: T, message = 'OK') => HttpResponse.json({ success: true, message, data });
@@ -71,7 +70,9 @@ export const handlers = [
     return ok(quoteFor(w, { amount: n('amount'), bundle: n('bundle') }));
   }),
   // M05 reads — the community and the wallet row
-  http.get(url('/frontend/community/circles/:id'), ({ params }) => ok(circleDetailFixture({ id: String(params.id) }))),
+  http.get(url('/frontend/community/circles/:id'), ({ params }) =>
+    ok(circleDetailFixture({ id: String(params.id) })),
+  ),
   http.get(url('/frontend/community/circles/:id/members'), () =>
     ok({ items: membersFixture, pagination: { total: 2, page: 1, limit: 24, totalPages: 1 } }),
   ),
@@ -80,13 +81,19 @@ export const handlers = [
     return ok({ items, pagination: { total: items.length, page: 1, limit: 24, totalPages: 1 } });
   }),
   http.get(url('/frontend/community/discussions'), () => ok({ items: [threadFixture()], nextBefore: null })),
-  http.get(url('/frontend/community/threads/:id'), ({ params }) => ok(threadDetailFixture({ id: String(params.id) }))),
-  http.get(url('/frontend/community/stories'), () => ok({ items: storiesFixture, nextBefore: null, total: 2 })),
+  http.get(url('/frontend/community/threads/:id'), ({ params }) =>
+    ok(threadDetailFixture({ id: String(params.id) })),
+  ),
+  http.get(url('/frontend/community/stories'), () =>
+    ok({ items: storiesFixture, nextBefore: null, total: 2 }),
+  ),
   http.get(url('/frontend/community/snapshot/contributors'), () => ok(contributorsFixture)),
   http.get(url('/frontend/community/snapshot/pulse'), () => ok(pulseFixture)),
   http.get(url('/frontend/community/my-weos'), () => ok({ items: myWeosFixture, nextBefore: null })),
   http.get(url('/frontend/me/drafts'), () => ok({ items: draftsFixture, total: 1 })),
-  http.get(url('/frontend/me/collections'), () => ok({ items: [], pagination: { total: 0, page: 1, limit: 3, totalPages: 0 } })),
+  http.get(url('/frontend/me/collections'), () =>
+    ok({ items: [], pagination: { total: 0, page: 1, limit: 3, totalPages: 0 } }),
+  ),
   http.get(url('/frontend/wallet/overview'), () => ok({ ...fullWalletFixture(), ...walletFixture })),
   // M10 notifications & company
   http.get(url('/frontend/notifications'), () => ok(notificationsFixture())),
@@ -98,7 +105,9 @@ export const handlers = [
   // M06 reads — Collect and Exchange
   http.get(url('/frontend/me/collections/snapshot'), () => ok(collectionsSnapshotFixture())),
   http.get(url('/frontend/me/listings/snapshot'), () => ok(listingsSnapshotFixture())),
-  http.get(url('/frontend/weos/:id/resell/quote'), ({ params }) => ok(resellQuoteFixture({ weoId: String(params.id) }))),
+  http.get(url('/frontend/weos/:id/resell/quote'), ({ params }) =>
+    ok(resellQuoteFixture({ weoId: String(params.id) })),
+  ),
   http.get(url('/frontend/weos/:id'), ({ params }) => {
     const w = liveWeos().find((x) => x._id === params.id);
     return w ? ok(w) : fail(404, 'WeO not found');
@@ -138,12 +147,19 @@ export const handlers = [
       {
         success: true,
         message: 'Uploaded',
-        data: { url: `https://cdn.test/weoverse/app/u/weos/2026/10/up.${type.split('/')[1] ?? 'bin'}`, type: type.startsWith('video/') ? 'video' : 'image', size: 9, contentType: type },
+        data: {
+          url: `https://cdn.test/weoverse/app/u/weos/2026/10/up.${type.split('/')[1] ?? 'bin'}`,
+          type: type.startsWith('video/') ? 'video' : 'image',
+          size: 9,
+          contentType: type,
+        },
       },
       { status: 201 },
     );
   }),
-  http.post(url('/frontend/ai/describe'), () => ok({ lines: ['Sixty prints, each signed and numbered by hand.', 'One of sixty — yours, signed.'] })),
+  http.post(url('/frontend/ai/describe'), () =>
+    ok({ lines: ['Sixty prints, each signed and numbered by hand.', 'One of sixty — yours, signed.'] }),
+  ),
   http.post(url('/frontend/weos'), () => ok({ _id: 'weo-new', title: 'Posted' }, 'WeO created successfully')),
   http.put(url('/frontend/weos/:id'), ({ params }) => ok({ _id: String(params.id) })),
   http.post(url('/frontend/request-weos'), () => ok({ _id: 'rq-new' })),
@@ -152,25 +168,59 @@ export const handlers = [
   // M11: worlds and the way to live
   http.get(url('/frontend/me/drafts/:id'), ({ params }) => ok(fullDraft(String(params.id)))),
   http.post(url('/frontend/me/drafts/:id/rehearsal'), ({ params }) =>
-    ok({ id: String(params.id), stage: 'rehearsed', reactions: { count: 0, need: 12 }, pledges: { count: 0, threshold: 20, promisedOs: 0 } }),
+    ok({
+      id: String(params.id),
+      stage: 'rehearsed',
+      reactions: { count: 0, need: 12 },
+      pledges: { count: 0, threshold: 20, promisedOs: 0 },
+    }),
   ),
   http.post(url('/frontend/me/drafts/:id/open-reactions'), ({ params }) =>
-    ok({ id: String(params.id), stage: 'reacting', reactions: { count: 0, need: 12 }, pledges: { count: 0, threshold: 20, promisedOs: 0 }, notified: 3 }),
+    ok({
+      id: String(params.id),
+      stage: 'reacting',
+      reactions: { count: 0, need: 12 },
+      pledges: { count: 0, threshold: 20, promisedOs: 0 },
+      notified: 3,
+    }),
   ),
   http.post(url('/frontend/me/drafts/:id/open-pledges'), ({ params }) =>
-    ok({ id: String(params.id), stage: 'pledging', reactions: { count: 12, need: 12 }, pledges: { count: 0, threshold: 20, promisedOs: 0 } }),
+    ok({
+      id: String(params.id),
+      stage: 'pledging',
+      reactions: { count: 12, need: 12 },
+      pledges: { count: 0, threshold: 20, promisedOs: 0 },
+    }),
   ),
   http.get(url('/frontend/vetting'), () => ok({ items: [], total: 0 })),
   http.get(url('/frontend/vetting/:id'), ({ params }) => ok(vettingCard({ id: String(params.id) }))),
   http.post(url('/frontend/vetting/:id/reactions'), ({ params }) =>
-    ok(vettingCard({ id: String(params.id), mine: { isOwner: false, reaction: { os: null, note: '' }, pledge: null } })),
+    ok(
+      vettingCard({
+        id: String(params.id),
+        mine: { isOwner: false, reaction: { os: null, note: '' }, pledge: null },
+      }),
+    ),
   ),
   http.post(url('/frontend/vetting/:id/pledges'), ({ params }) =>
-    ok(vettingCard({ id: String(params.id), stage: 'pledging', mine: { isOwner: false, reaction: null, pledge: { os: 1200 } } })),
+    ok(
+      vettingCard({
+        id: String(params.id),
+        stage: 'pledging',
+        mine: { isOwner: false, reaction: null, pledge: { os: 1200 } },
+      }),
+    ),
   ),
-  http.delete(url('/frontend/vetting/:id/pledges'), ({ params }) => ok(vettingCard({ id: String(params.id), stage: 'pledging' }))),
+  http.delete(url('/frontend/vetting/:id/pledges'), ({ params }) =>
+    ok(vettingCard({ id: String(params.id), stage: 'pledging' })),
+  ),
   http.post(url('/frontend/weos/:id/rehearsals'), ({ params }) =>
-    ok({ _id: 'r-1', weoId: String(params.id), receiptId: 'WEO-SIM-1A2B-7Q', settledAt: '2026-09-28T10:00:00.000Z' }),
+    ok({
+      _id: 'r-1',
+      weoId: String(params.id),
+      receiptId: 'WEO-SIM-1A2B-7Q',
+      settledAt: '2026-09-28T10:00:00.000Z',
+    }),
   ),
   http.delete(url('/frontend/me/drafts/:id'), () => ok(null)),
   http.post(url('/frontend/community/push'), () => ok({ id: 't-push' })),

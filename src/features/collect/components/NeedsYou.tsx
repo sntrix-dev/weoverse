@@ -30,7 +30,13 @@ export function NeedsYou({
         title={`${items.length} thing${items.length === 1 ? '' : 's'} waiting on you`}
         note="Confirming tells the creator it reached you"
       />
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(min(100%,340px),1fr))', gap: 12 }}>
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fill,minmax(min(100%,340px),1fr))',
+          gap: 12,
+        }}
+      >
         {items.map((t, i) => (
           <div
             key={t.h.id}
@@ -60,7 +66,9 @@ export function NeedsYou({
                 >
                   {t.headline}
                 </h3>
-                <p style={{ margin: '3px 0 0', fontSize: 12, lineHeight: 1.45, color: 'var(--text-dim)' }}>{t.sub}</p>
+                <p style={{ margin: '3px 0 0', fontSize: 12, lineHeight: 1.45, color: 'var(--text-dim)' }}>
+                  {t.sub}
+                </p>
               </div>
             </div>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>

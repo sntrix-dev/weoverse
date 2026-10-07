@@ -11,7 +11,15 @@ export interface RailRow {
 /** design: exchange.jsx (from snapshot.jsx) SnapshotRail — the snapshot's right rail: same well, one readout per row. */
 export function SnapshotRail({ title, rows, empty }: { title: string; rows: RailRow[]; empty?: string }) {
   return (
-    <div style={{ borderRadius: 24, padding: 18, background: 'var(--surface-2)', boxShadow: 'var(--nm-inset)', minWidth: 0 }}>
+    <div
+      style={{
+        borderRadius: 24,
+        padding: 18,
+        background: 'var(--surface-2)',
+        boxShadow: 'var(--nm-inset)',
+        minWidth: 0,
+      }}
+    >
       <p
         style={{
           margin: 0,
@@ -29,10 +37,30 @@ export function SnapshotRail({ title, rows, empty }: { title: string; rows: Rail
         {rows.map((r, i) => (
           <div key={`${r.k}-${i}`}>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
-              <span style={{ fontSize: 12.5, fontWeight: 600, color: 'var(--text)', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              <span
+                style={{
+                  fontSize: 12.5,
+                  fontWeight: 600,
+                  color: 'var(--text)',
+                  minWidth: 0,
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                }}
+              >
                 {r.k}
               </span>
-              <span style={{ marginLeft: 'auto', fontSize: 11, fontWeight: 700, color: r.tone, whiteSpace: 'nowrap' }}>{r.note}</span>
+              <span
+                style={{
+                  marginLeft: 'auto',
+                  fontSize: 11,
+                  fontWeight: 700,
+                  color: r.tone,
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {r.note}
+              </span>
               {r.onAct ? (
                 <button
                   type="button"
@@ -68,13 +96,31 @@ export function SnapshotRail({ title, rows, empty }: { title: string; rows: Rail
               )}
             </div>
             {r.rate != null && (
-              <div style={{ marginTop: 5, height: 6, borderRadius: 999, background: 'var(--surface)', boxShadow: 'var(--nm-inset)', overflow: 'hidden' }}>
-                <div style={{ width: `${Math.round(r.rate * 100)}%`, height: '100%', borderRadius: 999, background: r.tone }} />
+              <div
+                style={{
+                  marginTop: 5,
+                  height: 6,
+                  borderRadius: 999,
+                  background: 'var(--surface)',
+                  boxShadow: 'var(--nm-inset)',
+                  overflow: 'hidden',
+                }}
+              >
+                <div
+                  style={{
+                    width: `${Math.round(r.rate * 100)}%`,
+                    height: '100%',
+                    borderRadius: 999,
+                    background: r.tone,
+                  }}
+                />
               </div>
             )}
           </div>
         ))}
-        {!rows.length && empty && <p style={{ margin: 0, fontSize: 12, color: 'var(--text-dim)' }}>{empty}</p>}
+        {!rows.length && empty && (
+          <p style={{ margin: 0, fontSize: 12, color: 'var(--text-dim)' }}>{empty}</p>
+        )}
       </div>
     </div>
   );

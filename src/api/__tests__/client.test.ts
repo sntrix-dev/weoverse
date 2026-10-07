@@ -141,7 +141,9 @@ describe('api client', () => {
     });
     server.use(
       http.get(url('/frontend/me'), ({ request }) =>
-        request.headers.get('authorization') === 'Bearer fresh' ? ok('me') : new HttpResponse('No token', { status: 401 }),
+        request.headers.get('authorization') === 'Bearer fresh'
+          ? ok('me')
+          : new HttpResponse('No token', { status: 401 }),
       ),
       http.post(url('/frontend/auth/new_access_token'), async ({ request }) => {
         const { refresh_token } = (await request.json()) as { refresh_token: string };
@@ -165,7 +167,9 @@ describe('api client', () => {
     const spent: string[] = [];
     server.use(
       http.get(url('/frontend/me'), ({ request }) =>
-        request.headers.get('authorization') === 'Bearer fresh' ? ok('me') : new HttpResponse('No token', { status: 401 }),
+        request.headers.get('authorization') === 'Bearer fresh'
+          ? ok('me')
+          : new HttpResponse('No token', { status: 401 }),
       ),
       http.post(url('/frontend/auth/new_access_token'), async ({ request }) => {
         const { refresh_token } = (await request.json()) as { refresh_token: string };

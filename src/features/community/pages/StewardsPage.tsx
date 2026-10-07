@@ -63,19 +63,55 @@ export function StewardsPage() {
       >
         The creators who keep Circles calm
       </h1>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(150px,1fr))', gap: 14, marginTop: 26 }}>
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit,minmax(150px,1fr))',
+          gap: 14,
+          marginTop: 26,
+        }}
+      >
         {stats.map(([v, l]) => (
-          <div key={l} style={{ borderRadius: 20, padding: 18, textAlign: 'center', background: 'var(--surface)', boxShadow: 'var(--nm-sm)' }}>
-            <p style={{ margin: 0, fontSize: 26, fontWeight: 700, color: 'var(--text)', fontVariantNumeric: 'tabular-nums' }}>{v}</p>
+          <div
+            key={l}
+            style={{
+              borderRadius: 20,
+              padding: 18,
+              textAlign: 'center',
+              background: 'var(--surface)',
+              boxShadow: 'var(--nm-sm)',
+            }}
+          >
+            <p
+              style={{
+                margin: 0,
+                fontSize: 26,
+                fontWeight: 700,
+                color: 'var(--text)',
+                fontVariantNumeric: 'tabular-nums',
+              }}
+            >
+              {v}
+            </p>
             <p style={{ margin: '3px 0 0', fontSize: 11.5, color: 'var(--text-dim)' }}>{l}</p>
           </div>
         ))}
       </div>
       {/* five tabs outgrow a phone: they scroll rather than widen the page (the design clips them) */}
       <div style={{ margin: '24px 0 22px', overflowX: 'auto', scrollbarWidth: 'none' }}>
-        <Tabs tabs={withTabIcons(FILTERS)} value={filter} onChange={setFilter} tone="var(--o-gold)" style={{ minWidth: 'max-content' }} />
+        <Tabs
+          tabs={withTabIcons(FILTERS)}
+          value={filter}
+          onChange={setFilter}
+          tone="var(--o-gold)"
+          style={{ minWidth: 'max-content' }}
+        />
       </div>
-      <StewardGrid list={list} onFollow={act.toggleFollow} onOpen={(s) => void navigate(routes.creators(s.id))} />
+      <StewardGrid
+        list={list}
+        onFollow={act.toggleFollow}
+        onOpen={(s) => void navigate(routes.creators(s.id))}
+      />
       {!list.length && (
         <p style={{ margin: 0, padding: 30, textAlign: 'center', fontSize: 13.5, color: 'var(--text-dim)' }}>
           {q.isLoading ? 'Finding the stewards…' : 'No stewards here yet.'}

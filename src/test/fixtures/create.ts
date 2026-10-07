@@ -26,7 +26,15 @@ const tpl = (o: Partial<TemplateDto> & Pick<TemplateDto, 'key' | 'name' | 'forma
 export const templatesFixture = (): TemplatesDto => ({
   templates: [
     tpl({ key: 'tpl-edition', name: 'Signed edition', format: 'Listing' }),
-    tpl({ key: 'tpl-generative', name: 'Generative drop', format: 'Drop', line: 'One seed per collector', live: false, os: 1900, qty: 50 }),
+    tpl({
+      key: 'tpl-generative',
+      name: 'Generative drop',
+      format: 'Drop',
+      line: 'One seed per collector',
+      live: false,
+      os: 1900,
+      qty: 50,
+    }),
     tpl({
       key: 'pro-season',
       name: 'Season pass',

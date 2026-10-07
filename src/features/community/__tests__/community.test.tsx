@@ -75,7 +75,9 @@ describe('circle page', () => {
     const user = userEvent.setup();
     renderApp('/community/circles/circ-1');
     expect(await screen.findByRole('heading', { level: 1, name: 'Digital Arts' })).toBeInTheDocument();
-    expect(screen.getByText(/cleared 40% collect-through here, and 62% of discussions resolved/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/cleared 40% collect-through here, and 62% of discussions resolved/),
+    ).toBeInTheDocument();
     // the snapshot card keeps it; the list drops it under the filter
     const before = screen.getAllByText('Cap the edition?').length;
     expect(screen.getByText('Top answer')).toBeInTheDocument();
@@ -145,11 +147,20 @@ describe('circle page', () => {
       expect(await within(d).findByText(/goes to Digital Arts/)).toBeInTheDocument();
       await user.type(within(d).getByRole('textbox', { name: 'What do you want to ask your Circle?' }), q);
       await user.click(within(d).getByRole('button', { name: 'Next' }));
-      await user.click(within(await screen.findByRole('dialog', { name: 'Push to the Hub' })).getByRole('button', { name: 'Push to Hub' }));
+      await user.click(
+        within(await screen.findByRole('dialog', { name: 'Push to the Hub' })).getByRole('button', {
+          name: 'Push to Hub',
+        }),
+      );
     };
     await ask(other.weo.title, 'Worth it?');
     await waitFor(() =>
-      expect(asked).toHaveBeenCalledWith({ question: 'Worth it?', circleId: 'circ-1', attachedWeoId: other.weo._id, tags: [] }),
+      expect(asked).toHaveBeenCalledWith({
+        question: 'Worth it?',
+        circleId: 'circ-1',
+        attachedWeoId: other.weo._id,
+        tags: [],
+      }),
     );
     await user.click(await screen.findByRole('button', { name: /^WeOs/ }));
     await ask(mine.weo.title, 'Price ok?');
@@ -173,7 +184,9 @@ describe('thread page', () => {
     const replied = spy('post', '/frontend/community/answers/a-1/replies', {});
     const answered = spy('post', '/frontend/community/threads/t-1/answers', answerFixture({ id: 'a-3' }));
     renderApp('/community/threads/t-1');
-    expect(await screen.findByRole('heading', { level: 1, name: 'How do I price a first edition?' })).toBeInTheDocument();
+    expect(
+      await screen.findByRole('heading', { level: 1, name: 'How do I price a first edition?' }),
+    ).toBeInTheDocument();
     expect(screen.getByText('ISR 82')).toBeInTheDocument();
     expect(screen.getByRole('heading', { level: 2, name: '2 answers' })).toBeInTheDocument();
     // not the asker: no accept control
@@ -207,7 +220,9 @@ describe('thread page', () => {
       answerId: 'a-1',
     });
     server.use(
-      http.get(url('/frontend/community/threads/:id'), () => ok(threadDetailFixture({ authorId: ME, author: author({ id: ME }) }))),
+      http.get(url('/frontend/community/threads/:id'), () =>
+        ok(threadDetailFixture({ authorId: ME, author: author({ id: ME }) })),
+      ),
     );
     renderApp('/community/threads/t-1');
     await user.click((await screen.findAllByRole('button', { name: 'Accept answer' }))[1]!);
@@ -253,7 +268,9 @@ describe('manage, stewards, stories', () => {
     const user = userEvent.setup();
     const followed = spy('post', '/frontend/users/u-ada/follow');
     renderApp('/community/stewards');
-    expect(await screen.findByRole('heading', { level: 1, name: 'The creators who keep Circles calm' })).toBeInTheDocument();
+    expect(
+      await screen.findByRole('heading', { level: 1, name: 'The creators who keep Circles calm' }),
+    ).toBeInTheDocument();
     expect(await screen.findByText('Average ISR')).toBeInTheDocument();
     expect(await screen.findByText('80')).toBeInTheDocument();
     expect(await screen.findByText('50%')).toBeInTheDocument();
@@ -270,7 +287,9 @@ describe('manage, stewards, stories', () => {
   it('stories: one leads into its thread; one without a thread opens its WeO', async () => {
     const user = userEvent.setup();
     const { router } = renderApp('/community/stories');
-    expect(await screen.findByRole('heading', { level: 2, name: 'Forty backers in a week' })).toBeInTheDocument();
+    expect(
+      await screen.findByRole('heading', { level: 2, name: 'Forty backers in a week' }),
+    ).toBeInTheDocument();
     await user.click(screen.getByRole('link', { name: /A hunt that sold out/ }));
     await waitFor(() => expect(router.state.location.pathname).toBe('/weos/weo-2'));
   });

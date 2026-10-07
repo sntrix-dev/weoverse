@@ -66,8 +66,13 @@ describe('composer payload (D-051)', () => {
 
   it('a Bid with a reserve holds that floor; without one it takes any offer down to the cap', () => {
     const bid = { ...listing, kind: 'Bid' as const, reserve: true, negotiateOff: 20 };
-    expect((buildPayload(bid, { usdAgainstO: 99 }).body.price as { negotiableUpTo: number }).negotiableUpTo).toBe(20);
-    expect((buildPayload({ ...bid, reserve: false }, { usdAgainstO: 99 }).body.price as { negotiableUpTo: number }).negotiableUpTo).toBe(90);
+    expect(
+      (buildPayload(bid, { usdAgainstO: 99 }).body.price as { negotiableUpTo: number }).negotiableUpTo,
+    ).toBe(20);
+    expect(
+      (buildPayload({ ...bid, reserve: false }, { usdAgainstO: 99 }).body.price as { negotiableUpTo: number })
+        .negotiableUpTo,
+    ).toBe(90);
     expect(buildPayload(bid, { usdAgainstO: 99 }).body.format).toBe('Bid');
     // editing a WeO made as a Drop keeps it a Drop
     expect(buildPayload({ ...listing, keepFormat: 'Drop' }, { usdAgainstO: 99 }).body.format).toBe('Drop');
@@ -138,7 +143,13 @@ describe('media rules', () => {
   });
 
   it('removing the cover promotes the next image', () => {
-    const f = { ...listing, gallery: [{ kind: 'video' as const, src: 'v' }, { kind: 'image' as const, src: 'i' }] };
+    const f = {
+      ...listing,
+      gallery: [
+        { kind: 'video' as const, src: 'v' },
+        { kind: 'image' as const, src: 'i' },
+      ],
+    };
     expect(removeMedia(f, 0)).toEqual({ media: 'i', gallery: [{ kind: 'video', src: 'v' }] });
     expect(placeMedia(f, 3, { kind: 'image', src: 'n' }).gallery).toHaveLength(3);
   });
@@ -168,10 +179,20 @@ describe('templates, drafts and edits', () => {
 
   it('a draft round-trips through its payload', () => {
     const body = draftBody({ ...listing, tagDraft: 'half' });
-    expect(body).toMatchObject({ weoType: 'regular', format: 'Listing', title: 'Signed print', coverUrl: listing.media, ready: 1 });
+    expect(body).toMatchObject({
+      weoType: 'regular',
+      format: 'Listing',
+      title: 'Signed print',
+      coverUrl: listing.media,
+      ready: 1,
+    });
     expect(formFromDraft({ ...body, format: body.format })).toEqual(listing);
     // an old draft with only the row fields still opens
-    expect(formFromDraft({ format: 'Pool', title: 'Fund', coverUrl: 'x' })).toMatchObject({ kind: 'Pool', title: 'Fund', media: 'x' });
+    expect(formFromDraft({ format: 'Pool', title: 'Fund', coverUrl: 'x' })).toMatchObject({
+      kind: 'Pool',
+      title: 'Fund',
+      media: 'x',
+    });
   });
 
   it('a live WeO reopens with its Os price and category', () => {

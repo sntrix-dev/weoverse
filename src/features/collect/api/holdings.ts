@@ -16,7 +16,8 @@ export type DisputeReason = 'not_received' | 'not_as_described' | 'other';
 export function useCollectionsSnapshot(window: '7d' | '30d' = '7d') {
   return useQuery({
     queryKey: qk.holdings.snapshot(window),
-    queryFn: () => api.get<CollectionsSnapshotDto>('/frontend/me/collections/snapshot', { query: { window } }),
+    queryFn: () =>
+      api.get<CollectionsSnapshotDto>('/frontend/me/collections/snapshot', { query: { window } }),
     staleTime: 30_000,
   });
 }

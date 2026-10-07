@@ -92,7 +92,9 @@ export function CircleCreatorsOrbit({
           placeItems: 'center',
         }}
       >
-        <div style={{ position: 'absolute', inset, borderRadius: '50%', border: '1px dashed var(--border)' }} />
+        <div
+          style={{ position: 'absolute', inset, borderRadius: '50%', border: '1px dashed var(--border)' }}
+        />
         <div style={{ position: 'absolute', inset, animation: 'weo-orbit 40s linear infinite' }}>
           {list.map((p, i) => (
             <div
@@ -104,7 +106,13 @@ export function CircleCreatorsOrbit({
                 transform: `rotate(${(i / list.length) * 360}deg) translateY(-${R}px)`,
               }}
             >
-              <div style={{ animation: 'weo-orbit-rev 40s linear infinite', marginLeft: -face / 2, marginTop: -face / 2 }}>
+              <div
+                style={{
+                  animation: 'weo-orbit-rev 40s linear infinite',
+                  marginLeft: -face / 2,
+                  marginTop: -face / 2,
+                }}
+              >
                 <button
                   type="button"
                   onClick={() => onOpen(p)}
@@ -144,10 +152,26 @@ export function CircleCreatorsOrbit({
         >
           {c ? c.handle || c.name : 'Your standing'}
         </p>
-        <h3 style={{ margin: '7px 0 0', fontSize: 'clamp(21px,2.4vw,27px)', fontWeight: 700, letterSpacing: '-.03em', color: 'var(--text)' }}>
+        <h3
+          style={{
+            margin: '7px 0 0',
+            fontSize: 'clamp(21px,2.4vw,27px)',
+            fontWeight: 700,
+            letterSpacing: '-.03em',
+            color: 'var(--text)',
+          }}
+        >
           {c ? c.name : `ISR ${me.isr} · ${me.tier ?? 'your tier'}`}
         </h3>
-        <p style={{ margin: '8px 0 0', maxWidth: '46ch', fontSize: 13.5, lineHeight: 1.55, color: 'var(--text-dim)' }}>
+        <p
+          style={{
+            margin: '8px 0 0',
+            maxWidth: '46ch',
+            fontSize: 13.5,
+            lineHeight: 1.55,
+            color: 'var(--text-dim)',
+          }}
+        >
           {c
             ? (c.bio ?? `${c.format} creator · ISR ${c.isr}.`)
             : shared

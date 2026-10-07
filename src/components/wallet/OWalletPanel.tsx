@@ -36,7 +36,16 @@ const chevron = svg(<polyline points="9 6 15 12 9 18" />, 15, 'var(--text-faint)
  * surface is (a testbed: movement only), and what the Os became. Moves forward from M09 for
  * the Community hub's Wallet row (D-038).
  */
-export function OWalletPanel({ wallet: W, power, holdings, faces, people, onMove, onCollected, onListed }: OWalletPanelProps) {
+export function OWalletPanel({
+  wallet: W,
+  power,
+  holdings,
+  faces,
+  people,
+  onMove,
+  onCollected,
+  onListed,
+}: OWalletPanelProps) {
   const total = W.available + W.protected + W.pending + W.locked;
   const [hot, setHot] = useState<string | null>(null);
   const [move, setMove] = useState(false);
@@ -98,7 +107,11 @@ export function OWalletPanel({ wallet: W, power, holdings, faces, people, onMove
         <span style={{ display: 'block', fontSize: 11, color: 'var(--text-faint)' }}>{note}</span>
       </span>
       {thumbs}
-      <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text)', fontVariantNumeric: 'tabular-nums' }}>{count}</span>
+      <span
+        style={{ fontSize: 13, fontWeight: 700, color: 'var(--text)', fontVariantNumeric: 'tabular-nums' }}
+      >
+        {count}
+      </span>
       {chevron}
     </button>
   );
@@ -120,7 +133,13 @@ export function OWalletPanel({ wallet: W, power, holdings, faces, people, onMove
         <div style={{ flex: '1 1 240px', minWidth: 0 }}>
           <span style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
             <span
-              style={{ fontSize: 10, fontWeight: 600, letterSpacing: '.16em', textTransform: 'uppercase', color: 'var(--text-faint)' }}
+              style={{
+                fontSize: 10,
+                fontWeight: 600,
+                letterSpacing: '.16em',
+                textTransform: 'uppercase',
+                color: 'var(--text-faint)',
+              }}
             >
               Earned Os · free to move
             </span>
@@ -209,7 +228,15 @@ export function OWalletPanel({ wallet: W, power, holdings, faces, people, onMove
 
       {/* four buckets, one bar — never one balance */}
       <div>
-        <span style={{ display: 'flex', height: 10, borderRadius: 999, overflow: 'hidden', boxShadow: 'var(--nm-inset)' }}>
+        <span
+          style={{
+            display: 'flex',
+            height: 10,
+            borderRadius: 999,
+            overflow: 'hidden',
+            boxShadow: 'var(--nm-inset)',
+          }}
+        >
           {buckets.map((b) => (
             <span
               key={b.k}
@@ -219,15 +246,29 @@ export function OWalletPanel({ wallet: W, power, holdings, faces, people, onMove
           ))}
         </span>
         <div
-          style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(150px,1fr))', gap: '8px 16px', marginTop: 12 }}
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit,minmax(150px,1fr))',
+            gap: '8px 16px',
+            marginTop: 12,
+          }}
         >
           {buckets.map((b) => (
             <span key={b.k} style={{ display: 'flex', alignItems: 'baseline', gap: 8, minWidth: 0 }}>
               <span
-                style={{ width: 7, height: 7, borderRadius: '50%', background: b.c, flex: '0 0 auto', transform: 'translateY(-1px)' }}
+                style={{
+                  width: 7,
+                  height: 7,
+                  borderRadius: '50%',
+                  background: b.c,
+                  flex: '0 0 auto',
+                  transform: 'translateY(-1px)',
+                }}
               />
               <span style={{ minWidth: 0, flex: 1 }}>
-                <span style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text)' }}>{b.k}</span>
+                <span style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text)' }}>
+                  {b.k}
+                </span>
                 <span style={{ display: 'block', fontSize: 10.5, color: 'var(--text-faint)' }}>{b.note}</span>
               </span>
               <b
@@ -261,9 +302,17 @@ export function OWalletPanel({ wallet: W, power, holdings, faces, people, onMove
           boxShadow: 'var(--nm-inset)',
         }}
       >
-        <span style={{ flex: '1 1 230px', minWidth: 0, fontSize: 11.5, lineHeight: 1.5, color: 'var(--text-dim)' }}>
-          Mock Os, earned in the WeOverse and moved inside it. No settlement, no cash out and no staking on this surface —
-          those live in your O-Wallet and the WeO apps.
+        <span
+          style={{
+            flex: '1 1 230px',
+            minWidth: 0,
+            fontSize: 11.5,
+            lineHeight: 1.5,
+            color: 'var(--text-dim)',
+          }}
+        >
+          Mock Os, earned in the WeOverse and moved inside it. No settlement, no cash out and no staking on
+          this surface — those live in your O-Wallet and the WeO apps.
         </span>
         <button
           onClick={() => setAbout(true)}
@@ -306,7 +355,9 @@ export function OWalletPanel({ wallet: W, power, holdings, faces, people, onMove
         {row('Exchange', 'On the floor now', holdings.listed, null, onListed)}
       </div>
       {about && <MockOsSheet onClose={() => setAbout(false)} />}
-      {move && <MoveOsSheet people={people} max={W.available} onMove={onMove} onClose={() => setMove(false)} />}
+      {move && (
+        <MoveOsSheet people={people} max={W.available} onMove={onMove} onClose={() => setMove(false)} />
+      )}
     </div>
   );
 }
@@ -334,7 +385,10 @@ export function MockOsSheet({ onClose }: { onClose: () => void }) {
             'Earned, not bought',
             'Os arrive from what you do here — answers accepted, WeOs collected, Circles grown. Nothing is purchased on this surface.',
           ],
-          ['Movement only', 'A wallet here can move earned Os to another passport. That is the whole capability.'],
+          [
+            'Movement only',
+            'A wallet here can move earned Os to another passport. That is the whole capability.',
+          ],
           [
             'No settlement, no cash out',
             'No bank account, no card, no conversion. Commerce Os and settlement belong to the WeO apps, under their own rules.',
@@ -361,8 +415,12 @@ export function MockOsSheet({ onClose }: { onClose: () => void }) {
               {tick}
             </span>
             <span style={{ minWidth: 0 }}>
-              <span style={{ display: 'block', fontSize: 13, fontWeight: 700, color: 'var(--text)' }}>{k}</span>
-              <span style={{ display: 'block', fontSize: 12.5, lineHeight: 1.5, color: 'var(--text-dim)' }}>{v}</span>
+              <span style={{ display: 'block', fontSize: 13, fontWeight: 700, color: 'var(--text)' }}>
+                {k}
+              </span>
+              <span style={{ display: 'block', fontSize: 12.5, lineHeight: 1.5, color: 'var(--text-dim)' }}>
+                {v}
+              </span>
             </span>
           </div>
         ))}
@@ -477,7 +535,13 @@ export function MoveOsSheet({
         <div>
           <span style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
             <span
-              style={{ fontSize: 10, fontWeight: 600, letterSpacing: '.15em', textTransform: 'uppercase', color: 'var(--text-faint)' }}
+              style={{
+                fontSize: 10,
+                fontWeight: 600,
+                letterSpacing: '.15em',
+                textTransform: 'uppercase',
+                color: 'var(--text-faint)',
+              }}
             >
               How many
             </span>

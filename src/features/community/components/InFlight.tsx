@@ -287,7 +287,15 @@ const stageLine: CSSProperties = {
 const plus = svg(<path d="M12 6v12M6 12h12" />, 18, 'currentColor', 2);
 
 /** design: v3-screens.jsx InFlightGrid — every WeO in flight as a Next-O, and a "New WeO" slot. */
-export function InFlightGrid({ items, view, h }: { items: FlightItem[]; view: FlightView; h: FlightHandlers }) {
+export function InFlightGrid({
+  items,
+  view,
+  h,
+}: {
+  items: FlightItem[];
+  view: FlightView;
+  h: FlightHandlers;
+}) {
   const name = (it: FlightItem) => (
     <button
       onClick={() => h.onOpen(it)}
@@ -328,7 +336,13 @@ export function InFlightGrid({ items, view, h }: { items: FlightItem[]; view: Fl
           return (
             <div
               key={it.id}
-              style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '10px 18px 10px 8px', background: 'var(--surface)' }}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 16,
+                padding: '10px 18px 10px 8px',
+                background: 'var(--surface)',
+              }}
             >
               <NextO item={it} h={h} size={64} dense />
               <div style={{ flex: 1, minWidth: 0 }}>
@@ -424,7 +438,15 @@ export function InFlightGrid({ items, view, h }: { items: FlightItem[]; view: Fl
               </div>
               {/* what you get for taking the step — the reason, at rest */}
               {n.get && (
-                <div style={{ marginTop: 7, fontSize: 12.5, lineHeight: 1.45, color: 'var(--text-dim)', textWrap: 'pretty' }}>
+                <div
+                  style={{
+                    marginTop: 7,
+                    fontSize: 12.5,
+                    lineHeight: 1.45,
+                    color: 'var(--text-dim)',
+                    textWrap: 'pretty',
+                  }}
+                >
                   {n.get}
                 </div>
               )}

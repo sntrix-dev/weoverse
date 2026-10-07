@@ -17,19 +17,32 @@ export const author = (over: Partial<S['CommunityAuthorView']> = {}): S['Communi
   ...over,
 });
 
-export const circleDetailFixture = (over: Partial<S['CommunityCircleDetailView']> = {}): S['CommunityCircleDetailView'] => ({
+export const circleDetailFixture = (
+  over: Partial<S['CommunityCircleDetailView']> = {},
+): S['CommunityCircleDetailView'] => ({
   ...circleFixture({ description: 'Edition strategy, generative work and first drops.', tags: ['editions'] }),
   trendingTags: [
     { tag: 'pricing', count: 3 },
     { tag: 'editions', count: 1 },
   ],
-  threads: [threadFixture(), threadFixture({ id: 't-2', title: 'Cap the edition?', tags: ['editions'], status: 'resolved', acceptedAnswerId: 'a-1' })],
+  threads: [
+    threadFixture(),
+    threadFixture({
+      id: 't-2',
+      title: 'Cap the edition?',
+      tags: ['editions'],
+      status: 'resolved',
+      acceptedAnswerId: 'a-1',
+    }),
+  ],
   threadsNextBefore: null,
   collectThrough7d: 0.4,
   ...over,
 });
 
-export const threadFixture = (over: Partial<S['CommunityThreadSummary']> = {}): S['CommunityThreadSummary'] => ({
+export const threadFixture = (
+  over: Partial<S['CommunityThreadSummary']> = {},
+): S['CommunityThreadSummary'] => ({
   id: 't-1',
   circleId: 'circ-1',
   circleSlug: 'digital-arts',
@@ -80,11 +93,24 @@ export const answerFixture = (over: Partial<S['CommunityAnswerView']> = {}): S['
   ...over,
 });
 
-export const threadDetailFixture = (over: Partial<S['CommunityThreadDetail']> = {}): S['CommunityThreadDetail'] => ({
+export const threadDetailFixture = (
+  over: Partial<S['CommunityThreadDetail']> = {},
+): S['CommunityThreadDetail'] => ({
   ...threadFixture(),
   body: 'Twelve pieces, no audience yet. Where do I start?',
   attachedWeo: null,
-  answers: [answerFixture(), answerFixture({ id: 'a-2', authorId: ME, author: author({ id: ME }), body: 'Mine.', voteScore: 9, replies: [], replyCount: 0 })],
+  answers: [
+    answerFixture(),
+    answerFixture({
+      id: 'a-2',
+      authorId: ME,
+      author: author({ id: ME }),
+      body: 'Mine.',
+      voteScore: 9,
+      replies: [],
+      replyCount: 0,
+    }),
+  ],
   updatedAt: T0,
   ...over,
 });
@@ -160,12 +186,25 @@ export const contributorsFixture: S['CommunityContributors'] = {
   metric: 'helpful',
   contributors: [
     contributor(),
-    contributor({ rank: 2, userId: 'u-bo', fullName: 'Bo Lin', isr: 70, focus: 'Hunt', isFollowing: true, acceptedRate: null }),
+    contributor({
+      rank: 2,
+      userId: 'u-bo',
+      fullName: 'Bo Lin',
+      isr: 70,
+      focus: 'Hunt',
+      isFollowing: true,
+      acceptedRate: null,
+    }),
   ],
   you: null,
 };
 
-const trend = (current: number): S['TrendValue'] => ({ current, previous: 0, delta: current, changePct: null });
+const trend = (current: number): S['TrendValue'] => ({
+  current,
+  previous: 0,
+  delta: current,
+  changePct: null,
+});
 export const pulseFixture: S['CommunityPulse'] = {
   meta: { window: '7d', start: T0, end: T0, previousStart: T0 },
   totals: {

@@ -6,7 +6,10 @@ type PulseDto = components['schemas']['SnapshotPulse'];
 type TrendDto = components['schemas']['TrendValue'];
 
 /** "+8%" / "−2%" / "+1" from a window trend; `undefined` when there is nothing to compare (D-049). */
-export function trendDelta(t: TrendDto | null | undefined, unit: PulseDto['unit'] = 'count'): string | undefined {
+export function trendDelta(
+  t: TrendDto | null | undefined,
+  unit: PulseDto['unit'] = 'count',
+): string | undefined {
   if (!t) return undefined;
   if (t.changePct != null && Number.isFinite(t.changePct)) {
     const pct = Math.round(t.changePct * 100);

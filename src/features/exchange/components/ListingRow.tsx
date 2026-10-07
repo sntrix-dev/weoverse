@@ -74,7 +74,8 @@ export function ListingRow({ l, i, act }: { l: ListingModel; i: number; act: Lis
     if (!menu) return;
     const down = (e: MouseEvent) => {
       const t = e.target as Node;
-      if (ref.current && !ref.current.contains(t) && !(btn.current && btn.current.contains(t))) setMenu(false);
+      if (ref.current && !ref.current.contains(t) && !(btn.current && btn.current.contains(t)))
+        setMenu(false);
     };
     const key = (e: KeyboardEvent) => {
       if (e.key === 'Escape') setMenu(false);
@@ -138,10 +139,29 @@ export function ListingRow({ l, i, act }: { l: ListingModel; i: number; act: Lis
         opacity: l.paused ? 0.72 : 1,
       }}
     >
-      <Orb size={58} fill={l.img ? 'image' : tone} src={l.img} ring ringColor={tone} matcap breathe={hov} style={{ flex: '0 0 auto' }} />
+      <Orb
+        size={58}
+        fill={l.img ? 'image' : tone}
+        src={l.img}
+        ring
+        ringColor={tone}
+        matcap
+        breathe={hov}
+        style={{ flex: '0 0 auto' }}
+      />
       <div style={{ minWidth: 0, flex: '1 1 150px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-          <h3 style={{ margin: 0, fontSize: 15, fontWeight: 700, letterSpacing: '-.015em', color: 'var(--text)' }}>{l.name}</h3>
+          <h3
+            style={{
+              margin: 0,
+              fontSize: 15,
+              fontWeight: 700,
+              letterSpacing: '-.015em',
+              color: 'var(--text)',
+            }}
+          >
+            {l.name}
+          </h3>
           <Pip tone={STATE_TONE[l.state]}>{l.state}</Pip>
         </div>
         <p style={{ margin: '3px 0 0', fontSize: 11.5, color: 'var(--text-faint)' }}>
@@ -172,7 +192,16 @@ export function ListingRow({ l, i, act }: { l: ListingModel; i: number; act: Lis
             ] as const
           ).map(([v, k]) => (
             <span key={k} style={{ display: 'flex', flexDirection: 'column' }}>
-              <span style={{ fontSize: 13.5, fontWeight: 700, color: 'var(--text)', fontVariantNumeric: 'tabular-nums' }}>{v}</span>
+              <span
+                style={{
+                  fontSize: 13.5,
+                  fontWeight: 700,
+                  color: 'var(--text)',
+                  fontVariantNumeric: 'tabular-nums',
+                }}
+              >
+                {v}
+              </span>
               <span style={{ fontSize: 10, color: 'var(--text-faint)' }}>{k}</span>
             </span>
           ))}
@@ -183,7 +212,16 @@ export function ListingRow({ l, i, act }: { l: ListingModel; i: number; act: Lis
           title={l.open ? `${l.open} of 5 checks open` : 'Preflight complete'}
           style={{ flex: '0 0 auto', display: 'flex', alignItems: 'center', gap: 8 }}
         >
-          <span style={{ width: 74, height: 6, borderRadius: 999, background: 'var(--surface-2)', boxShadow: 'var(--nm-inset)', overflow: 'hidden' }}>
+          <span
+            style={{
+              width: 74,
+              height: 6,
+              borderRadius: 999,
+              background: 'var(--surface-2)',
+              boxShadow: 'var(--nm-inset)',
+              overflow: 'hidden',
+            }}
+          >
             <span
               style={{
                 display: 'block',
@@ -288,7 +326,9 @@ export function ListingRow({ l, i, act }: { l: ListingModel; i: number; act: Lis
                     e.currentTarget.style.background = 'transparent';
                   }}
                 >
-                  <span style={{ display: 'grid', placeItems: 'center', width: 22, color: 'var(--text-dim)' }}>
+                  <span
+                    style={{ display: 'grid', placeItems: 'center', width: 22, color: 'var(--text-dim)' }}
+                  >
                     {svg(it.icon, 16, 'currentColor', 1.7)}
                   </span>
                   {it.label}

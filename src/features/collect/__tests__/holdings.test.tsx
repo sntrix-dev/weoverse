@@ -57,7 +57,11 @@ describe('collect page', () => {
     const held = container.querySelector('#c-held') as HTMLElement;
     expect(within(held).getAllByRole('heading', { level: 3 })).toHaveLength(4);
     await user.click(within(held).getByRole('button', { name: /^Pool/ }));
-    expect(within(held).getAllByRole('heading', { level: 3 }).map((h) => h.textContent)).toEqual(['Block Party Fund']);
+    expect(
+      within(held)
+        .getAllByRole('heading', { level: 3 })
+        .map((h) => h.textContent),
+    ).toEqual(['Block Party Fund']);
 
     // a holding opens its WeO, not the collection row
     await user.click(within(held).getByRole('button', { name: 'Open Block Party Fund' }));
@@ -74,7 +78,9 @@ describe('collect page', () => {
         redeemed(params.id);
         snap = {
           ...snap,
-          rows: snap.rows.map((r) => (r.id === params.id ? { ...r, redeemedAt: new Date().toISOString() } : r)),
+          rows: snap.rows.map((r) =>
+            r.id === params.id ? { ...r, redeemedAt: new Date().toISOString() } : r,
+          ),
         };
         return ok(state({ redeemedAt: new Date().toISOString() }));
       }),

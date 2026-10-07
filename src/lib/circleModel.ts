@@ -7,7 +7,11 @@ type CircleCardDto = S['CommunityCircleCardView'];
 type CircleDetailDto = S['CommunityCircleDetailView'];
 
 /** A WeO's kind as the design names its format. */
-export const KIND_FORMAT: Record<string, WeoFormat> = { regular: 'Listing', crowdfund: 'Pool', lottery: 'Hunt' };
+export const KIND_FORMAT: Record<string, WeoFormat> = {
+  regular: 'Listing',
+  crowdfund: 'Pool',
+  lottery: 'Hunt',
+};
 const KIND_ICON: Record<string, string> = { regular: 'assets', crowdfund: 'pool', lottery: 'hunt' };
 
 export const formatOfKind = (kind: string | null | undefined): WeoFormat | null =>

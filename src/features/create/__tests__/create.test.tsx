@@ -34,7 +34,16 @@ describe('create · the O', () => {
     const user = userEvent.setup();
     renderApp('/create');
     expect(await screen.findByRole('region', { name: 'Make a WeO' })).toBeInTheDocument();
-    for (const n of [/^Sell —/, /^Pool —/, /^Bid —/, /^Request —/, /^Hunt — coming soon/, /^Drop — coming soon/, /^Gift — coming soon/, /^Subscription — coming soon/])
+    for (const n of [
+      /^Sell —/,
+      /^Pool —/,
+      /^Bid —/,
+      /^Request —/,
+      /^Hunt — coming soon/,
+      /^Drop — coming soon/,
+      /^Gift — coming soon/,
+      /^Subscription — coming soon/,
+    ])
       expect(screen.getByRole('button', { name: n })).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: /^Hunt — coming soon/ }));
     expect(await screen.findByText('We’ll tell you when Hunt goes live')).toBeInTheDocument();
@@ -69,12 +78,20 @@ describe('create · the composer', () => {
     })();
     // preflight is always pressable: nothing moves, the gaps are named
     await user.click(await screen.findByRole('button', { name: 'Preflight — Review it, then post' }));
-    expect(await screen.findByText(/^Still needed: a name, a line, a category, a figure, a cover$/)).toBeInTheDocument();
+    expect(
+      await screen.findByText(/^Still needed: a name, a line, a category, a figure, a cover$/),
+    ).toBeInTheDocument();
 
     await user.type(screen.getByRole('textbox', { name: 'Name your WeO' }), 'Signed print');
-    await user.type(screen.getByRole('textbox', { name: 'One line on what someone actually gets' }), 'One of sixty');
+    await user.type(
+      screen.getByRole('textbox', { name: 'One line on what someone actually gets' }),
+      'One of sixty',
+    );
     await user.click(screen.getByRole('button', { name: 'Creating' }));
-    await user.upload(await screen.findByTestId('media-input-0'), new File(['img'], 'cover.png', { type: 'image/png' }));
+    await user.upload(
+      await screen.findByTestId('media-input-0'),
+      new File(['img'], 'cover.png', { type: 'image/png' }),
+    );
     expect(await screen.findByRole('button', { name: 'Replace cover' })).toBeInTheDocument();
     const ask = screen.getAllByRole('textbox', { name: 'Ask' })[0]!;
     await user.clear(ask);
@@ -110,7 +127,15 @@ describe('create · the composer', () => {
           _id: 'd-9',
           format: 'Listing',
           payload: {
-            form: { kind: 'Listing', title: 'Signed print', desc: 'One of sixty', catId: categoriesFixture[0]!._id, cat: 'Creating', media: 'https://cdn.test/a.jpg', price: 4950 },
+            form: {
+              kind: 'Listing',
+              title: 'Signed print',
+              desc: 'One of sixty',
+              catId: categoriesFixture[0]!._id,
+              cat: 'Creating',
+              media: 'https://cdn.test/a.jpg',
+              price: 4950,
+            },
           },
         }),
       ),
@@ -122,7 +147,11 @@ describe('create · the composer', () => {
     await user.click(within(sheet).getByRole('button', { name: /^A Circle/ }));
     await user.click(within(sheet).getByRole('button', { name: 'Post it' }));
     await waitFor(() => expect(pushes).toHaveLength(1));
-    expect(pushes[0]).toMatchObject({ weoId: 'weo-new', question: 'Signed print', description: 'One of sixty' });
+    expect(pushes[0]).toMatchObject({
+      weoId: 'weo-new',
+      question: 'Signed print',
+      description: 'One of sixty',
+    });
   });
 
   it('Mya drafts the line from the title; nothing is written until you pick one', async () => {
@@ -131,8 +160,12 @@ describe('create · the composer', () => {
     await user.type(screen.getByRole('textbox', { name: 'Name your WeO' }), 'Signed print');
     await user.click(screen.getByRole('button', { name: 'Draft with Mya' }));
     await user.click(screen.getByRole('button', { name: 'Ask Mya to draft it' }));
-    await user.click(await screen.findByRole('button', { name: /Sixty prints, each signed and numbered by hand\./ }));
-    expect(screen.getByRole('textbox', { name: 'One line on what someone actually gets' })).toHaveValue('Sixty prints, each signed and numbered by hand.');
+    await user.click(
+      await screen.findByRole('button', { name: /Sixty prints, each signed and numbered by hand\./ }),
+    );
+    expect(screen.getByRole('textbox', { name: 'One line on what someone actually gets' })).toHaveValue(
+      'Sixty prints, each signed and numbered by hand.',
+    );
   });
 
   it('autosaves a draft once the composer has something in it', async () => {
@@ -141,7 +174,10 @@ describe('create · the composer', () => {
     await openComposer(user, /^Pool —/);
     await user.type(screen.getByRole('textbox', { name: 'Name your WeO' }), 'Neighbourhood fund');
     await waitFor(() => expect(saved.some((b) => b.format === 'Pool')).toBe(true), { timeout: 6000 });
-    expect(saved.find((b) => b.format === 'Pool')).toMatchObject({ weoType: 'crowdfund', title: 'Neighbourhood fund' });
+    expect(saved.find((b) => b.format === 'Pool')).toMatchObject({
+      weoType: 'crowdfund',
+      title: 'Neighbourhood fund',
+    });
   });
 
   it('a Request has no media and posts straight to the asks board in Os', async () => {
@@ -150,9 +186,15 @@ describe('create · the composer', () => {
     await openComposer(user, /^Request —/);
     expect(screen.queryByRole('button', { name: /^Media/ })).not.toBeInTheDocument();
     await user.type(screen.getByRole('textbox', { name: 'Name your WeO' }), 'A sketchbook');
-    await user.type(screen.getByRole('textbox', { name: 'One line on what someone actually gets' }), 'Hand-bound');
+    await user.type(
+      screen.getByRole('textbox', { name: 'One line on what someone actually gets' }),
+      'Hand-bound',
+    );
     await user.click(screen.getByRole('button', { name: 'Creating' }));
-    for (const [name, v] of [['From', '500'], ['To', '1200']] as const) {
+    for (const [name, v] of [
+      ['From', '500'],
+      ['To', '1200'],
+    ] as const) {
       const box = screen.getAllByRole('textbox', { name })[0]!;
       await user.clear(box);
       await user.type(box, v);
@@ -160,8 +202,14 @@ describe('create · the composer', () => {
     await user.click(screen.getByRole('button', { name: 'Preflight — Review it, then post' }));
     await user.click(await screen.findAllByRole('button', { name: 'Post it' }).then((b) => b[0]!));
     await waitFor(() => expect(asked).toHaveLength(1));
-    expect(asked[0]).toMatchObject({ title: 'A sketchbook', categoryName: 'Creating', price: { min: 500, max: 1200 } });
-    expect(await screen.findByRole('heading', { name: 'A sketchbook is live' }, { timeout: 5000 })).toBeInTheDocument();
+    expect(asked[0]).toMatchObject({
+      title: 'A sketchbook',
+      categoryName: 'Creating',
+      price: { min: 500, max: 1200 },
+    });
+    expect(
+      await screen.findByRole('heading', { name: 'A sketchbook is live' }, { timeout: 5000 }),
+    ).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'See the asks' })).toBeInTheDocument();
   });
 
@@ -178,7 +226,11 @@ describe('create · the composer', () => {
     await user.click(screen.getByRole('button', { name: 'Preflight — Review it, then post' }));
     await user.click(await screen.findAllByRole('button', { name: 'Save it' }).then((b) => b[0]!));
     await waitFor(() => expect(saved).toHaveLength(1));
-    expect(saved[0]).toMatchObject({ title: w.title, description: 'Fifty unique seeds', categoryId: 'c-art' });
+    expect(saved[0]).toMatchObject({
+      title: w.title,
+      description: 'Fifty unique seeds',
+      categoryId: 'c-art',
+    });
     await waitFor(() => expect(router.state.location.pathname).toBe(`/weos/${w._id}`));
   });
 });

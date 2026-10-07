@@ -55,8 +55,19 @@ export function StewardGrid({
             Steward · {s.circles} Circles
           </span>
           <h3 style={{ margin: '8px 0 0', fontSize: 15, fontWeight: 700, color: 'var(--text)' }}>{s.name}</h3>
-          {s.bio && <p style={{ margin: '4px 0 0', fontSize: 11.5, lineHeight: 1.45, color: 'var(--text-dim)' }}>{s.bio}</p>}
-          <p style={{ margin: '8px 0 0', fontSize: 11, color: 'var(--text-dim)', fontVariantNumeric: 'tabular-nums' }}>
+          {s.bio && (
+            <p style={{ margin: '4px 0 0', fontSize: 11.5, lineHeight: 1.45, color: 'var(--text-dim)' }}>
+              {s.bio}
+            </p>
+          )}
+          <p
+            style={{
+              margin: '8px 0 0',
+              fontSize: 11,
+              color: 'var(--text-dim)',
+              fontVariantNumeric: 'tabular-nums',
+            }}
+          >
             {s.weos} WeOs · {s.answers} answers · {Math.round(s.accept * 100)}% accepted
           </p>
           {!s.you && (

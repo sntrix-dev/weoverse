@@ -53,7 +53,14 @@ export function PreviewCard({
         transition: 'transform .24s var(--ease-portal), box-shadow .24s',
       }}
     >
-      <span style={{ display: 'block', height: tall ? 168 : 124, background: 'var(--surface-2)', overflow: 'hidden' }}>
+      <span
+        style={{
+          display: 'block',
+          height: tall ? 168 : 124,
+          background: 'var(--surface-2)',
+          overflow: 'hidden',
+        }}
+      >
         {img && (
           <img
             src={img}
@@ -145,7 +152,9 @@ export function ThreadRow({ t, onOpen }: { t: ThreadModel; onOpen: () => void })
       <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
         <Avatar src={p.avatar} isr={p.isr} size={28} />
         <span style={{ fontSize: 12.5, fontWeight: 600, color: 'var(--text)' }}>{p.name}</span>
-        <span style={{ fontSize: 11, color: 'var(--text-faint)' }}>· {t.createdAt ? relTime(t.createdAt) : 'just now'}</span>
+        <span style={{ fontSize: 11, color: 'var(--text-faint)' }}>
+          · {t.createdAt ? relTime(t.createdAt) : 'just now'}
+        </span>
         {t.tags[0] && (
           <span
             style={{
@@ -163,20 +172,41 @@ export function ThreadRow({ t, onOpen }: { t: ThreadModel; onOpen: () => void })
           </span>
         )}
       </div>
-      <h4 style={{ margin: '9px 0 0', fontSize: 15, fontWeight: 600, letterSpacing: '-.01em', color: 'var(--text)' }}>
+      <h4
+        style={{
+          margin: '9px 0 0',
+          fontSize: 15,
+          fontWeight: 600,
+          letterSpacing: '-.01em',
+          color: 'var(--text)',
+        }}
+      >
         {t.title}
       </h4>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginTop: 9, fontSize: 11.5, color: 'var(--text-dim)' }}>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 16,
+          marginTop: 9,
+          fontSize: 11.5,
+          color: 'var(--text-dim)',
+        }}
+      >
         <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
           {svg(ICO.hub, 14)}
-          <span style={{ fontWeight: 700, color: 'var(--text)', fontVariantNumeric: 'tabular-nums' }}>{t.replies}</span>
+          <span style={{ fontWeight: 700, color: 'var(--text)', fontVariantNumeric: 'tabular-nums' }}>
+            {t.replies}
+          </span>
         </span>
         <span style={{ fontWeight: 700, color: t.resolved ? 'var(--o-green)' : 'var(--o-violet)' }}>
           {t.resolved ? 'Resolved' : 'Open'}
         </span>
         <span style={{ fontVariantNumeric: 'tabular-nums' }}>{t.views} views</span>
         {weo && (
-          <span style={{ marginLeft: 'auto', display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 11 }}>
+          <span
+            style={{ marginLeft: 'auto', display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 11 }}
+          >
             <span
               style={{
                 width: 18,
@@ -200,7 +230,9 @@ const HUB_LENSES: { value: HubLens; label: string }[] = [
   { value: 'stories', label: 'Stories' },
 ];
 export const LENS_ICONS: Record<HubLens, ReactNode> = {
-  questions: <path d="M20.5 11.5a8 8 0 0 1-8 8 8 8 0 0 1-3.6-.85L3.5 20.5l1.85-5.4A8 8 0 0 1 12.5 3.5a8 8 0 0 1 8 8z" />,
+  questions: (
+    <path d="M20.5 11.5a8 8 0 0 1-8 8 8 8 0 0 1-3.6-.85L3.5 20.5l1.85-5.4A8 8 0 0 1 12.5 3.5a8 8 0 0 1 8 8z" />
+  ),
   stewards: <path d="M12 3.4l2.6 5.6 6.1.6-4.6 4.1 1.4 6-5.5-3.2-5.5 3.2 1.4-6L3.3 9.6l6.1-.6z" />,
   stories: (
     <>
@@ -256,7 +288,8 @@ export function LensSegs({ value, onChange }: { value: HubLens; onChange: (v: Hu
                 : hot
                   ? 'color-mix(in srgb, var(--o-violet) 9%, transparent)'
                   : 'transparent',
-              transition: 'background .26s, color .24s, gap .32s var(--ease-portal), padding .32s var(--ease-portal)',
+              transition:
+                'background .26s, color .24s, gap .32s var(--ease-portal), padding .32s var(--ease-portal)',
             }}
           >
             {svg(LENS_ICONS[it.value], 17, 'currentColor', 1.7)}
@@ -323,5 +356,14 @@ export function useOpenStory() {
 
 /** A small orb for a WeO face (used by the circle snapshot and stories). */
 export function FaceOrb({ img, size, ring }: { img: string | null; size: number; ring?: string }) {
-  return <Orb size={size} fill={img ? 'image' : (ring ?? 'var(--o-violet)')} src={img ?? undefined} ring={!!ring} ringColor={ring} matcap />;
+  return (
+    <Orb
+      size={size}
+      fill={img ? 'image' : (ring ?? 'var(--o-violet)')}
+      src={img ?? undefined}
+      ring={!!ring}
+      ringColor={ring}
+      matcap
+    />
+  );
 }

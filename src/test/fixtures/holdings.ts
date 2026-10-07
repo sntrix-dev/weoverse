@@ -16,7 +16,11 @@ const meta = (): S['SnapshotWindowMeta'] => ({
   end: daysAgo(0),
   previousStart: daysAgo(14),
 });
-const pulse = (label: string, headline: number, unit: 'count' | 'os' | 'ratio' = 'count'): S['SnapshotPulse'] => ({
+const pulse = (
+  label: string,
+  headline: number,
+  unit: 'count' | 'os' | 'ratio' = 'count',
+): S['SnapshotPulse'] => ({
   label,
   note: '7d',
   headline,
@@ -116,9 +120,17 @@ export const collectionsSnapshotFixture = (): S['CollectionsSnapshot'] => {
     ],
     boards: {
       movers: { label: 'Biggest movers', metric: 'resale delta · 7d', rowIds: ['col-2', 'col-1'] },
-      formats: { label: 'WeO kinds you engage with most', metric: 'Os held by format', rowIds: ['format:Pool', 'format:Drop'] },
+      formats: {
+        label: 'WeO kinds you engage with most',
+        metric: 'Os held by format',
+        rowIds: ['format:Pool', 'format:Drop'],
+      },
       creators: { label: 'Creators you circle', metric: 'Os flowed with them', rowIds: ['creator:u-lena'] },
-      pending: { label: 'Awaiting an outcome', metric: 'Os you cannot spend yet', rowIds: ['col-3', 'col-4'] },
+      pending: {
+        label: 'Awaiting an outcome',
+        metric: 'Os you cannot spend yet',
+        rowIds: ['col-3', 'col-4'],
+      },
     },
     pulse: {
       movers: pulse('Movers', 820, 'os'),
@@ -212,7 +224,11 @@ export const listingsSnapshotFixture = (): S['ListingsSnapshot'] => {
     collectThrough: 0.82,
     rows,
     boards: {
-      performing: { label: 'Best performing listings', metric: 'collect-through · 7d', rowIds: ['l-3', 'l-1'] },
+      performing: {
+        label: 'Best performing listings',
+        metric: 'collect-through · 7d',
+        rowIds: ['l-3', 'l-1'],
+      },
       views: { label: 'Most viewed', metric: 'views · lifetime', rowIds: ['l-1'] },
       earning: { label: 'Earning most', metric: 'settled Os · 7d', rowIds: ['l-1'] },
       ready: { label: 'Needs attention', metric: 'preflight complete', rowIds: ['l-2'] },

@@ -179,7 +179,12 @@ async function request<T>(
     method,
     headers,
     signal,
-    body: body === undefined ? undefined : raw || body instanceof FormData ? (body as BodyInit) : JSON.stringify(body),
+    body:
+      body === undefined
+        ? undefined
+        : raw || body instanceof FormData
+          ? (body as BodyInit)
+          : JSON.stringify(body),
   });
   const payload = await readBody(res);
 

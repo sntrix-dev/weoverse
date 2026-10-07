@@ -114,7 +114,10 @@ export function CollectPage() {
               onConfirm: () =>
                 dispute.mutate(
                   { collectionId: h.id },
-                  { onSuccess: () => toast('Dispute opened · a steward will look'), onError: (e) => toast(fail(e)) },
+                  {
+                    onSuccess: () => toast('Dispute opened · a steward will look'),
+                    onError: (e) => toast(fail(e)),
+                  },
                 ),
             }),
         },
@@ -150,8 +153,26 @@ export function CollectPage() {
 
   const o = s?.osPlacement;
   const rail = (
-    <div className="weo-osonly" style={{ borderRadius: 24, padding: 18, background: 'var(--surface-2)', boxShadow: 'var(--nm-inset)', minWidth: 0 }}>
-      <p style={{ margin: 0, fontSize: 10.5, fontWeight: 700, letterSpacing: '.14em', textTransform: 'uppercase', color: 'var(--text-faint)' }}>
+    <div
+      className="weo-osonly"
+      style={{
+        borderRadius: 24,
+        padding: 18,
+        background: 'var(--surface-2)',
+        boxShadow: 'var(--nm-inset)',
+        minWidth: 0,
+      }}
+    >
+      <p
+        style={{
+          margin: 0,
+          fontSize: 10.5,
+          fontWeight: 700,
+          letterSpacing: '.14em',
+          textTransform: 'uppercase',
+          color: 'var(--text-faint)',
+        }}
+      >
         Where your Os sit
       </p>
       <div style={{ height: 12 }} />
@@ -187,7 +208,12 @@ export function CollectPage() {
         ]}
         foot={
           Object.keys(pulse).length ? (
-            <SnapshotChart pulse={pulse} keys={Object.keys(COLLECT_PULSE_TONES)} value={board} onChange={setBoard} />
+            <SnapshotChart
+              pulse={pulse}
+              keys={Object.keys(COLLECT_PULSE_TONES)}
+              value={board}
+              onChange={setBoard}
+            />
           ) : undefined
         }
       />
@@ -210,7 +236,13 @@ export function CollectPage() {
             </div>
           }
         />
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(min(100%,420px),1fr))', gap: 14 }}>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fill,minmax(min(100%,420px),1fr))',
+            gap: 14,
+          }}
+        >
           {list.map((h, i) => (
             <HoldingRow key={h.id} h={h} i={i} act={act} />
           ))}
@@ -255,7 +287,12 @@ export function CollectPage() {
       </Scene>
       <FlowFoot
         screen="collected"
-        next={{ label: 'Create', lead: 'Make one of your own', go: () => void navigate(routes.create()), tone: '#22C55E' }}
+        next={{
+          label: 'Create',
+          lead: 'Make one of your own',
+          go: () => void navigate(routes.create()),
+          tone: '#22C55E',
+        }}
       />
     </main>
   );

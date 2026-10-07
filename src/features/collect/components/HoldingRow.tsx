@@ -73,13 +73,38 @@ export function HoldingRow({ h, i, act }: { h: HoldingModel; i: number; act: Hol
         type="button"
         onClick={() => act.onOpen(h)}
         aria-label={`Open ${h.name}`}
-        style={{ border: 'none', background: 'transparent', padding: 0, cursor: 'pointer', borderRadius: '50%', flex: '0 0 auto' }}
+        style={{
+          border: 'none',
+          background: 'transparent',
+          padding: 0,
+          cursor: 'pointer',
+          borderRadius: '50%',
+          flex: '0 0 auto',
+        }}
       >
-        <Orb size={72} fill={h.img ? 'image' : tone} src={h.img ?? undefined} ring ringColor={tone} matcap breathe={show} />
+        <Orb
+          size={72}
+          fill={h.img ? 'image' : tone}
+          src={h.img ?? undefined}
+          ring
+          ringColor={tone}
+          matcap
+          breathe={show}
+        />
       </button>
       <div style={{ minWidth: 0, flex: 1 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-          <h3 style={{ margin: 0, fontSize: 15, fontWeight: 700, letterSpacing: '-.015em', color: 'var(--text)' }}>{h.name}</h3>
+          <h3
+            style={{
+              margin: 0,
+              fontSize: 15,
+              fontWeight: 700,
+              letterSpacing: '-.015em',
+              color: 'var(--text)',
+            }}
+          >
+            {h.name}
+          </h3>
           <Pip tone={KIND_TONE[h.kind] || tone}>{h.kind}</Pip>
         </div>
         <p style={{ margin: '4px 0 0', fontSize: 11.5, color: 'var(--text-dim)' }}>
@@ -111,7 +136,9 @@ export function HoldingRow({ h, i, act }: { h: HoldingModel; i: number; act: Hol
                 color: delta > 0 ? 'var(--o-green)' : delta < 0 ? 'var(--status-error)' : 'var(--text-faint)',
               }}
             >
-              {delta === 0 ? 'settling' : `${delta > 0 ? '+' : '−'}${oStr(Math.abs(delta)).slice(2)} if resold`}
+              {delta === 0
+                ? 'settling'
+                : `${delta > 0 ? '+' : '−'}${oStr(Math.abs(delta)).slice(2)} if resold`}
             </span>
           )}
         </div>
@@ -130,15 +157,36 @@ export function HoldingRow({ h, i, act }: { h: HoldingModel; i: number; act: Hol
         }}
       >
         {h.resellable ? (
-          <OButton variant="raised" size={38} tone="green" aria-label={`Resell ${h.name}`} title="Resell" onClick={() => act.onResell(h)}>
+          <OButton
+            variant="raised"
+            size={38}
+            tone="green"
+            aria-label={`Resell ${h.name}`}
+            title="Resell"
+            onClick={() => act.onResell(h)}
+          >
             {svg(ROW_ICO.resell, 17, 'currentColor', 1.7)}
           </OButton>
         ) : (
-          <OButton variant="raised" size={38} tone="blue" aria-label={`Track ${h.name}`} title="Track" onClick={() => act.onTrack(h)}>
+          <OButton
+            variant="raised"
+            size={38}
+            tone="blue"
+            aria-label={`Track ${h.name}`}
+            title="Track"
+            onClick={() => act.onTrack(h)}
+          >
             {svg(ROW_ICO.track, 17, 'currentColor', 1.7)}
           </OButton>
         )}
-        <OButton variant="raised" size={38} tone="violet" aria-label="Open its circle" title="Its circle" onClick={() => act.onCircle(h)}>
+        <OButton
+          variant="raised"
+          size={38}
+          tone="violet"
+          aria-label="Open its circle"
+          title="Its circle"
+          onClick={() => act.onCircle(h)}
+        >
           {svg(ICO.hub, 17, 'currentColor', 1.7)}
         </OButton>
       </div>

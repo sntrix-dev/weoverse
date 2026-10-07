@@ -17,7 +17,11 @@ const page: CSSProperties = {
 };
 
 const STORY_ARC = [
-  { k: 'Rehearsed', n: '01', note: 'The terms were tried in a world first — provisional, dashed, reversible.' },
+  {
+    k: 'Rehearsed',
+    n: '01',
+    note: 'The terms were tried in a world first — provisional, dashed, reversible.',
+  },
   { k: 'Listed', n: '02', note: 'One format, one ask, at rest. Nothing behind a hover.' },
   { k: 'Settled', n: '03', note: 'A permanent record, and standing that moved with it.' },
 ];
@@ -86,7 +90,15 @@ export function StoriesPage() {
             }}
           >
             <div style={{ display: 'grid', placeItems: 'center' }}>
-              <Orb size={220} fill={lead.img ? 'image' : lead.tone} src={lead.img} ring ringColor="#3A95F2" matcap breathe />
+              <Orb
+                size={220}
+                fill={lead.img ? 'image' : lead.tone}
+                src={lead.img}
+                ring
+                ringColor="#3A95F2"
+                matcap
+                breathe
+              />
             </div>
             <div style={{ minWidth: 0 }}>
               <span style={{ ...kicker, fontSize: 10.5, letterSpacing: '.14em', color: 'var(--o-blue)' }}>
@@ -104,10 +116,26 @@ export function StoriesPage() {
               >
                 {lead.title}
               </h2>
-              <p style={{ margin: '12px 0 0', maxWidth: '46ch', fontSize: 14, lineHeight: 1.6, color: 'var(--text-dim)' }}>{lead.blurb}</p>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 18, flexWrap: 'wrap' }}>
+              <p
+                style={{
+                  margin: '12px 0 0',
+                  maxWidth: '46ch',
+                  fontSize: 14,
+                  lineHeight: 1.6,
+                  color: 'var(--text-dim)',
+                }}
+              >
+                {lead.blurb}
+              </p>
+              <div
+                style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 18, flexWrap: 'wrap' }}
+              >
                 <Chip tone="var(--o-blue)">{lead.author}</Chip>
-                {lead.status && <span style={{ fontSize: 12.5, fontWeight: 600, color: 'var(--o-green)' }}>{lead.status}</span>}
+                {lead.status && (
+                  <span style={{ fontSize: 12.5, fontWeight: 600, color: 'var(--o-green)' }}>
+                    {lead.status}
+                  </span>
+                )}
                 <span style={{ fontSize: 12.5, color: 'var(--text-faint)' }}>
                   {lead.threadId ? 'Open the thread it came from →' : 'Open the WeO →'}
                 </span>
@@ -115,7 +143,15 @@ export function StoriesPage() {
             </div>
           </div>
         ) : (
-          <p style={{ margin: '26px 0 0', padding: 30, textAlign: 'center', fontSize: 13.5, color: 'var(--text-dim)' }}>
+          <p
+            style={{
+              margin: '26px 0 0',
+              padding: 30,
+              textAlign: 'center',
+              fontSize: 13.5,
+              color: 'var(--text-dim)',
+            }}
+          >
             {q.isLoading ? 'Reading the stories…' : 'No stories yet.'}
           </p>
         )}
@@ -129,10 +165,39 @@ export function StoriesPage() {
         />
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(240px,1fr))', gap: 14 }}>
           {STORY_ARC.map((s) => (
-            <div key={s.k} style={{ borderRadius: 26, padding: 20, background: 'var(--surface-2)', boxShadow: 'var(--nm-inset)' }}>
-              <span style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: '.14em', color: 'var(--text-faint)' }}>{s.n}</span>
-              <h4 style={{ margin: '8px 0 0', fontSize: 15.5, fontWeight: 700, letterSpacing: '-.02em', color: 'var(--text)' }}>{s.k}</h4>
-              <p style={{ margin: '7px 0 0', fontSize: 12.5, lineHeight: 1.55, color: 'var(--text-dim)' }}>{s.note}</p>
+            <div
+              key={s.k}
+              style={{
+                borderRadius: 26,
+                padding: 20,
+                background: 'var(--surface-2)',
+                boxShadow: 'var(--nm-inset)',
+              }}
+            >
+              <span
+                style={{
+                  fontSize: 10.5,
+                  fontWeight: 700,
+                  letterSpacing: '.14em',
+                  color: 'var(--text-faint)',
+                }}
+              >
+                {s.n}
+              </span>
+              <h4
+                style={{
+                  margin: '8px 0 0',
+                  fontSize: 15.5,
+                  fontWeight: 700,
+                  letterSpacing: '-.02em',
+                  color: 'var(--text)',
+                }}
+              >
+                {s.k}
+              </h4>
+              <p style={{ margin: '7px 0 0', fontSize: 12.5, lineHeight: 1.55, color: 'var(--text-dim)' }}>
+                {s.note}
+              </p>
             </div>
           ))}
         </div>
@@ -140,8 +205,18 @@ export function StoriesPage() {
 
       {rest.length > 0 && (
         <Scene style={{ display: 'block', marginTop: 52 }}>
-          <SectionHead eyebrow="03 — More" title="The rest of the record" note="Each one opens the Circle thread it actually happened in." />
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(min(100%,300px),1fr))', gap: 20 }}>
+          <SectionHead
+            eyebrow="03 — More"
+            title="The rest of the record"
+            note="Each one opens the Circle thread it actually happened in."
+          />
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fill,minmax(min(100%,300px),1fr))',
+              gap: 20,
+            }}
+          >
             {rest.map((s) => (
               <div
                 key={s.id}
@@ -160,12 +235,29 @@ export function StoriesPage() {
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-                  <Orb size={64} fill={s.img ? 'image' : s.tone} src={s.img} matcap style={{ flex: '0 0 auto' }} />
+                  <Orb
+                    size={64}
+                    fill={s.img ? 'image' : s.tone}
+                    src={s.img}
+                    matcap
+                    style={{ flex: '0 0 auto' }}
+                  />
                   <div style={{ minWidth: 0 }}>
-                    <span style={{ ...kicker, fontSize: 10, letterSpacing: '.13em', color: 'var(--text-faint)' }}>
+                    <span
+                      style={{ ...kicker, fontSize: 10, letterSpacing: '.13em', color: 'var(--text-faint)' }}
+                    >
                       {s.type} · {s.duration}
                     </span>
-                    <h4 style={{ margin: '5px 0 0', fontSize: 14.5, fontWeight: 700, letterSpacing: '-.02em', lineHeight: 1.25, color: 'var(--text)' }}>
+                    <h4
+                      style={{
+                        margin: '5px 0 0',
+                        fontSize: 14.5,
+                        fontWeight: 700,
+                        letterSpacing: '-.02em',
+                        lineHeight: 1.25,
+                        color: 'var(--text)',
+                      }}
+                    >
                       {s.title}
                     </h4>
                   </div>
@@ -204,11 +296,28 @@ export function StoriesPage() {
           }}
         >
           <div style={{ minWidth: 0, flex: 1 }}>
-            <h3 style={{ margin: 0, fontSize: 'clamp(18px,2.1vw,24px)', fontWeight: 700, letterSpacing: '-.028em', color: 'var(--text)' }}>
+            <h3
+              style={{
+                margin: 0,
+                fontSize: 'clamp(18px,2.1vw,24px)',
+                fontWeight: 700,
+                letterSpacing: '-.028em',
+                color: 'var(--text)',
+              }}
+            >
               Start yours in a world, not on the floor
             </h3>
-            <p style={{ margin: '8px 0 0', maxWidth: '52ch', fontSize: 13.5, lineHeight: 1.55, color: 'var(--text-dim)' }}>
-              Rehearse the terms first. If they hold, one confirm makes them real — and the thread becomes the story.
+            <p
+              style={{
+                margin: '8px 0 0',
+                maxWidth: '52ch',
+                fontSize: 13.5,
+                lineHeight: 1.55,
+                color: 'var(--text-dim)',
+              }}
+            >
+              Rehearse the terms first. If they hold, one confirm makes them real — and the thread becomes the
+              story.
             </p>
           </div>
           {/* "Enter a world" arrives with worlds (M11) */}

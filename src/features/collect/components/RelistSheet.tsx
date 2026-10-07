@@ -53,7 +53,15 @@ export function RelistSheet({ target }: { target: RelistTarget }) {
     return (
       <Scrim>
         {quote.isError ? (
-          <div style={{ borderRadius: 24, padding: 22, background: 'var(--surface)', color: 'var(--text)', textAlign: 'center' }}>
+          <div
+            style={{
+              borderRadius: 24,
+              padding: 22,
+              background: 'var(--surface)',
+              color: 'var(--text)',
+              textAlign: 'center',
+            }}
+          >
             <p style={{ margin: '0 0 12px' }}>This WeO could not be opened.</p>
             <Button size="sm" variant="ghost" tone="violet" onClick={closeFlow}>
               Close
@@ -112,7 +120,15 @@ export function RelistSheet({ target }: { target: RelistTarget }) {
     priceLabel: 'Your ask',
     commitLabel: 'Your ask · you receive',
     front: (advance) => (
-      <div style={{ width: 300, borderRadius: 26, padding: 18, background: 'var(--surface-2)', boxShadow: 'var(--nm-inset)' }}>
+      <div
+        style={{
+          width: 300,
+          borderRadius: 26,
+          padding: 18,
+          background: 'var(--surface-2)',
+          boxShadow: 'var(--nm-inset)',
+        }}
+      >
         <span
           style={{
             display: 'block',
@@ -127,7 +143,16 @@ export function RelistSheet({ target }: { target: RelistTarget }) {
         >
           {img && <img src={img} alt={name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />}
         </span>
-        <h4 style={{ margin: '14px 0 0', fontSize: 15, fontWeight: 700, letterSpacing: '-.02em', lineHeight: 1.25, color: 'var(--text)' }}>
+        <h4
+          style={{
+            margin: '14px 0 0',
+            fontSize: 15,
+            fontWeight: 700,
+            letterSpacing: '-.02em',
+            lineHeight: 1.25,
+            color: 'var(--text)',
+          }}
+        >
           {name}
         </h4>
         <p style={{ margin: '7px 0 0', fontSize: 12.5, lineHeight: 1.5, color: 'var(--text-dim)' }}>
@@ -177,7 +202,9 @@ export function RelistSheet({ target }: { target: RelistTarget }) {
         setListed({ id: r.resold._id, amount: value });
         return true;
       } catch (e) {
-        setError(e instanceof ApiError ? e.message : 'That did not go through. Nothing was listed — try again.');
+        setError(
+          e instanceof ApiError ? e.message : 'That did not go through. Nothing was listed — try again.',
+        );
         void quote.refetch();
         return false;
       }

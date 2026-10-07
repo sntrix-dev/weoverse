@@ -40,7 +40,13 @@ const page: CSSProperties = {
   animation: 'weo-cardin .5s var(--ease-portal) both',
 };
 
-const quiet: CSSProperties = { margin: 0, padding: 24, textAlign: 'center', fontSize: 13, color: 'var(--text-dim)' };
+const quiet: CSSProperties = {
+  margin: 0,
+  padding: 24,
+  textAlign: 'center',
+  fontSize: 13,
+  color: 'var(--text-dim)',
+};
 
 const HERO_ART = '/media/weo-nutrition.jpg';
 
@@ -153,10 +159,17 @@ export function HubPage() {
                   {joined.length ? (
                     <CircleGrid list={joined} act={circleAct} />
                   ) : (
-                    <p style={quiet}>{circlesQ.isLoading ? 'Finding your circles…' : 'You have not joined a circle yet.'}</p>
+                    <p style={quiet}>
+                      {circlesQ.isLoading ? 'Finding your circles…' : 'You have not joined a circle yet.'}
+                    </p>
                   )}
                   <div style={{ marginTop: 12 }}>
-                    <Button size="sm" variant="ghost" tone="violet" onClick={() => void navigate(routes.manage())}>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      tone="violet"
+                      onClick={() => void navigate(routes.manage())}
+                    >
                       Manage
                     </Button>
                   </div>
@@ -184,7 +197,15 @@ export function HubPage() {
               tone: '#3A95F2',
               body: (
                 <div>
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, alignItems: 'center', marginBottom: 14 }}>
+                  <div
+                    style={{
+                      display: 'flex',
+                      flexWrap: 'wrap',
+                      gap: 8,
+                      alignItems: 'center',
+                      marginBottom: 14,
+                    }}
+                  >
                     <LensSegs value={lens} onChange={setLens} />
                     {lens === 'questions' && (
                       <Tabs
@@ -219,7 +240,9 @@ export function HubPage() {
                         ))}
                       </div>
                     ) : (
-                      <p style={quiet}>{feedQ.isLoading ? 'Reading the questions…' : 'No questions here yet.'}</p>
+                      <p style={quiet}>
+                        {feedQ.isLoading ? 'Reading the questions…' : 'No questions here yet.'}
+                      </p>
                     ))}
                   {lens === 'stewards' && (
                     <StewardGrid
@@ -253,7 +276,12 @@ export function HubPage() {
       ) : (
         <FlowFoot
           screen="hub"
-          next={{ label: 'Exchange', lead: 'Move with the market', go: () => void navigate(routes.listed()), tone: '#F7C62B' }}
+          next={{
+            label: 'Exchange',
+            lead: 'Move with the market',
+            go: () => void navigate(routes.listed()),
+            tone: '#F7C62B',
+          }}
         />
       )}
       {opening && (

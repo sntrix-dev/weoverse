@@ -36,7 +36,8 @@ const eyebrow: CSSProperties = {
 };
 const QUESTION_MAX = 280;
 
-const failed = (e: unknown) => toast(e instanceof ApiError ? e.message : 'That did not go through — try again.');
+const failed = (e: unknown) =>
+  toast(e instanceof ApiError ? e.message : 'That did not go through — try again.');
 
 const radio = (on: boolean, tone: string): CSSProperties => ({
   width: 15,
@@ -84,7 +85,15 @@ function usePostable() {
   }, [q.data]);
 }
 
-function CirclePick({ list, value, onPick }: { list: CircleView[]; value: string | null; onPick: (id: string) => void }) {
+function CirclePick({
+  list,
+  value,
+  onPick,
+}: {
+  list: CircleView[];
+  value: string | null;
+  onPick: (id: string) => void;
+}) {
   return (
     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 7 }}>
       {list.map((c) => {
@@ -201,7 +210,9 @@ export function ComposeSheet({ circleId }: { circleId: string | null }) {
             style={wellInput}
           />
           {!question.trim() && (
-            <span style={{ fontSize: 11.5, color: 'var(--text-faint)' }}>Ask something before you carry on — the rest is optional.</span>
+            <span style={{ fontSize: 11.5, color: 'var(--text-faint)' }}>
+              Ask something before you carry on — the rest is optional.
+            </span>
           )}
           <textarea
             value={detail}
@@ -212,8 +223,19 @@ export function ComposeSheet({ circleId }: { circleId: string | null }) {
             style={{ ...wellInput, resize: 'none' }}
           />
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 7 }}>
-            {['How do I reach my first collectors?', 'Is my price right for this edition?', 'What should the world sim tell me?'].map((p) => (
-              <Chip key={p} tone="var(--o-violet)" role="button" tabIndex={0} onClick={() => setQuestion(p)} style={{ cursor: 'pointer' }}>
+            {[
+              'How do I reach my first collectors?',
+              'Is my price right for this edition?',
+              'What should the world sim tell me?',
+            ].map((p) => (
+              <Chip
+                key={p}
+                tone="var(--o-violet)"
+                role="button"
+                tabIndex={0}
+                onClick={() => setQuestion(p)}
+                style={{ cursor: 'pointer' }}
+              >
                 {p}
               </Chip>
             ))}
@@ -222,9 +244,16 @@ export function ComposeSheet({ circleId }: { circleId: string | null }) {
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           <p style={eyebrow}>Attach a WeO (optional)</p>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 6, maxHeight: 160, overflowY: 'auto' }}>
+          <div
+            style={{ display: 'flex', flexDirection: 'column', gap: 6, maxHeight: 160, overflowY: 'auto' }}
+          >
             {[{ id: 'none', title: 'No WeO' }, ...weos].map((o) => (
-              <button key={o.id} onClick={() => setWeoId(o.id)} aria-pressed={weoId === o.id} style={option(weoId === o.id, 'var(--o-violet)')}>
+              <button
+                key={o.id}
+                onClick={() => setWeoId(o.id)}
+                aria-pressed={weoId === o.id}
+                style={option(weoId === o.id, 'var(--o-violet)')}
+              >
                 <span style={radio(weoId === o.id, 'var(--o-violet)')} />
                 {o.title}
               </button>
@@ -341,8 +370,19 @@ export function PushSheet({ weo: w, circleId }: { weo: PushTarget; circleId: str
             style={{ ...wellInput, resize: 'none' }}
           />
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 7 }}>
-            {['Why is my first-collector time slow?', 'How do I price the next edition?', 'Which world should I rehearse in?'].map((p) => (
-              <Chip key={p} tone="var(--o-violet)" role="button" tabIndex={0} onClick={() => setQuestion(p)} style={{ cursor: 'pointer' }}>
+            {[
+              'Why is my first-collector time slow?',
+              'How do I price the next edition?',
+              'Which world should I rehearse in?',
+            ].map((p) => (
+              <Chip
+                key={p}
+                tone="var(--o-violet)"
+                role="button"
+                tabIndex={0}
+                onClick={() => setQuestion(p)}
+                style={{ cursor: 'pointer' }}
+              >
                 {p}
               </Chip>
             ))}
@@ -350,7 +390,14 @@ export function PushSheet({ weo: w, circleId }: { weo: PushTarget; circleId: str
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-          <div style={{ borderRadius: 16, padding: 14, background: 'var(--surface)', boxShadow: 'var(--nm-inset)' }}>
+          <div
+            style={{
+              borderRadius: 16,
+              padding: 14,
+              background: 'var(--surface)',
+              boxShadow: 'var(--nm-inset)',
+            }}
+          >
             <p style={eyebrow}>Your question</p>
             <p style={{ margin: '4px 0 0', fontSize: 14, color: 'var(--text)' }}>{question || '—'}</p>
           </div>
@@ -361,7 +408,15 @@ export function PushSheet({ weo: w, circleId }: { weo: PushTarget; circleId: str
 }
 
 /** design: screens-more.jsx ReportModal — four reasons, one submit (D-041). */
-export function ReportSheet({ label, threadId, answerId }: { label: string; threadId?: string; answerId?: string }) {
+export function ReportSheet({
+  label,
+  threadId,
+  answerId,
+}: {
+  label: string;
+  threadId?: string;
+  answerId?: string;
+}) {
   const report = useReport();
   const [reason, setReason] = useState<(typeof REPORT_REASONS)[number] | null>(null);
   const submit = () => {
@@ -398,7 +453,12 @@ export function ReportSheet({ label, threadId, answerId }: { label: string; thre
         {REPORT_REASONS.map((r) => {
           const on = reason?.type === r.type;
           return (
-            <button key={r.type} onClick={() => setReason(r)} aria-pressed={on} style={option(on, 'var(--status-error)')}>
+            <button
+              key={r.type}
+              onClick={() => setReason(r)}
+              aria-pressed={on}
+              style={option(on, 'var(--status-error)')}
+            >
               <span style={radio(on, 'var(--status-error)')} />
               {r.label}
             </button>

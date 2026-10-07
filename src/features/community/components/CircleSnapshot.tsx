@@ -42,7 +42,9 @@ export function CircleSnapshot({
       label: 'Discussions',
       count: compact(c.threads),
       tone: 'var(--o-violet)',
-      icon: <path d="M20.5 11.5a8 8 0 0 1-8 8 8 8 0 0 1-3.6-.85L3.5 20.5l1.85-5.4A8 8 0 0 1 12.5 3.5a8 8 0 0 1 8 8z" />,
+      icon: (
+        <path d="M20.5 11.5a8 8 0 0 1-8 8 8 8 0 0 1-3.6-.85L3.5 20.5l1.85-5.4A8 8 0 0 1 12.5 3.5a8 8 0 0 1 8 8z" />
+      ),
       note: open ? `${open} still open` : 'all resolved',
       body: (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
@@ -70,7 +72,11 @@ export function CircleSnapshot({
               >
                 {t.title}
               </span>
-              <span style={{ fontSize: 10.5, color: 'var(--text-faint)', fontVariantNumeric: 'tabular-nums' }}>{t.replies}</span>
+              <span
+                style={{ fontSize: 10.5, color: 'var(--text-faint)', fontVariantNumeric: 'tabular-nums' }}
+              >
+                {t.replies}
+              </span>
             </span>
           ))}
         </div>
@@ -113,9 +119,19 @@ export function CircleSnapshot({
       body: (
         <span style={{ display: 'flex', gap: 6 }}>
           {weos.slice(0, 4).map((w) => (
-            <Orb key={w.id} size={30} fill={w.img ? 'image' : w.ring} src={w.img} ring ringColor={w.ring} matcap />
+            <Orb
+              key={w.id}
+              size={30}
+              fill={w.img ? 'image' : w.ring}
+              src={w.img}
+              ring
+              ringColor={w.ring}
+              matcap
+            />
           ))}
-          {!weos.length && <span style={{ fontSize: 11.5, color: 'var(--text-faint)' }}>Nothing posted yet</span>}
+          {!weos.length && (
+            <span style={{ fontSize: 11.5, color: 'var(--text-faint)' }}>Nothing posted yet</span>
+          )}
         </span>
       ),
     },
@@ -176,10 +192,26 @@ export function CircleSnapshot({
               >
                 {svg(card.icon, 16, 'currentColor', 1.8)}
               </span>
-              <span style={{ minWidth: 0, flex: 1, fontSize: 12, fontWeight: 700, letterSpacing: '.02em', color: 'var(--text)' }}>
+              <span
+                style={{
+                  minWidth: 0,
+                  flex: 1,
+                  fontSize: 12,
+                  fontWeight: 700,
+                  letterSpacing: '.02em',
+                  color: 'var(--text)',
+                }}
+              >
                 {card.label}
               </span>
-              <span style={{ fontSize: 15, fontWeight: 700, color: 'var(--text)', fontVariantNumeric: 'tabular-nums' }}>
+              <span
+                style={{
+                  fontSize: 15,
+                  fontWeight: 700,
+                  color: 'var(--text)',
+                  fontVariantNumeric: 'tabular-nums',
+                }}
+              >
                 {card.count}
               </span>
             </span>

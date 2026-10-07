@@ -131,7 +131,10 @@ export function draftModel(d: DraftDto): ListingModel {
 export function exchangeStats(s: ListingsSnapshotDto | undefined, rows: ListingModel[]) {
   return [
     { value: compact(s?.totals.collects.current ?? 0), label: 'Collects · 7d' },
-    { value: s?.collectThrough != null ? `${Math.round(s.collectThrough * 100)}%` : '—', label: 'Collect-through' },
+    {
+      value: s?.collectThrough != null ? `${Math.round(s.collectThrough * 100)}%` : '—',
+      label: 'Collect-through',
+    },
     { value: String(rows.filter((r) => r.kind === 'draft').length), label: 'Drafts' },
     { value: String(rows.filter((r) => r.resellable).length), label: 'Resellable' },
   ];
@@ -161,7 +164,13 @@ export function attention(rows: ListingModel[]): AttentionItem[] {
     }
     if (l.state !== 'Live') continue;
     if (l.stockLeft != null && l.stockTotal && l.stockLeft > 0 && l.stockLeft / l.stockTotal <= 0.25)
-      out.push({ l, why: `${l.stockLeft} left of ${l.stockTotal}`, act: 'Restock', tone: '#22C55E', urgency: 2 });
+      out.push({
+        l,
+        why: `${l.stockLeft} left of ${l.stockTotal}`,
+        act: 'Restock',
+        tone: '#22C55E',
+        urgency: 2,
+      });
     else if (open) out.push({ l, why: checks(open), act: 'Fix', tone: '#D946EF', urgency: 1.5 });
   }
   return out.sort((a, b) => b.urgency - a.urgency);
@@ -177,7 +186,17 @@ export function exchangeBoards(
   const row = (id: string, extra: (l: ListingModel) => Partial<BoardRow>): BoardRow[] => {
     const l = byId.get(id);
     return l
-      ? [{ id: l.id, name: l.name, img: l.img, tone: formatHex(l.format), sub: `${l.format} · ${l.state}`, value: '', ...extra(l) }]
+      ? [
+          {
+            id: l.id,
+            name: l.name,
+            img: l.img,
+            tone: formatHex(l.format),
+            sub: `${l.format} · ${l.state}`,
+            value: '',
+            ...extra(l),
+          },
+        ]
       : [];
   };
   const b = s.boards;
@@ -186,14 +205,21 @@ export function exchangeBoards(
       label: b.performing.label,
       metric: b.performing.metric,
       rows: b.performing.rowIds.flatMap((id) =>
-        row(id, (l) => ({ value: `${Math.round((l.through ?? 0) * 100)}%`, delta: `${l.collects} collects` })),
+        row(id, (l) => ({
+          value: `${Math.round((l.through ?? 0) * 100)}%`,
+          delta: `${l.collects} collects`,
+        })),
       ),
     },
     views: {
       label: b.views.label,
       metric: b.views.metric,
       rows: b.views.rowIds.flatMap((id) =>
-        row(id, (l) => ({ sub: `${l.format} · ${l.since}`, value: compact(l.views), delta: `${l.saves} saves` })),
+        row(id, (l) => ({
+          sub: `${l.format} · ${l.since}`,
+          value: compact(l.views),
+          delta: `${l.saves} saves`,
+        })),
       ),
     },
     earning: {

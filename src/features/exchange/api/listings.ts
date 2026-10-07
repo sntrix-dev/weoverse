@@ -30,7 +30,12 @@ export function useSetListingStatus() {
             ...d,
             rows: d.rows.map((r) =>
               r.id === id
-                ? { ...r, status, paused: status === 'inactive', state: status === 'inactive' ? 'draft' : 'live' }
+                ? {
+                    ...r,
+                    status,
+                    paused: status === 'inactive',
+                    state: status === 'inactive' ? 'draft' : 'live',
+                  }
                 : r,
             ),
           }
@@ -38,9 +43,12 @@ export function useSetListingStatus() {
     );
   return useMutation({
     mutationFn: ({ id, status }: { id: string; status: 'active' | 'inactive'; was: 'active' | 'inactive' }) =>
-      api.patch<{ _id: string; status: string; changed: boolean }>(`/frontend/weos/${encodeURIComponent(id)}/status`, {
-        status,
-      }),
+      api.patch<{ _id: string; status: string; changed: boolean }>(
+        `/frontend/weos/${encodeURIComponent(id)}/status`,
+        {
+          status,
+        },
+      ),
     onMutate: ({ id, status }) => flip(id, status),
     onError: (_e, { id, was }) => flip(id, was),
     onSettled: () => {
@@ -60,7 +68,9 @@ export function useCircleCreators(limit = 6) {
     queryKey: qk.creators.list({ circle: 'joined', limit }),
     queryFn: async () => {
       type Page = { items: CreatorRowDto[] };
-      const mine = await api.get<Page>('/frontend/creators', { query: { circle: 'joined', sort: 'isr', limit } });
+      const mine = await api.get<Page>('/frontend/creators', {
+        query: { circle: 'joined', sort: 'isr', limit },
+      });
       if (mine.items.length) return { items: mine.items, shared: true };
       const top = await api.get<Page>('/frontend/creators', { query: { sort: 'isr', limit } });
       return { items: top.items, shared: false };

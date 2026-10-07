@@ -100,17 +100,22 @@ export function ExchangePage() {
     [creatorsQ.data, me?.id],
   );
 
-  const open = (l: ListingModel) => void navigate(l.kind === 'draft' ? routes.create(l.id) : routes.weo(l.id));
+  const open = (l: ListingModel) =>
+    void navigate(l.kind === 'draft' ? routes.create(l.id) : routes.weo(l.id));
   const act: ListingRowHandlers = {
     onOpen: open,
     // a live WeO opens in the composer (M07); a Hunt has no composer yet (CRE-12) and opens the WeO
-    onEdit: (l) => void navigate(l.kind === 'draft' ? routes.create(l.id) : l.format === 'Hunt' ? routes.weo(l.id) : routes.edit(l.id)),
+    onEdit: (l) =>
+      void navigate(
+        l.kind === 'draft' ? routes.create(l.id) : l.format === 'Hunt' ? routes.weo(l.id) : routes.edit(l.id),
+      ),
     onToggle: (l) => {
       const to = l.paused ? 'active' : 'inactive';
       setStatus.mutate(
         { id: l.id, status: to, was: l.paused ? 'inactive' : 'active' },
         {
-          onSuccess: () => toast(`${l.name} · ${to === 'active' ? 'back in flow' : 'paused — off the floor'}`),
+          onSuccess: () =>
+            toast(`${l.name} · ${to === 'active' ? 'back in flow' : 'paused — off the floor'}`),
           onError: (e) => toast(fail(e)),
         },
       );
@@ -138,7 +143,9 @@ export function ExchangePage() {
     <SnapshotRail
       title="Needs attention"
       empty="Nothing waiting on you."
-      rows={att.slice(0, 6).map((a) => ({ k: a.l.name, v: a.act, note: a.why, tone: a.tone, onAct: () => open(a.l) }))}
+      rows={att
+        .slice(0, 6)
+        .map((a) => ({ k: a.l.name, v: a.act, note: a.why, tone: a.tone, onAct: () => open(a.l) }))}
     />
   );
 
@@ -165,7 +172,12 @@ export function ExchangePage() {
         }
         foot={
           Object.keys(pulse).length ? (
-            <SnapshotChart pulse={pulse} keys={Object.keys(EXCHANGE_PULSE_TONES)} value={board} onChange={setBoard} />
+            <SnapshotChart
+              pulse={pulse}
+              keys={Object.keys(EXCHANGE_PULSE_TONES)}
+              value={board}
+              onChange={setBoard}
+            />
           ) : undefined
         }
       />
@@ -174,7 +186,14 @@ export function ExchangePage() {
         <SectionHead
           eyebrow="01 — In flow"
           title="WeOs you flow"
-          right={<Tabs tabs={withTabIcons([...TABS])} value={tab} onChange={(v) => setTab(v as Tab)} tone="var(--o-gold)" />}
+          right={
+            <Tabs
+              tabs={withTabIcons([...TABS])}
+              value={tab}
+              onChange={(v) => setTab(v as Tab)}
+              tone="var(--o-gold)"
+            />
+          }
         />
         <div
           style={{
@@ -219,7 +238,9 @@ export function ExchangePage() {
                   onPick={onPick}
                 />
               ) : (
-                <p style={{ ...quiet, background: 'transparent' }}>{snap.isLoading ? 'Measuring…' : 'Nothing to measure yet.'}</p>
+                <p style={{ ...quiet, background: 'transparent' }}>
+                  {snap.isLoading ? 'Measuring…' : 'Nothing to measure yet.'}
+                </p>
               ),
             },
             {
@@ -254,7 +275,12 @@ export function ExchangePage() {
       <FlowFoot
         screen="listed"
         back={{ label: 'Community', go: () => void navigate(routes.hub()) }}
-        next={{ label: 'Discover', lead: 'See them on the floor', go: () => void navigate(routes.discover()), tone: '#3A95F2' }}
+        next={{
+          label: 'Discover',
+          lead: 'See them on the floor',
+          go: () => void navigate(routes.discover()),
+          tone: '#3A95F2',
+        }}
       />
     </main>
   );

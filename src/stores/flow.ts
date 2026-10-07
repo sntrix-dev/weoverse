@@ -67,11 +67,13 @@ export const useFlow = create<FlowState>(() => ({ ...closed, creator: null }));
 export const openCollect = (weoId: string) => useFlow.setState({ ...closed, collect: weoId });
 /** design `app.openRelist(h)` */
 export const openRelist = (target: RelistTarget) => useFlow.setState({ ...closed, relist: target });
-export const openCompose = (circleId: string | null = null) => useFlow.setState({ ...closed, compose: { circleId } });
+export const openCompose = (circleId: string | null = null) =>
+  useFlow.setState({ ...closed, compose: { circleId } });
 export const openPush = (weo: PushTarget, circleId: string | null = null) =>
   useFlow.setState({ ...closed, push: { weo, circleId } });
 /** design `app.openPush(w)` from any WeO surface */
-export const askAbout = (w: WeoCardModel, circleId: string | null = null) => openPush(pushTargetOf(w), circleId);
+export const askAbout = (w: WeoCardModel, circleId: string | null = null) =>
+  openPush(pushTargetOf(w), circleId);
 export const openReport = (target: ReportTarget) => useFlow.setState({ ...closed, report: target });
 export const closeFlow = () => useFlow.setState({ ...closed });
 /** design `app.openOffer(r)` */

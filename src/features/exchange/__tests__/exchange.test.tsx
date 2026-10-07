@@ -26,7 +26,14 @@ describe('listings model', () => {
   it('needs attention: close to selling out first, then open checks, then drafts to finish', () => {
     const rows = [
       draftModel(draftsFixture[0]!),
-      listingModel(listingRow({ id: 'a', stockLeft: 40, readyRate: 0.8, preflight: [{ label: 'Media · orb preview', ok: false }] })),
+      listingModel(
+        listingRow({
+          id: 'a',
+          stockLeft: 40,
+          readyRate: 0.8,
+          preflight: [{ label: 'Media · orb preview', ok: false }],
+        }),
+      ),
       listingModel(listingRow({ id: 'b', stockLeft: 5, stockTotal: 50 })),
     ];
     expect(attention(rows).map((a) => [a.l.id, a.act])).toEqual([
@@ -58,7 +65,10 @@ describe('exchange page', () => {
     expect(within(listed).getAllByText('1,881').length).toBeGreaterThan(0);
 
     await user.click(within(listed).getByRole('button', { name: /^Live/ }));
-    const names = () => within(listed).getAllByRole('heading', { level: 3 }).map((h) => h.textContent);
+    const names = () =>
+      within(listed)
+        .getAllByRole('heading', { level: 3 })
+        .map((h) => h.textContent);
     expect(names()).toEqual(['Tide Pool', 'Studio Hour']);
     expect(within(listed).getByText('Paused')).toBeInTheDocument();
     await user.click(within(listed).getByRole('button', { name: /^Draft/ }));
@@ -84,7 +94,9 @@ describe('exchange page', () => {
     await user.click(screen.getByRole('menuitem', { name: 'Activate' }));
     await waitFor(() => expect(patched).toHaveBeenCalledWith('l-2', { status: 'active' }));
 
-    server.use(http.patch(url('/frontend/weos/:id/status'), () => fail(409, 'A resold WeO cannot be paused')));
+    server.use(
+      http.patch(url('/frontend/weos/:id/status'), () => fail(409, 'A resold WeO cannot be paused')),
+    );
     await user.click(screen.getByRole('button', { name: 'Actions for Tide Pool' }));
     await user.click(screen.getByRole('menuitem', { name: 'Inactivate' }));
     expect(await screen.findByText('A resold WeO cannot be paused')).toBeInTheDocument();
@@ -93,7 +105,10 @@ describe('exchange page', () => {
   it('offers only what a row can do: no pause on a re-listing, no push on a draft', async () => {
     server.use(
       http.get(url('/frontend/me/listings/snapshot'), () =>
-        ok({ ...listingsSnapshotFixture(), rows: [listingRow({ id: 'l-9', title: 'Relisted Loop', status: 'resold' })] }),
+        ok({
+          ...listingsSnapshotFixture(),
+          rows: [listingRow({ id: 'l-9', title: 'Relisted Loop', status: 'resold' })],
+        }),
       ),
     );
     const user = userEvent.setup();

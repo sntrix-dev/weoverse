@@ -36,7 +36,8 @@ const eyebrow: CSSProperties = {
   color: 'var(--text-faint)',
 };
 
-const failed = (e: unknown) => toast(e instanceof ApiError ? e.message : 'That did not go through — try again.');
+const failed = (e: unknown) =>
+  toast(e instanceof ApiError ? e.message : 'That did not go through — try again.');
 
 /** design: thread.jsx ThreadScreen — the question, its answers by score, your answer, and what it is about. */
 export function ThreadPage() {
@@ -54,7 +55,7 @@ export function ThreadPage() {
   const [replyText, setReplyText] = useState('');
 
   const t = useMemo(() => (q.data ? threadDetail(q.data, me?.id) : null), [q.data, me?.id]);
-  const weoQ = useWeo(q.data?.attachedWeo ? q.data.attachedWeoId ?? undefined : undefined);
+  const weoQ = useWeo(q.data?.attachedWeo ? (q.data.attachedWeoId ?? undefined) : undefined);
   const w = useMemo(() => (weoQ.data ? cardModel(weoQ.data) : null), [weoQ.data]);
   const wh = useCommunityWeoHandlers(t?.circleId ?? null);
   const circleName = t?.circleName ?? 'Circle';
@@ -171,7 +172,16 @@ export function ThreadPage() {
               {t.title}
             </h1>
             {t.body && (
-              <p style={{ margin: '12px 0 0', fontSize: 15, lineHeight: 1.6, color: 'var(--text)', maxWidth: '68ch', whiteSpace: 'pre-line' }}>
+              <p
+                style={{
+                  margin: '12px 0 0',
+                  fontSize: 15,
+                  lineHeight: 1.6,
+                  color: 'var(--text)',
+                  maxWidth: '68ch',
+                  whiteSpace: 'pre-line',
+                }}
+              >
                 {t.body}
               </p>
             )}
@@ -203,7 +213,16 @@ export function ThreadPage() {
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
-            <h2 style={{ margin: 0, fontSize: 20, fontWeight: 700, letterSpacing: '-.02em', color: 'var(--text)', whiteSpace: 'nowrap' }}>
+            <h2
+              style={{
+                margin: 0,
+                fontSize: 20,
+                fontWeight: 700,
+                letterSpacing: '-.02em',
+                color: 'var(--text)',
+                whiteSpace: 'nowrap',
+              }}
+            >
               <span style={{ fontVariantNumeric: 'tabular-nums' }}>{t.answers.length}</span>{' '}
               {t.answers.length === 1 ? 'answer' : 'answers'}
             </h2>
@@ -251,16 +270,40 @@ export function ThreadPage() {
                 fontFamily: 'inherit',
               }}
             />
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, marginTop: 10, flexWrap: 'wrap' }}>
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: 10,
+                marginTop: 10,
+                flexWrap: 'wrap',
+              }}
+            >
               <span />
-              <Button size="sm" variant="primary" tone="green" disabled={answer.isPending} onClick={postAnswer}>
+              <Button
+                size="sm"
+                variant="primary"
+                tone="green"
+                disabled={answer.isPending}
+                onClick={postAnswer}
+              >
                 Post answer
               </Button>
             </div>
           </div>
         </div>
 
-        <div style={{ flex: '1 1 250px', minWidth: 230, display: 'flex', flexDirection: 'column', gap: 14, alignItems: 'stretch' }}>
+        <div
+          style={{
+            flex: '1 1 250px',
+            minWidth: 230,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 14,
+            alignItems: 'stretch',
+          }}
+        >
           {w && (
             <div
               style={{
@@ -279,9 +322,20 @@ export function ThreadPage() {
           )}
           <div style={{ ...panel, borderRadius: 22, padding: 18 }}>
             <p style={{ ...eyebrow, margin: '0 0 10px' }}>Thread</p>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 5, fontSize: 12.5, color: 'var(--text-dim)' }}>
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 5,
+                fontSize: 12.5,
+                color: 'var(--text-dim)',
+              }}
+            >
               <p style={{ margin: 0 }}>
-                Status <span style={{ fontWeight: 700, color: 'var(--text)' }}>{t.resolved ? 'Resolved' : 'Open'}</span>
+                Status{' '}
+                <span style={{ fontWeight: 700, color: 'var(--text)' }}>
+                  {t.resolved ? 'Resolved' : 'Open'}
+                </span>
               </p>
               <p style={{ margin: 0, fontVariantNumeric: 'tabular-nums' }}>
                 {t.replies} replies · {t.reactions} reactions

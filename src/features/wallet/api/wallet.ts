@@ -20,8 +20,7 @@ export function useWalletView() {
 export function useHoldingFaces(limit = 3) {
   return useQuery({
     queryKey: ['wallet', 'faces', limit],
-    queryFn: () =>
-      api.get<{ items: CollectionRow[] }>('/frontend/me/collections', { query: { limit } }),
+    queryFn: () => api.get<{ items: CollectionRow[] }>('/frontend/me/collections', { query: { limit } }),
     select: (d) =>
       d.items
         .map((c) => ({ id: c._id, img: c.weo?.media?.find((m) => m.url)?.url ?? null }))

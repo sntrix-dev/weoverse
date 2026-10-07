@@ -14,7 +14,15 @@ export interface CircleActions {
  * orb, what it is, who is here now, and Enter / Join / Close. "Stewarded by" is gone with the
  * steward role (D-036); the rim is the circle's first members.
  */
-export function CircleOrbit({ c, act, onCollapse }: { c: CircleView; act: CircleActions; onCollapse: () => void }) {
+export function CircleOrbit({
+  c,
+  act,
+  onCollapse,
+}: {
+  c: CircleView;
+  act: CircleActions;
+  onCollapse: () => void;
+}) {
   const members = useCircleMembers(c.id, 6);
   const rim = (members.data?.items ?? []).map((m) => ({ id: m.id, avatar: m.profileImage || null }));
   const outer = rim.slice(0, 4);
@@ -68,10 +76,33 @@ export function CircleOrbit({ c, act, onCollapse }: { c: CircleView; act: Circle
         animation: 'weo-cardin .45s var(--ease-portal) both',
       }}
     >
-      <div style={{ flex: '0 0 auto', width: 348, maxWidth: '100%', height: 348, display: 'grid', placeItems: 'center' }}>
+      <div
+        style={{
+          flex: '0 0 auto',
+          width: 348,
+          maxWidth: '100%',
+          height: 348,
+          display: 'grid',
+          placeItems: 'center',
+        }}
+      >
         <div className="orbit-ring" style={{ position: 'relative', width: 300, height: 300 }}>
-          <div style={{ position: 'absolute', inset: 0, borderRadius: '50%', border: '1px dashed var(--border)' }} />
-          <div style={{ position: 'absolute', inset: 64, borderRadius: '50%', border: '1px solid var(--border)' }} />
+          <div
+            style={{
+              position: 'absolute',
+              inset: 0,
+              borderRadius: '50%',
+              border: '1px dashed var(--border)',
+            }}
+          />
+          <div
+            style={{
+              position: 'absolute',
+              inset: 64,
+              borderRadius: '50%',
+              border: '1px solid var(--border)',
+            }}
+          />
           {ring(outer, 0, 34, false)}
           {ring(inner, 64, 26, true)}
           <div style={{ position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%,-50%)' }}>
@@ -100,7 +131,15 @@ export function CircleOrbit({ c, act, onCollapse }: { c: CircleView; act: Circle
         >
           {c.axis}
         </p>
-        <h3 style={{ margin: '7px 0 0', fontSize: 'clamp(21px,2.4vw,27px)', fontWeight: 700, letterSpacing: '-.03em', color: 'var(--text)' }}>
+        <h3
+          style={{
+            margin: '7px 0 0',
+            fontSize: 'clamp(21px,2.4vw,27px)',
+            fontWeight: 700,
+            letterSpacing: '-.03em',
+            color: 'var(--text)',
+          }}
+        >
           {c.name}
         </h3>
         <p
@@ -120,7 +159,15 @@ export function CircleOrbit({ c, act, onCollapse }: { c: CircleView; act: Circle
         </p>
         <CircleChip c={c} />
         <div style={{ display: 'flex', alignItems: 'center', gap: 9, marginTop: 14 }}>
-          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 12, color: 'var(--text-dim)' }}>
+          <span
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 6,
+              fontSize: 12,
+              color: 'var(--text-dim)',
+            }}
+          >
             <span
               style={{
                 width: 7,
@@ -130,15 +177,23 @@ export function CircleOrbit({ c, act, onCollapse }: { c: CircleView; act: Circle
                 animation: 'weo-breathe-sm 3.4s var(--ease-standard) infinite',
               }}
             />
-            <span style={{ fontWeight: 700, color: 'var(--text)', fontVariantNumeric: 'tabular-nums' }}>{c.active}</span> here
-            now
+            <span style={{ fontWeight: 700, color: 'var(--text)', fontVariantNumeric: 'tabular-nums' }}>
+              {c.active}
+            </span>{' '}
+            here now
           </span>
         </div>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 9, marginTop: 20 }}>
           <Button size="sm" variant="primary" tone="violet" onClick={() => act.onEnter(c)}>
             Enter circle
           </Button>
-          <Button size="sm" variant="ghost" tone="green" selected={c.joined} onClick={() => act.onToggleJoin(c)}>
+          <Button
+            size="sm"
+            variant="ghost"
+            tone="green"
+            selected={c.joined}
+            onClick={() => act.onToggleJoin(c)}
+          >
             {c.joined ? '✓ Joined' : 'Join'}
           </Button>
           <Button size="sm" variant="ghost" tone="blue" onClick={onCollapse}>

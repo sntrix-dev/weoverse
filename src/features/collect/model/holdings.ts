@@ -153,7 +153,16 @@ export function collectBoards(
   const holdingRow = (id: string, value: (h: HoldingModel) => Partial<BoardRow>): BoardRow[] => {
     const h = rows.get(id);
     return h
-      ? [{ id: h.id, name: h.name, img: h.img, tone: formatHex(h.format), value: oStr(h.current), ...value(h) }]
+      ? [
+          {
+            id: h.id,
+            name: h.name,
+            img: h.img,
+            tone: formatHex(h.format),
+            value: oStr(h.current),
+            ...value(h),
+          },
+        ]
       : [];
   };
 
@@ -169,7 +178,11 @@ export function collectBoards(
         value: oStr(Math.round(g.value)),
         delta: share(g),
         tone: fmt ? formatHex(fmt) : '#D946EF',
-        ...(fmt ? { initial: g.label.charAt(0) } : g.img ? { avatar: g.img } : { initial: g.label.charAt(0) }),
+        ...(fmt
+          ? { initial: g.label.charAt(0) }
+          : g.img
+            ? { avatar: g.img }
+            : { initial: g.label.charAt(0) }),
       },
     ];
   };
@@ -180,11 +193,18 @@ export function collectBoards(
       label: b.movers.label,
       metric: b.movers.metric,
       rows: b.movers.rowIds.flatMap((id) =>
-        holdingRow(id, (h) => ({ sub: `${h.format} · paid ${oStr(h.paid)}`, delta: signed(h.current - h.paid) })),
+        holdingRow(id, (h) => ({
+          sub: `${h.format} · paid ${oStr(h.paid)}`,
+          delta: signed(h.current - h.paid),
+        })),
       ),
     },
     formats: { label: b.formats.label, metric: b.formats.metric, rows: b.formats.rowIds.flatMap(groupRow) },
-    creators: { label: b.creators.label, metric: b.creators.metric, rows: b.creators.rowIds.flatMap(groupRow) },
+    creators: {
+      label: b.creators.label,
+      metric: b.creators.metric,
+      rows: b.creators.rowIds.flatMap(groupRow),
+    },
     pending: {
       label: b.pending.label,
       metric: b.pending.metric,
