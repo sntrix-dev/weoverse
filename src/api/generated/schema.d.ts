@@ -7731,19 +7731,6 @@ export interface components {
             /** @example 7 */
             totalPages: number;
         };
-        /** @description Auto-managed Mongoose timestamps; present on most documents. */
-        TimestampFields: {
-            /**
-             * Format: date-time
-             * @example 2024-09-12T08:31:00.000Z
-             */
-            createdAt?: string;
-            /**
-             * Format: date-time
-             * @example 2024-09-13T12:01:42.123Z
-             */
-            updatedAt?: string;
-        };
         BaseResponse: {
             /** @example true */
             success: boolean;
@@ -7807,22 +7794,63 @@ export interface components {
             error?: string | null;
             errors: components["schemas"]["ValidationFieldError"][];
         };
+        /**
+         * @description Structured account-status context attached to a 403 when the caller's
+         *     account is deleted, suspended or banned (`auth.middleware.ts`
+         *     `authenticate`, `shared/utils/user-status.ts` `assertUserActive`).
+         *     `reason` is the user's `statusReason` and is omitted when unset
+         *     (never present for `ACCOUNT_DELETED`).
+         */
+        AccountStatusPayload: {
+            /**
+             * @example ACCOUNT_SUSPENDED
+             * @enum {string}
+             */
+            code: "ACCOUNT_DELETED" | "ACCOUNT_SUSPENDED" | "ACCOUNT_BANNED";
+            /**
+             * @example suspended
+             * @enum {string}
+             */
+            status: "deleted" | "suspended" | "banned";
+            /** @example Repeated policy violations. */
+            reason?: string;
+        };
+        /**
+         * @description 403 emitted directly by `authenticate` (`auth.middleware.ts`) when the
+         *     token is valid but the account is deleted / suspended / banned. The
+         *     payload lives in `data` and there is **no** `error` field.
+         */
+        AccountStatusErrorResponse: {
+            /**
+             * @example false
+             * @enum {boolean}
+             */
+            success: false;
+            /** @example Your account has been suspended. Contact support if you believe this is a mistake. */
+            message: string;
+            data: components["schemas"]["AccountStatusPayload"];
+        };
+        /**
+         * @description 403 from `POST /frontend/auth/verify` and `POST /frontend/auth/new_access_token`
+         *     when `assertUserActive` rejects the local user. The account state is in
+         *     `data` (`data.code`, like every other `authenticate` refusal — M12) and,
+         *     for clients written before M12, repeated in `errors`.
+         */
+        AuthAccountStatusErrorResponse: {
+            /**
+             * @example false
+             * @enum {boolean}
+             */
+            success: false;
+            /** @example Your account has been suspended. Contact support if you believe this is a mistake. */
+            message: string;
+            data: components["schemas"]["AccountStatusPayload"];
+            /** @example Your account has been suspended. Contact support if you believe this is a mistake. */
+            error: string;
+            errors: components["schemas"]["AccountStatusPayload"];
+        };
         /** @enum {string} */
         ActivityEntityType: "offer" | "user" | "collection" | "installment" | "resell" | "negotiation" | "wallet" | "category" | "subcategory" | "report" | "feedback" | "invitation";
-        /** @description User activity counter (`src/modules/activity/activity.model.ts`). */
-        Activity: {
-            _id: components["schemas"]["ObjectId"];
-            userId: components["schemas"]["ObjectId"];
-            type: components["schemas"]["WeoActivityType"];
-            /** @example 12 */
-            count: number;
-            /** Format: date-time */
-            createdAt?: string;
-            /** Format: date-time */
-            updatedAt?: string;
-        } & {
-            [key: string]: unknown;
-        };
         /** @description Per-event activity log row (`src/modules/activity/activity.log.model.ts`). */
         ActivityLog: {
             _id: components["schemas"]["ObjectId"];
@@ -7889,6 +7917,50 @@ export interface components {
             createdAt?: string;
             /** Format: date-time */
             updatedAt?: string;
+        } & {
+            [key: string]: unknown;
+        };
+        /**
+         * @description Body for `POST /frontend/admin/activity/config` and
+         *     `PUT /frontend/admin/activity/config/{id}`. There is no Zod validator —
+         *     the controller passes `req.body` straight to the service, so every
+         *     field is optional and model defaults apply on create. Server-managed
+         *     `_id`, `createdAt` and `updatedAt` are not sent.
+         */
+        WeoActivityConfigRequest: {
+            /** @example default-2024-q4 */
+            name?: string;
+            description?: string;
+            /** @example true */
+            isActive?: boolean;
+            /** @example 0.1 */
+            weoCollection?: number;
+            /** @example 0.15 */
+            weoSell?: number;
+            /** @example 0.05 */
+            resellActivity?: number;
+            /** @example 0.05 */
+            weoPost?: number;
+            /** @example 0.02 */
+            likeActivity?: number;
+            /** @example 0.05 */
+            weoTopUp?: number;
+            /** @example 0.02 */
+            weoWithdrawal?: number;
+            /** @example 0.05 */
+            weoReferral?: number;
+            /** @example 0.02 */
+            weoFollow?: number;
+            /** @example 0.02 */
+            weoShare?: number;
+            /** @example 0.05 */
+            weoRegistration?: number;
+            /** @example 0.03 */
+            weoProfileComplete?: number;
+            /** @example 0.05 */
+            weoServicePurchase?: number;
+            /** @example 0.04 */
+            weoRewards?: number;
         } & {
             [key: string]: unknown;
         };
@@ -8288,11 +8360,6 @@ export interface components {
             /** @enum {boolean} */
             success?: true;
             data?: components["schemas"]["Category"];
-        };
-        SubcategoryResponse: components["schemas"]["BaseResponse"] & {
-            /** @enum {boolean} */
-            success?: true;
-            data?: components["schemas"]["Subcategory"];
         };
         AdminCategoryListResponse: components["schemas"]["BaseResponse"] & {
             /** @enum {boolean} */
@@ -9024,23 +9091,20 @@ export interface components {
             /** @example Digital Arts */
             name: string;
             description: string;
-            /** @example #1F2937 */
+            /** @example #B981F6 */
             coverColor: string;
             /**
              * @description Optional hero image URL; empty on legacy rows.
-             * @example
+             * @example https://cdn.weo.example/circles/digital-arts.jpg
              */
             coverImage: string;
-            /** @example 1240 */
+            /** @example 4820 */
             memberCount: number;
             /**
              * @description Mongo `$text` textScore. Comparable across other circle
              *     hits in the same response but NOT across lists.
-             * @example 1.1
              */
             score: number;
-            /** @example By Category */
-            axisLabel?: string;
         };
         SearchThreadHit: {
             id: components["schemas"]["ObjectId"];
@@ -9583,44 +9647,6 @@ export interface components {
             [key: string]: unknown;
         };
         /**
-         * @description Validated by `CREATE_CAMPAIGN_SCHEMA`. The FE sends `offerType: "crowdfund"`,
-         *     `userId`, and `creatorName` — server-side `userId`/`creatorName` are
-         *     taken from the auth context; the body values are ignored to prevent
-         *     spoofing.
-         */
-        CrowdfundCreateRequest: {
-            /** @enum {string} */
-            offerType?: "crowdfund";
-            /** @example Block Party Community Fund */
-            title: string;
-            /** @example Funds for the summer block party. */
-            description: string;
-            categoryId: components["schemas"]["ObjectId"];
-            /** @example Community */
-            categoryName: string;
-            tags?: string[];
-            media: components["schemas"]["OfferMedia"][];
-            goal: components["schemas"]["CrowdfundGoal"];
-            contribution?: components["schemas"]["CrowdfundContributionRange"];
-            /**
-             * Format: date-time
-             * @description ISO 8601 — must be in the future.
-             * @example 2026-08-15T23:59:59.000Z
-             */
-            deadline: string;
-            duration?: number;
-            milestones?: components["schemas"]["CrowdfundMilestone"][];
-            useOfFunds?: components["schemas"]["CrowdfundUseOfFundsItem"][];
-            /**
-             * @default active
-             * @enum {string}
-             */
-            status: "active" | "inactive";
-            isScheduled?: boolean;
-            /** Format: date-time */
-            scheduledDate?: string;
-        };
-        /**
          * @description Partial. Rejected by the service once any backer has contributed
          *     (`participantsCount > 0`) — the editable-while-untouched rule
          *     replaced the prior draft-status gate.
@@ -9954,10 +9980,6 @@ export interface components {
          * @enum {string}
          */
         Currency: "USD" | "O";
-        /** @enum {string} */
-        TransactionStatus: "pending" | "completed" | "failed" | "cancelled";
-        /** @enum {string} */
-        TransactionType: "deposit" | "withdrawal" | "purchase" | "refund" | "transfer" | "fee" | "reward";
         /** @enum {string} */
         ReportType: "spam" | "inappropriate_content" | "misleading" | "fraud" | "copyright_violation" | "harassment" | "other";
         /**
@@ -10446,41 +10468,6 @@ export interface components {
             [key: string]: unknown;
         };
         /**
-         * @description Append-only ticket-purchase record. One row per "Buy Tickets" call.
-         *     Each row records one user purchasing a bundle of N tickets in one go;
-         *     `ticketIds[]` holds the N sequential IDs minted by that purchase.
-         */
-        Ticket: {
-            _id: components["schemas"]["ObjectId"];
-            lotteryId: components["schemas"]["ObjectId"];
-            entrantId: components["schemas"]["ObjectId"] | components["schemas"]["OfferUserRef"];
-            /**
-             * @example [
-             *       "000123",
-             *       "000124",
-             *       "000125"
-             *     ]
-             */
-            ticketIds: string[];
-            /** @example 3 */
-            bundle: number;
-            /** @example 15 */
-            totalCost: number;
-            /**
-             * @example active
-             * @enum {string}
-             */
-            status: "active" | "won" | "lost";
-            /** @example false */
-            transferable: boolean;
-            /** Format: date-time */
-            purchasedAt: string;
-            /** Format: date-time */
-            createdAt: string;
-            /** Format: date-time */
-            updatedAt: string;
-        };
-        /**
          * @description PUT /lotteries/:id — only allowed while no tickets have been
          *     sold (`ticketsSold === 0`). Every field is optional; supply
          *     only what you want to change. (Replaced the prior `draft`
@@ -10861,6 +10848,29 @@ export interface components {
              */
             score?: number;
         };
+        /**
+         * @description Circle row for the global shell search (`src/modules/search/search.service.ts`
+         *     `SearchCircleHit`). Named apart from the Community-Hub search's
+         *     `SearchCircleHit` (which carries `description`) because the builder
+         *     deep-merges same-named components across files.
+         */
+        GlobalSearchCircleHit: {
+            id: components["schemas"]["ObjectId"];
+            /** @example digital-arts */
+            slug: string;
+            /** @example Digital Arts */
+            name: string;
+            /** @example By Category */
+            axisLabel: string;
+            /** @example #1F2937 */
+            coverColor: string;
+            /** @example  */
+            coverImage: string;
+            /** @example 1240 */
+            memberCount: number;
+            /** @example 1.1 */
+            score: number;
+        };
         SearchCreatorHit: {
             id?: components["schemas"]["ObjectId"];
             /** @example janedoe */
@@ -10879,7 +10889,7 @@ export interface components {
             /** @example sunset */
             query: string;
             weos: components["schemas"]["SearchWeoHit"][];
-            circles: components["schemas"]["SearchCircleHit"][];
+            circles: components["schemas"]["GlobalSearchCircleHit"][];
             creators: components["schemas"]["SearchCreatorHit"][];
             /**
              * @description Sum across the three lists — what the shell shows as "N results".
@@ -11189,24 +11199,6 @@ export interface components {
             success?: true;
             data?: components["schemas"]["CategoryUnreadCountsData"];
         };
-        OfferWishlistEntry: {
-            _id: components["schemas"]["ObjectId"];
-            userId: components["schemas"]["ObjectId"];
-            offerId: components["schemas"]["ObjectId"] | components["schemas"]["Offer"];
-            /** Format: date-time */
-            createdAt?: string;
-            /** Format: date-time */
-            updatedAt?: string;
-        } & {
-            [key: string]: unknown;
-        };
-        WishlistListResponse: components["schemas"]["BaseResponse"] & {
-            /** @enum {boolean} */
-            success?: true;
-            /** @example Wishlist retrieved successfully */
-            message?: string;
-            data?: components["schemas"]["OfferWishlistEntry"][];
-        };
         OfferPrice: {
             /** @example 100 */
             amount: number;
@@ -11422,44 +11414,6 @@ export interface components {
             /** @example 4 */
             noOfInstallments: number;
         };
-        /**
-         * @description Validated by `REQUESTED_OFFER_ZOD_SCHEMA`. Used for POST
-         *     `/offers/requested` — offers fulfilling a buyer's RFQ. Adds
-         *     `offerType` and `requestedId` (the `RequestOffer` id being fulfilled).
-         *     `quantity` has no `unitName` requirement here.
-         */
-        RequestedOfferCreateRequest: {
-            title: string;
-            description: string;
-            slug?: string;
-            categoryId: components["schemas"]["ObjectId"];
-            categoryName: string;
-            creatorName: string;
-            price: components["schemas"]["OfferPrice"];
-            quantity: {
-                amount: number;
-                /** @default 0 */
-                negotiableUpTo: number;
-            };
-            tags?: string[];
-            /** @default 1 */
-            customerLimit: number;
-            totalWeoInCirculation: number;
-            /** @enum {string} */
-            status: "active" | "inactive";
-            duration: number;
-            media: {
-                type: string;
-                /** Format: uri */
-                url: string;
-            }[];
-            noOfInstallments: number;
-            /** @enum {string} */
-            offerType: "normal" | "requested";
-            /** Format: date-time */
-            availabilityTill?: string;
-            requestedId: components["schemas"]["ObjectId"];
-        };
         AdminUpdateOfferStatusRequest: {
             status: components["schemas"]["OfferStatus"];
         };
@@ -11543,21 +11497,27 @@ export interface components {
             /** @example 1024 */
             totalCollections: number;
         };
+        /**
+         * @description Cross-kind stats from `AdminWeoService.getStats` (`GET /admin/weos/stats`).
+         *     Same buckets as `AdminOfferStatsData` plus `byWeoType`.
+         */
+        AdminWeoStatsData: components["schemas"]["AdminOfferStatsData"] & {
+            /**
+             * @description Count per `weoType` discriminator value (`unknown` for unstamped docs).
+             * @example {
+             *       "regular": 969,
+             *       "crowdfund": 218,
+             *       "lottery": 97
+             *     }
+             */
+            byWeoType: {
+                [key: string]: number;
+            };
+        };
         OfferResponse: components["schemas"]["BaseResponse"] & {
             /** @enum {boolean} */
             success?: true;
             data?: components["schemas"]["Offer"];
-        };
-        /**
-         * @description Frontend list/search endpoints — shape varies by endpoint. Some
-         *     return a bare array, some return `{ offers, pagination }`. Documented
-         *     permissively here.
-         */
-        OffersListResponse: components["schemas"]["BaseResponse"] & {
-            /** @enum {boolean} */
-            success?: true;
-            /** @description Endpoint-specific list payload (array or paginated object). */
-            data?: unknown;
         };
         AdminOfferListResponse: components["schemas"]["BaseResponse"] & {
             /** @enum {boolean} */
@@ -11578,6 +11538,11 @@ export interface components {
             /** @enum {boolean} */
             success?: true;
             data?: components["schemas"]["AdminOfferStatsData"];
+        };
+        AdminWeoStatsResponse: components["schemas"]["BaseResponse"] & {
+            /** @enum {boolean} */
+            success?: true;
+            data?: components["schemas"]["AdminWeoStatsData"];
         };
         OwalletOverviewStats: {
             /** @example 8 */
@@ -12627,15 +12592,6 @@ export interface components {
              */
             tags?: string[];
         };
-        RequestOfferUpdateRequest: {
-            title?: string;
-            description?: string;
-            categoryId?: components["schemas"]["ObjectId"];
-            categoryName?: string;
-            price?: components["schemas"]["RequestOfferPrice"];
-            tags?: string[];
-            status?: components["schemas"]["RequestOfferStatus"];
-        };
         RequestOfferResponse: components["schemas"]["BaseResponse"] & {
             /** @enum {boolean} */
             success?: true;
@@ -13492,6 +13448,22 @@ export interface components {
             /** @example 1000 */
             maxLimit: number;
         };
+        /**
+         * @description 400 from `WalletService.topUp` — thrown via
+         *     `createError(message, 400, { remainingLimit, maxLimit })` and shaped by
+         *     the global `errorHandler`, which copies the error's `data` into the
+         *     envelope (so `data` is an object here, not `null`).
+         */
+        DailyLimitErrorResponse: components["schemas"]["BaseResponse"] & {
+            /**
+             * @example false
+             * @enum {boolean}
+             */
+            success?: false;
+            data?: components["schemas"]["DailyLimitErrorData"];
+            /** @example Top-up amount exceeds daily limit. You can top-up 250 O more today. */
+            error: string;
+        };
         /** @description Generic wallet response — used by `GET /wallet`, `topup`, `withdraw`. */
         WalletResponse: components["schemas"]["BaseResponse"] & {
             /** @enum {boolean} */
@@ -13510,31 +13482,6 @@ export interface components {
             message?: string;
             /** @description Whatever the upstream OAuth server returns (number or object). */
             data?: unknown;
-        };
-        /** @description One installment payment record (`src/modules/weo-installment/weo.installment.model.ts`). */
-        OfferInstallment: {
-            _id: components["schemas"]["ObjectId"];
-            userId: components["schemas"]["ObjectId"];
-            sellerId: components["schemas"]["ObjectId"];
-            /**
-             * @description The purchase's RegularCollection row. Field name is preserved
-             *     for data-layer compat; the underlying ref is
-             *     `RegularCollection`.
-             */
-            offerCollectionId: components["schemas"]["ObjectId"];
-            /** @example 25 */
-            amount: number;
-            /**
-             * @default 0
-             * @example 25
-             */
-            oAmountCollected: number;
-            /** Format: date-time */
-            createdAt?: string;
-            /** Format: date-time */
-            updatedAt?: string;
-        } & {
-            [key: string]: unknown;
         };
         /**
          * @description Validated by `PAY_INSTALLMENT_SCHEMA`. `amount` is computed
@@ -15865,26 +15812,19 @@ export interface components {
          *     - **Token typ wrong** (refresh token sent where access expected) →
          *       plain text `"Not an access token"`.
          *     - **Account deleted / suspended / banned** → JSON envelope with a
-         *       structured `data: { code, status, reason? }` payload (codes:
-         *       `ACCOUNT_DELETED`, `ACCOUNT_SUSPENDED`, `ACCOUNT_BANNED`).
+         *       structured `data: { code, status, reason? }` payload and no
+         *       `error` field (codes: `ACCOUNT_DELETED`, `ACCOUNT_SUSPENDED`,
+         *       `ACCOUNT_BANNED`).
+         *     - **Controller-level checks** (e.g. not the owner) → the standard
+         *       `ErrorResponse` envelope via `ResponseHandler.error(...)`.
+         *     Documented via `oneOf` so every JSON shape is valid against the schema.
          */
         Forbidden: {
             headers: {
                 [name: string]: unknown;
             };
             content: {
-                /**
-                 * @example {
-                 *       "success": false,
-                 *       "message": "Your account has been suspended. Contact support if you believe this is a mistake.",
-                 *       "data": {
-                 *         "code": "ACCOUNT_SUSPENDED",
-                 *         "status": "suspended",
-                 *         "reason": "Repeated policy violations."
-                 *       }
-                 *     }
-                 */
-                "application/json": components["schemas"]["ErrorResponse"];
+                "application/json": components["schemas"]["ErrorResponse"] | components["schemas"]["AccountStatusErrorResponse"] | components["schemas"]["MinimalErrorResponse"];
                 /** @example Not an access token */
                 "text/plain": string;
             };
@@ -15946,21 +15886,21 @@ export interface components {
                 "application/json": components["schemas"]["ErrorResponse"];
             };
         };
-        /** @description Rate limit exceeded (global limiter or per-endpoint limiter). */
+        /**
+         * @description Rate limit exceeded. Every `/api/*` route sits behind `globalLimiter`
+         *     (`src/shared/middlewares/rate-limit.middleware.ts`, `RATE_LIMIT_PER_MIN`
+         *     per IP), so any operation can return this. The body is the
+         *     `express-rate-limit` `message` option, not a `ResponseHandler` envelope:
+         *     - `globalLimiter` / `authLimiter` / `otpLimiter` → `{ message }` only.
+         *     - Per-route limiters (e.g. AI describe, data export) →
+         *       `{ success: false, message, data: null }` (no `error`).
+         */
         TooManyRequests: {
             headers: {
                 [name: string]: unknown;
             };
             content: {
-                /**
-                 * @example {
-                 *       "success": false,
-                 *       "message": "Too many requests",
-                 *       "data": null,
-                 *       "error": "Too many requests"
-                 *     }
-                 */
-                "application/json": components["schemas"]["ErrorResponse"];
+                "application/json": components["schemas"]["MinimalErrorResponse"] | components["schemas"]["BaseResponse"];
             };
         };
     };
@@ -15991,11 +15931,6 @@ export interface components {
          * @example month
          */
         TimeFilterParam: components["schemas"]["TimeFilter"];
-        /**
-         * @description Field name to sort by. Defaults vary per endpoint.
-         * @example createdAt
-         */
-        SortByParam: string;
         /** @example desc */
         SortOrderParam: components["schemas"]["SortOrder"];
         /**
@@ -16288,7 +16223,7 @@ export interface operations {
                  *       "weoRewards": 0.04
                  *     }
                  */
-                "application/json": components["schemas"]["WeoActivityConfig"];
+                "application/json": components["schemas"]["WeoActivityConfigRequest"];
             };
         };
         responses: {
@@ -16395,7 +16330,7 @@ export interface operations {
                  *       "weoRewards": 0.04
                  *     }
                  */
-                "application/json": components["schemas"]["WeoActivityConfig"];
+                "application/json": components["schemas"]["WeoActivityConfigRequest"];
             };
         };
         responses: {
@@ -16674,7 +16609,10 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description Account is deleted / suspended / banned */
+            /**
+             * @description Account is deleted / suspended / banned: `data.code` names the state
+             *     (repeated in `errors` for clients written before M12).
+             */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -16683,16 +16621,21 @@ export interface operations {
                     /**
                      * @example {
                      *       "success": false,
-                     *       "message": "Your account has been suspended.",
+                     *       "message": "Your account has been suspended. Contact support if you believe this is a mistake.",
                      *       "data": {
                      *         "code": "ACCOUNT_SUSPENDED",
                      *         "status": "suspended",
                      *         "reason": "Policy violation"
                      *       },
-                     *       "error": "Your account has been suspended."
+                     *       "errors": {
+                     *         "code": "ACCOUNT_SUSPENDED",
+                     *         "status": "suspended",
+                     *         "reason": "Policy violation"
+                     *       },
+                     *       "error": "Your account has been suspended. Contact support if you believe this is a mistake."
                      *     }
                      */
-                    "application/json": components["schemas"]["ErrorResponse"];
+                    "application/json": components["schemas"]["AuthAccountStatusErrorResponse"];
                 };
             };
             429: components["responses"]["TooManyRequests"];
@@ -16770,7 +16713,10 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description Local user is deleted / suspended / banned */
+            /**
+             * @description Local user is deleted / suspended / banned: `data.code` names the
+             *     state (repeated in `errors`) — see `AuthAccountStatusErrorResponse`.
+             */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -16784,10 +16730,14 @@ export interface operations {
                      *         "code": "ACCOUNT_DELETED",
                      *         "status": "deleted"
                      *       },
+                     *       "errors": {
+                     *         "code": "ACCOUNT_DELETED",
+                     *         "status": "deleted"
+                     *       },
                      *       "error": "Your account has been removed."
                      *     }
                      */
-                    "application/json": components["schemas"]["ErrorResponse"];
+                    "application/json": components["schemas"]["AuthAccountStatusErrorResponse"];
                 };
             };
             429: components["responses"]["TooManyRequests"];
@@ -19366,6 +19316,16 @@ export interface operations {
                      *         "notification": "all",
                      *         "createdAt": "2026-06-01T00:00:00.000Z",
                      *         "updatedAt": "2026-06-20T00:00:00.000Z",
+                     *         "trendingTags": [
+                     *           {
+                     *             "tag": "meta",
+                     *             "count": 1
+                     *           },
+                     *           {
+                     *             "tag": "planning",
+                     *             "count": 1
+                     *           }
+                     *         ],
                      *         "threads": [
                      *           {
                      *             "id": "672b1122334455667788aa01",
@@ -20388,6 +20348,7 @@ export interface operations {
                     "application/json": components["schemas"]["CompanyPageListResponse"];
                 };
             };
+            429: components["responses"]["TooManyRequests"];
             500: components["responses"]["ServerError"];
         };
     };
@@ -21495,6 +21456,7 @@ export interface operations {
                     "application/json": components["schemas"]["EmailSubscriptionCheckResponse"];
                 };
             };
+            429: components["responses"]["TooManyRequests"];
             500: components["responses"]["ServerError"];
         };
     };
@@ -21525,6 +21487,7 @@ export interface operations {
                     "application/json": components["schemas"]["EmailSubscriptionCountResponse"];
                 };
             };
+            429: components["responses"]["TooManyRequests"];
             500: components["responses"]["ServerError"];
         };
     };
@@ -27937,12 +27900,11 @@ export interface operations {
                      *         "remainingLimit": 250,
                      *         "maxLimit": 1000
                      *       },
-                     *       "error": "Top-up amount exceeds daily limit. You can top-up 250 O more today."
+                     *       "error": "Top-up amount exceeds daily limit. You can top-up 250 O more today.",
+                     *       "errors": null
                      *     }
                      */
-                    "application/json": components["schemas"]["ErrorResponse"] & {
-                        data?: components["schemas"]["DailyLimitErrorData"];
-                    };
+                    "application/json": components["schemas"]["DailyLimitErrorResponse"];
                 };
             };
             401: components["responses"]["Unauthorized"];
@@ -29837,6 +29799,7 @@ export interface operations {
                     "application/json": components["schemas"]["WebsiteCheckEmailResponse"];
                 };
             };
+            429: components["responses"]["TooManyRequests"];
             500: components["responses"]["ServerError"];
         };
     };
@@ -29858,6 +29821,7 @@ export interface operations {
                     "application/json": components["schemas"]["WebsiteCountResponse"];
                 };
             };
+            429: components["responses"]["TooManyRequests"];
             500: components["responses"]["ServerError"];
         };
     };
@@ -29977,6 +29941,7 @@ export interface operations {
                     "application/json": components["schemas"]["WebsiteCheckEmailResponse"];
                 };
             };
+            429: components["responses"]["TooManyRequests"];
             500: components["responses"]["ServerError"];
         };
     };
@@ -29998,6 +29963,7 @@ export interface operations {
                     "application/json": components["schemas"]["WebsiteCountResponse"];
                 };
             };
+            429: components["responses"]["TooManyRequests"];
             500: components["responses"]["ServerError"];
         };
     };
@@ -30117,6 +30083,7 @@ export interface operations {
                     "application/json": components["schemas"]["WebsiteCheckEmailResponse"];
                 };
             };
+            429: components["responses"]["TooManyRequests"];
             500: components["responses"]["ServerError"];
         };
     };
@@ -30189,7 +30156,7 @@ export interface operations {
                      *       }
                      *     }
                      */
-                    "application/json": components["schemas"]["AdminOfferStatsResponse"];
+                    "application/json": components["schemas"]["AdminWeoStatsResponse"];
                 };
             };
             401: components["responses"]["Unauthorized"];
@@ -31235,6 +31202,7 @@ export interface operations {
                     "application/json": components["schemas"]["BaseResponse"];
                 };
             };
+            429: components["responses"]["TooManyRequests"];
             500: components["responses"]["ServerError"];
         };
     };
