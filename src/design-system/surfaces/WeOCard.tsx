@@ -1,6 +1,6 @@
 // design: js/ds/_ds_bundle.js components/surfaces/WeOCard.jsx — converted from the compiled bundle (scripts/ds2tsx.mjs), then typed by hand.
 import { useRef, useState } from 'react';
-import type { CSSProperties, HTMLAttributes, PointerEvent, ReactNode } from 'react';
+import type { CSSProperties, HTMLAttributes, KeyboardEvent, PointerEvent, ReactNode } from 'react';
 import { Avatar } from '../data/Avatar';
 import { isrStage } from '../data/ISRRing';
 import { OMark } from '../core/OMark';
@@ -230,11 +230,19 @@ export function WeOCard({
   });
   const [spatialOpen, setSpatialOpen] = useState(false);
   const dragRef = useRef<{ x: number; y: number; tx: number; ty: number; moved: boolean } | null>(null);
+  // what the render needs from the drag (the cursor, the transition) — the ref keeps the numbers
+  const [drag, setDrag] = useState<'idle' | 'held' | 'moved'>('idle');
   const h = Math.round(w * 1.58);
   const orb = Math.round(w * 0.64);
   const backOrb = Math.round(w * 0.62);
   const flip = () => flippable && setFace((f) => (f === 'front' ? 'back' : 'front'));
   const stop = (e: { stopPropagation: () => void }) => e.stopPropagation();
+  // Enter / Space on a pointer control does what its click does (only on the control itself)
+  const onPress = (fn: (e: KeyboardEvent<HTMLDivElement>) => void) => (e: KeyboardEvent<HTMLDivElement>) => {
+    if (e.target !== e.currentTarget || (e.key !== 'Enter' && e.key !== ' ')) return;
+    e.preventDefault();
+    fn(e);
+  };
   const faceBase: CSSProperties = {
     position: 'absolute',
     inset: 0,
@@ -389,6 +397,8 @@ export function WeOCard({
           gap: 9,
           minWidth: 0,
         }}
+        // a hover / tap detail: the row already says who and their ISR, so it is no control
+        role="presentation"
         onMouseEnter={() => setTip(true)}
         onMouseLeave={() => setTip(false)}
         onClick={(e) => {
@@ -1168,12 +1178,20 @@ export function WeOCard({
         const r = e.currentTarget.getBoundingClientRect();
         setDuo(e.clientY - r.top < r.height / 2 ? 'resell' : 'create');
       }}
+      role="button"
+      tabIndex={0}
+      aria-label="Resell — Shift+Enter to create one like it"
       onMouseLeave={() => setDuo(null)}
       onClick={(e) => {
         stop(e);
         if (duo === 'create') onCreate?.();
         else onResell?.();
       }}
+      onKeyDown={onPress((e) => {
+        stop(e);
+        if (e.shiftKey) onCreate?.();
+        else onResell?.();
+      })}
     >
       <div
         style={{
@@ -1432,6 +1450,7 @@ export function WeOCard({
         ty: tilt.y,
         moved: false,
       };
+      setDrag('held');
       try {
         e.currentTarget.setPointerCapture(e.pointerId);
       } catch {
@@ -1441,7 +1460,10 @@ export function WeOCard({
     const onMove = (e: PointerEvent<HTMLDivElement>) => {
       const d = dragRef.current;
       if (!d) return;
-      if (Math.abs(e.clientX - d.x) > 4 || Math.abs(e.clientY - d.y) > 4) d.moved = true;
+      if (!d.moved && (Math.abs(e.clientX - d.x) > 4 || Math.abs(e.clientY - d.y) > 4)) {
+        d.moved = true;
+        setDrag('moved');
+      }
       setTilt({
         x: Math.max(-40, Math.min(40, d.tx - (e.clientY - d.y) * 0.4)),
         y: d.ty + (e.clientX - d.x) * 0.4,
@@ -1450,6 +1472,7 @@ export function WeOCard({
     const onUp = () => {
       const d = dragRef.current;
       dragRef.current = null;
+      setDrag('idle');
       if (d && !d.moved) setSpatialOpen((o) => !o);
     };
     return (
@@ -1472,7 +1495,7 @@ export function WeOCard({
             width: w,
             height: Math.round(w * 1.02),
             perspective: 1100,
-            cursor: dragRef.current && dragRef.current.moved ? 'grabbing' : 'grab',
+            cursor: drag === 'moved' ? 'grabbing' : 'grab',
             touchAction: 'none',
           }}
         >
@@ -1514,9 +1537,10 @@ export function WeOCard({
               zIndex: 2,
               transformStyle: 'preserve-3d',
               transform: `translate(-50%,-50%) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) scale(${spatialOpen ? 0.72 : 1})`,
-              transition: dragRef.current
-                ? 'top .1s'
-                : 'transform .45s var(--ease-portal, cubic-bezier(.22,1,.36,1)), top .45s var(--ease-portal, cubic-bezier(.22,1,.36,1))',
+              transition:
+                drag !== 'idle'
+                  ? 'top .1s'
+                  : 'transform .45s var(--ease-portal, cubic-bezier(.22,1,.36,1)), top .45s var(--ease-portal, cubic-bezier(.22,1,.36,1))',
             }}
           >
             <div
@@ -1907,10 +1931,18 @@ export function WeOCard({
                   display: 'grid',
                   placeItems: 'center',
                 }}
+                role="button"
+                tabIndex={0}
+                aria-expanded={orbOpen}
+                aria-label="Open the WeO"
                 onClick={(e) => {
                   stop(e);
                   setOrbOpen((o) => !o);
                 }}
+                onKeyDown={onPress((e) => {
+                  stop(e);
+                  setOrbOpen((o) => !o);
+                })}
               >
                 {heroOrb(oSize, reveal)}
                 {reveal && !justCollected && (
@@ -2161,7 +2193,9 @@ export function WeOCard({
             pointerEvents: face === 'back' ? 'none' : 'auto',
           }}
           onClick={flip}
+          onKeyDown={onPress(flip)}
           role="button"
+          tabIndex={face === 'back' ? -1 : 0}
           aria-label="Flip for WeO details"
           onMouseEnter={() => setFrontHover(true)}
           onMouseLeave={() => setFrontHover(false)}
@@ -2284,10 +2318,20 @@ export function WeOCard({
                       placeItems: 'center',
                       zIndex: 5,
                     }}
+                    // named with the WeO, so a grid of cards is not a column of identical "Collect"s
+                    role="button"
+                    tabIndex={0}
+                    aria-label={`${typeof engageLabel === 'string' ? engageLabel : 'Collect'}${typeof name === 'string' && name ? ` ${name}` : ''}`}
                     onClick={(e) => {
                       stop(e);
                       onEngage?.();
                     }}
+                    onKeyDown={onPress((e) => {
+                      stop(e);
+                      onEngage?.();
+                    })}
+                    onFocus={() => setEngageHover(true)}
+                    onBlur={() => setEngageHover(false)}
                     onMouseEnter={() => setEngageHover(true)}
                     onMouseLeave={() => setEngageHover(false)}
                   >
@@ -2365,6 +2409,7 @@ export function WeOCard({
             );
           })()}
         </div>
+        {/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events -- not an action: keeps a click on the details face from flipping the card */}
         <div
           style={{
             ...faceBase,

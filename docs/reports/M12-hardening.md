@@ -74,3 +74,20 @@ Console errors: none across the sweep. Failed requests: none.
 - [x] All High/Medium fixed and re-tested
 - [x] Docs updated (spec, plan, API map, decisions, changelog)
 - [x] Commits pushed (backend + frontend)
+
+## 8. Clean-up pass (2026-10-07)
+
+Surya asked for both projects to be tested and every issue fixed.
+
+| Check | Before | After |
+|---|---|---|
+| `npm run lint` | 0 errors, 26 warnings | **0 / 0** |
+| `npm test` | 269 pass, 4 jsdom "Not implemented: getContext" logs | 269 pass, no stderr noise |
+| `npm run build` | "(!) Some chunks are larger than 500 kB" | no warnings — the only such chunk is the lazy three.js `world3d`; the limit is 600 kB with the reason in `vite.config.ts` |
+| `prettier --check src` | 46 files off-format | all formatted |
+
+Fixes behind the lint warnings:
+- **O portal** (`OPortal`, dev gallery): reachable by keyboard — Tab to it, arrows lean to an edge, Enter / Space jumps, Escape rests; the arrival ripple is set while rendering instead of in an effect; the gaze listener uses an effect event (subscribed once).
+- **Portal jump**: `onDone` through an effect event (a parent re-render no longer restarts the jump).
+- **Ring nav**: the visible fan and the scrim are presentational — the menubar's arrow keys and the screen-reader menu already carry them.
+- **WeO card**: the front face flips with Enter / Space and is tabbable; the logo orb (Enter resells, Shift+Enter creates), the orb toggle and the engage orb are keyboard buttons — the engage orb is named with the WeO ("Collect Sunrise Loop") so a grid is not a column of identical "Collect"s; the creator row's hover detail is presentational; the spatial card reads its drag phase from state, not a ref, while rendering.

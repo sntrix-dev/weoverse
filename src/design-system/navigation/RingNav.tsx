@@ -267,8 +267,11 @@ export function RingNav({
         const on = s.key === active,
           hv = hoverSeg === s.key;
         return (
+          // the visible fan is the pointer surface; keyboard and screen readers use the
+          // menubar's arrow keys and the menu above, so the segment itself is presentational
           <div
             key={s.key}
+            role="presentation"
             onClick={() => choose(s.key)}
             onMouseEnter={() => setHoverSeg(s.key)}
             onMouseLeave={() => setHoverSeg(null)}
@@ -441,6 +444,7 @@ export function RingNav({
   );
   const scrim = (
     <div
+      role="presentation"
       onClick={() => setOpen(false)}
       style={{
         position: portal ? 'absolute' : 'fixed',

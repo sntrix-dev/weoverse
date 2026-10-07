@@ -16,6 +16,8 @@ window.open = (() => null) as typeof window.open;
 // …and no media playback: the Create O plays and pauses its clips (jsdom logs "not implemented")
 HTMLMediaElement.prototype.pause = () => {};
 HTMLMediaElement.prototype.play = () => Promise.resolve();
+// …and no canvas: WebGL detection gets null (the world falls back to its flat stage) without jsdom's log
+HTMLCanvasElement.prototype.getContext = (() => null) as typeof HTMLCanvasElement.prototype.getContext;
 
 // the live bell's socket (api/live.ts) stays inert: no server to reach (its own test fakes it)
 vi.mock('socket.io-client', () => {

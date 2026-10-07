@@ -49,6 +49,12 @@ export default defineConfig({
   },
   server: { port: 5173, strictPort: true },
   preview: { port: 5173, strictPort: true },
+  build: {
+    // The one chunk past Vite's 500 kB default is `world3d` (three.js, ~560 kB minified, ~140 kB
+    // gzip): it loads only when a world opens (M11), never on first paint, and three.js cannot be
+    // split further. Every other chunk stays far below this limit.
+    chunkSizeWarningLimit: 600,
+  },
   test: {
     globals: true,
     environment: 'jsdom',

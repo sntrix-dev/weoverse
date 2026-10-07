@@ -1,5 +1,5 @@
 // design: js/ds/_ds_bundle.js components/motion/PortalJump.jsx — converted from the compiled bundle (scripts/ds2tsx.mjs), then typed by hand.
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useEffectEvent, useRef, useState } from 'react';
 import type { CSSProperties, HTMLAttributes, ReactNode } from 'react';
 import type { StyleVars } from '../types';
 
@@ -51,13 +51,15 @@ export function PortalJump({
 }: PortalJumpProps) {
   const [active, setActive] = useState(false);
   const prev = useRef(play);
+  // the latest onDone, without restarting the jump when the parent re-renders
+  const done = useEffectEvent(() => onDone?.());
   useEffect(() => {
     if (play === prev.current) return;
     prev.current = play;
     setActive(true);
     const t = window.setTimeout(() => {
       setActive(false);
-      onDone?.();
+      done();
     }, duration);
     return () => window.clearTimeout(t);
   }, [play, duration]);

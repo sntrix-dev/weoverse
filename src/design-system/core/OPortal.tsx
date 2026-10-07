@@ -1,8 +1,9 @@
 // design: js/ds/_ds_bundle.js components/core/OPortal.jsx — converted from the compiled bundle (scripts/ds2tsx.mjs), then typed by hand.
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useEffectEvent, useRef, useState } from 'react';
 import type {
   CSSProperties,
   HTMLAttributes,
+  KeyboardEvent as ReactKeyboardEvent,
   MouseEvent as ReactMouseEvent,
   ReactNode,
   TouchEvent as ReactTouchEvent,
@@ -164,27 +165,34 @@ export function OPortal({
   const RING_COUNT = 5;
 
   // arrival: when the parent reports the landed section, inherit its signal (protocol §4 arrival).
-  useEffect(() => {
-    if (!arrivalKey || !sections[arrivalKey]) return;
-    setArrival({
-      color: sections[arrivalKey].color,
-      id: Date.now(),
-    });
+  // The ripple is adjusted while rendering — the key changed — so it paints with the landing;
+  // the effect only reports the phase and clears the ripple when it has played.
+  const [arrivedFor, setArrivedFor] = useState<PortalEdge | null | undefined>(undefined);
+  if (arrivalKey !== arrivedFor) {
+    setArrivedFor(arrivalKey);
+    if (arrivalKey && sections[arrivalKey]) {
+      const color = sections[arrivalKey].color;
+      setArrival((a) => ({ color, id: (a?.id ?? 0) + 1 }));
+    }
+  }
+  const arrive = useEffectEvent((key: PortalEdge | null): number | null => {
+    if (!key || !sections[key]) return null;
     setPhase('arrival', {
-      key: arrivalKey,
+      key,
     });
     emit('portal_complete', {
-      key: arrivalKey,
+      key,
     });
-    const t = window.setTimeout(
-      () => {
-        setArrival(null);
-        stateRef.current = 'rest';
-      },
-      reduceMotion ? 300 : 900,
-    );
+    return reduceMotion ? 300 : 900;
+  });
+  useEffect(() => {
+    const ms = arrive(arrivalKey ?? null);
+    if (ms === null) return;
+    const t = window.setTimeout(() => {
+      setArrival(null);
+      stateRef.current = 'rest';
+    }, ms);
     return () => window.clearTimeout(t);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [arrivalKey]);
   const measure = (clientX: number, clientY: number) => {
     const el = ref.current;
@@ -213,42 +221,43 @@ export function OPortal({
   // "Look animation" — a liquid-eye effect: even before the pointer directly
   // hovers, the whole O tilts/gazes toward the cursor within a proximity
   // range, exactly like the source portal's ambient direction detection.
+  const LOOK_RANGE = 380;
+  const onLook = useEffectEvent((e: MouseEvent) => {
+    if (window.__weoTouch) return; // touch-sim: no cursor-proximity gaze on a phone
+    if (hover) return; // direct hover takes over below
+    const m = measure(e.clientX, e.clientY);
+    if (!m) return;
+    if (m.dist < LOOK_RANGE) {
+      const norm = Math.min(m.dist / LOOK_RANGE, 1);
+      // Dramatic gaze — the whole O leans hard toward the cursor.
+      const rx = Math.max(-18, Math.min(18, (-m.dy / LOOK_RANGE) * 20));
+      const ry = Math.max(-18, Math.min(18, (m.dx / LOOK_RANGE) * 20));
+      const ix = Math.max(-20, Math.min(20, (m.dx / LOOK_RANGE) * 22 * norm));
+      const iy = Math.max(-20, Math.min(20, (m.dy / LOOK_RANGE) * 22 * norm));
+      setLook({
+        active: true,
+        rx,
+        ry,
+        ix,
+        iy,
+        dir: computeDirection(e.clientX, e.clientY),
+      });
+    } else if (look.active) {
+      setLook({
+        active: false,
+        rx: 0,
+        ry: 0,
+        ix: 0,
+        iy: 0,
+        dir: 'center',
+      });
+    }
+  });
   useEffect(() => {
-    const LOOK_RANGE = 380;
-    const onMove = (e: MouseEvent) => {
-      if (window.__weoTouch) return; // touch-sim: no cursor-proximity gaze on a phone
-      if (hover) return; // direct hover takes over below
-      const m = measure(e.clientX, e.clientY);
-      if (!m) return;
-      if (m.dist < LOOK_RANGE) {
-        const norm = Math.min(m.dist / LOOK_RANGE, 1);
-        // Dramatic gaze — the whole O leans hard toward the cursor.
-        const rx = Math.max(-18, Math.min(18, (-m.dy / LOOK_RANGE) * 20));
-        const ry = Math.max(-18, Math.min(18, (m.dx / LOOK_RANGE) * 20));
-        const ix = Math.max(-20, Math.min(20, (m.dx / LOOK_RANGE) * 22 * norm));
-        const iy = Math.max(-20, Math.min(20, (m.dy / LOOK_RANGE) * 22 * norm));
-        setLook({
-          active: true,
-          rx,
-          ry,
-          ix,
-          iy,
-          dir: computeDirection(e.clientX, e.clientY),
-        });
-      } else if (look.active) {
-        setLook({
-          active: false,
-          rx: 0,
-          ry: 0,
-          ix: 0,
-          iy: 0,
-          dir: 'center',
-        });
-      }
-    };
+    const onMove = (e: MouseEvent) => onLook(e);
     window.addEventListener('mousemove', onMove);
     return () => window.removeEventListener('mousemove', onMove);
-  }, [hover, look.active]);
+  }, []);
   const handleMove = (e: ReactMouseEvent<HTMLDivElement>) => {
     const d = computeDirection(e.clientX, e.clientY);
     setDirection(d);
@@ -286,6 +295,31 @@ export function OPortal({
     }
     const s = sections[direction];
     if (s && onNavigate) onNavigate(s.key, s);
+  };
+  // keyboard: the arrows lean toward an edge (its preview shows), Enter / Space jumps
+  const KEY_DIR: Record<string, PortalDirection> = {
+    ArrowUp: 'top',
+    ArrowRight: 'right',
+    ArrowDown: 'bottom',
+    ArrowLeft: 'left',
+  };
+  const handleKey = (e: ReactKeyboardEvent<HTMLDivElement>) => {
+    const d = KEY_DIR[e.key];
+    if (d) {
+      e.preventDefault();
+      setHover(true);
+      setDirection(d);
+      setPhase('intent', {
+        key: d,
+      });
+    } else if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      handleClick();
+    } else if (e.key === 'Escape') {
+      setHover(false);
+      setDirection('center');
+      setPhase('rest');
+    }
   };
   const edgeSection = (d: PortalDirection) => (d === 'center' ? undefined : sections[d]);
   const active = hover ? edgeSection(direction) : look.active ? edgeSection(look.dir) : null;
@@ -329,7 +363,13 @@ export function OPortal({
     <div
       ref={ref}
       role="button"
+      tabIndex={0}
       aria-label="O portal — hover an edge to preview a section, tap to jump"
+      onKeyDown={handleKey}
+      onBlur={() => {
+        setHover(false);
+        setDirection('center');
+      }}
       onMouseEnter={() => {
         setHover(true);
         setPhase('interest');
@@ -499,7 +539,10 @@ export function OPortal({
             mask: donutMask,
           }}
         />
+        {/* the aperture: a pointer shortcut to the centre — the portal itself is the
+            keyboard control (Enter jumps to the centre when no edge is chosen) */}
         <div
+          role="presentation"
           onClick={(e) => {
             e.stopPropagation();
             const jc = '#8fb8f6';
