@@ -103,6 +103,29 @@ describe('api client', () => {
     expect(tokens.getRefresh()).toBe('refresh-2');
   });
 
+  it('after a reload (refresh token only) refreshes once before the first requests — no 401 burst', async () => {
+    tokens.set(null, 'refresh-1');
+    const seen: (string | null)[] = [];
+    let refreshCalls = 0;
+    server.use(
+      http.get(url('/frontend/a'), ({ request }) => {
+        seen.push(request.headers.get('authorization'));
+        return ok('a');
+      }),
+      http.get(url('/frontend/b'), ({ request }) => {
+        seen.push(request.headers.get('authorization'));
+        return ok('b');
+      }),
+      http.post(url('/frontend/auth/new_access_token'), () => {
+        refreshCalls += 1;
+        return ok({ accessToken: 'fresh', refreshToken: 'refresh-2' });
+      }),
+    );
+    await expect(Promise.all([api.get('/frontend/a'), api.get('/frontend/b')])).resolves.toEqual(['a', 'b']);
+    expect(refreshCalls).toBe(1);
+    expect(seen).toEqual(['Bearer fresh', 'Bearer fresh']);
+  });
+
   it('shares one refresh between concurrent 401s', async () => {
     tokens.set('expired', 'refresh-1');
     let refreshCalls = 0;

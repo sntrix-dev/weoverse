@@ -172,6 +172,10 @@ async function request<T>(
   const raw = typeof Blob !== 'undefined' && body instanceof Blob;
   if (raw) headers['Content-Type'] = body.type || 'application/octet-stream';
   else if (body !== undefined && !(body instanceof FormData)) headers['Content-Type'] = 'application/json';
+  // After a reload the access token is gone (memory only) but the refresh token is kept: refresh
+  // once, shared by every request of the first paint, instead of sending each one to a 401 first
+  // (a burst that also spends the per-IP rate limit).
+  if (auth && !retried && !tokens.getAccess() && tokens.getRefresh()) await refreshAccessToken();
   const access = tokens.getAccess();
   if (auth && access) headers.Authorization = `Bearer ${access}`;
 
