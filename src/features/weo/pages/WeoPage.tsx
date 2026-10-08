@@ -64,6 +64,9 @@ export function WeoPage() {
   }
 
   const tone = w.hex;
+  // your own WeO: the backend refuses to sell it to you, so the page's act is to edit it
+  const mine = !!me?.id && me.id === w.creatorId;
+  const edit = () => void navigate(routes.edit(w.id));
   const collect = () => (w.live ? openCollect(w.id) : toast(`${w.name} has closed`));
   const ask = () => h.onPush?.(w);
   const row = (k: string, v: string, i: number) => (
@@ -104,7 +107,6 @@ export function WeoPage() {
       },
     );
   };
-  const mine = !!me?.id && me.id === w.creatorId;
 
   return (
     <main style={page}>
@@ -134,11 +136,13 @@ export function WeoPage() {
           { value: w.timer || (w.live ? 'Open' : 'Closed'), label: w.live ? 'Closes in' : 'State' },
         ]}
         priorities={[
-          {
-            label: w.live ? w.cta : 'Closed',
-            note: w.live ? 'Review, then a receipt' : 'This one has closed',
-            onClick: collect,
-          },
+          mine
+            ? { label: 'Edit it', note: 'It is yours — others collect it', onClick: edit }
+            : {
+                label: w.live ? w.cta : 'Closed',
+                note: w.live ? 'Review, then a receipt' : 'This one has closed',
+                onClick: collect,
+              },
           { label: 'Ask its Circle', note: w.circles[0]?.name ?? 'Post it as a thread', onClick: ask },
           {
             label: 'Rehearse it in a world',
@@ -200,7 +204,11 @@ export function WeoPage() {
               boxShadow: 'var(--nm-raised), inset 0 0 0 1px var(--border)',
             }}
           >
-            <WeOCard w={272} {...weoCardProps(w, h)} />
+            <WeOCard
+              w={272}
+              {...weoCardProps(w, h)}
+              {...(mine ? { engageLabel: 'Edit it', onEngage: edit } : {})}
+            />
             <WeoPriceAtRest os={w.os} label={w.priceLabel} />
             <WeoActions w={w} h={h} show />
           </div>
@@ -234,28 +242,47 @@ export function WeoPage() {
             </div>
 
             {/* the act this page exists for, right under the terms it commits to */}
-            <div id="weo-collect" style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
-              <Button
-                variant="primary"
-                selected
-                tone={tone}
-                style={{ width: '100%' }}
-                dot={w.live}
-                onClick={collect}
-                disabled={!w.live}
-              >
-                {w.live ? (
-                  <>
-                    {w.cta} · <OMark size={12} /> {osFmt(w.os)}
-                  </>
-                ) : (
-                  'Closed'
-                )}
-              </Button>
-              <span style={{ fontSize: 11, textAlign: 'center', color: 'var(--text-faint)' }}>
-                {w.live ? 'Review first, then a receipt' : 'This one has closed'}
-              </span>
-            </div>
+            {mine ? (
+              <div id="weo-collect" style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
+                <Button variant="primary" selected tone={tone} style={{ width: '100%' }} onClick={edit}>
+                  Edit it
+                </Button>
+                <Button
+                  variant="ghost"
+                  tone={tone}
+                  style={{ width: '100%' }}
+                  onClick={() => void navigate(routes.listed())}
+                >
+                  See it in Exchange
+                </Button>
+                <span style={{ fontSize: 11, textAlign: 'center', color: 'var(--text-faint)' }}>
+                  This one is yours — others collect it; you edit or pause it
+                </span>
+              </div>
+            ) : (
+              <div id="weo-collect" style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
+                <Button
+                  variant="primary"
+                  selected
+                  tone={tone}
+                  style={{ width: '100%' }}
+                  dot={w.live}
+                  onClick={collect}
+                  disabled={!w.live}
+                >
+                  {w.live ? (
+                    <>
+                      {w.cta} · <OMark size={12} /> {osFmt(w.os)}
+                    </>
+                  ) : (
+                    'Closed'
+                  )}
+                </Button>
+                <span style={{ fontSize: 11, textAlign: 'center', color: 'var(--text-faint)' }}>
+                  {w.live ? 'Review first, then a receipt' : 'This one has closed'}
+                </span>
+              </div>
+            )}
 
             {progressTone && (
               <div

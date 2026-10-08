@@ -1,9 +1,10 @@
-import { screen, within } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { http } from 'msw';
 import { afterEach, describe, expect, it } from 'vitest';
 import { tokens } from '@/api/tokens';
 import { liveWeos } from '@/test/fixtures/discover';
+import { navSummaryFixture } from '@/test/fixtures/navSummary';
 import { fail, ok, url } from '@/test/msw/handlers';
 import { server } from '@/test/msw/server';
 import { renderApp } from '@/test/renderApp';
@@ -40,6 +41,24 @@ describe('WeO page', () => {
     const act = await screen.findByText('This one has closed', { selector: '#weo-collect span' });
     const button = within(act.parentElement as HTMLElement).getByRole('button', { name: 'Closed' });
     expect(button).toBeDisabled();
+  });
+
+  it('your own WeO offers Edit, not Collect (the backend refuses to sell it to you)', async () => {
+    const user = userEvent.setup();
+    const mine = liveWeos().find((w) => w._id === 'weo-2')!;
+    server.use(
+      http.get(url('/frontend/weos/weo-2'), () =>
+        ok({ ...mine, creator: { ...mine.creator, _id: navSummaryFixture().identity.id } }),
+      ),
+    );
+    const { router } = renderApp('/weos/weo-2');
+    const act = await screen.findByText(/This one is yours/, { selector: '#weo-collect span' });
+    const panel = act.parentElement as HTMLElement;
+    expect(within(panel).queryByRole('button', { name: /Collect/ })).not.toBeInTheDocument();
+    await user.click(within(panel).getByRole('button', { name: 'Edit it' }));
+    await waitFor(() =>
+      expect(router.state.location.pathname + router.state.location.search).toBe('/create?edit=weo-2'),
+    );
   });
 
   it('a missing WeO is an empty state with the way back', async () => {
