@@ -143,7 +143,9 @@ export function WeoPage() {
                 note: w.live ? 'Review, then a receipt' : 'This one has closed',
                 onClick: collect,
               },
-          { label: 'Ask its Circle', note: w.circles[0]?.name ?? 'Post it as a thread', onClick: ask },
+          mine
+            ? { label: 'Push to the Hub', note: 'It becomes a thread in a Circle', onClick: ask }
+            : { label: 'Ask its Circle', note: w.circles[0]?.name ?? 'Post it as a thread', onClick: ask },
           {
             label: 'Rehearse it in a world',
             note: 'Try the terms before they are real',
@@ -247,6 +249,9 @@ export function WeoPage() {
                 <Button variant="primary" selected tone={tone} style={{ width: '100%' }} onClick={edit}>
                   Edit it
                 </Button>
+                <Button variant="secondary" tone={tone} style={{ width: '100%' }} onClick={ask}>
+                  Push to the Hub
+                </Button>
                 <Button
                   variant="ghost"
                   tone={tone}
@@ -256,7 +261,7 @@ export function WeoPage() {
                   See it in Exchange
                 </Button>
                 <span style={{ fontSize: 11, textAlign: 'center', color: 'var(--text-faint)' }}>
-                  This one is yours — others collect it; you edit or pause it
+                  This one is yours — others collect it; you edit it, push it or pause it
                 </span>
               </div>
             ) : (

@@ -55,6 +55,9 @@ describe('WeO page', () => {
     const act = await screen.findByText(/This one is yours/, { selector: '#weo-collect span' });
     const panel = act.parentElement as HTMLElement;
     expect(within(panel).queryByRole('button', { name: /Collect/ })).not.toBeInTheDocument();
+    await user.click(within(panel).getByRole('button', { name: 'Push to the Hub' }));
+    expect(await screen.findByRole('dialog', { name: 'Push to the Hub' })).toBeInTheDocument();
+    await user.keyboard('{Escape}');
     await user.click(within(panel).getByRole('button', { name: 'Edit it' }));
     await waitFor(() =>
       expect(router.state.location.pathname + router.state.location.search).toBe('/create?edit=weo-2'),
