@@ -65,7 +65,11 @@ export function MediaUploader({
       const up = await uploadMedia(file);
       onChange(placeMedia(f, i, { kind: up.type, src: up.url, name: file.name }));
     } catch (e) {
-      toast(e instanceof ApiError ? e.message : 'That upload did not go through — try again.');
+      toast(
+        e instanceof ApiError && e.status < 500
+          ? e.message
+          : 'Uploads aren’t working on our side right now — your draft is kept, try again later.',
+      );
     } finally {
       setBusy(null);
     }

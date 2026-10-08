@@ -248,7 +248,9 @@ describe('thread page', () => {
     renderApp('/community/threads/t-1');
     const up = (await screen.findAllByRole('button', { name: 'Upvote' }))[1]!;
     await user.click(up);
-    expect(await screen.findByText('Vote failed')).toBeInTheDocument();
+    expect(
+      await screen.findByText('Something went wrong on our side — try again in a moment.'),
+    ).toBeInTheDocument();
     await waitFor(() => expect(up).toHaveAttribute('aria-pressed', 'false'));
   });
 });

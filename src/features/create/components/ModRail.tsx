@@ -39,7 +39,7 @@ export function ModRail({
   return (
     <aside
       className={rail ? 'weo-quiet' : 'weo-modrail weo-quiet'}
-      style={{ position: 'sticky', top: 96, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 10 }}
+      style={{ position: 'sticky', top: 120, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 10 }}
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
         <span

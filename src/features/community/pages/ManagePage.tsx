@@ -113,7 +113,11 @@ export function ManagePage() {
         ))}
         {!mine.length && (
           <p style={{ margin: 0, padding: 24, textAlign: 'center', fontSize: 13, color: 'var(--text-dim)' }}>
-            {q.isLoading ? 'Finding your circles…' : 'You have not joined a circle yet.'}
+            {q.isLoading
+              ? 'Finding your circles…'
+              : q.isError
+                ? 'Your circles didn’t load — try again in a moment.'
+                : 'You have not joined a circle yet.'}
           </p>
         )}
       </div>
@@ -171,6 +175,12 @@ export function ManagePage() {
           </div>
         ))}
       </div>
+      {/* live pass: the heading stood over nothing when no circle is open to join */}
+      {!other.length && !q.isLoading && !q.isError && (
+        <p style={{ margin: 0, padding: 24, textAlign: 'center', fontSize: 13, color: 'var(--text-dim)' }}>
+          No open circles to join right now — they appear here as soon as one opens.
+        </p>
+      )}
     </main>
   );
 }

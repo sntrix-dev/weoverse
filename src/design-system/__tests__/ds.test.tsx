@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { DsGalleryPage } from '@/features/dev/pages/DsGalleryPage';
-import { Button, Chip, isrStage, OPortal, oPowerStage, RingNav, Tabs, Toggle, WeOCard } from '..';
+import { Avatar, Button, Chip, isrStage, OPortal, oPowerStage, RingNav, Tabs, Toggle, WeOCard } from '..';
 
 describe('design system', () => {
   it('renders every ported component without React warnings', () => {
@@ -10,6 +10,13 @@ describe('design system', () => {
     expect(screen.getByRole('heading', { name: 'Design system' })).toBeInTheDocument();
     expect(errors).not.toHaveBeenCalled();
     errors.mockRestore();
+  });
+
+  it('Avatar falls back to the initials when the photo fails (live pass)', () => {
+    const { container } = render(<Avatar src="https://example.test/a.jpg" initials="NK" size={30} />);
+    fireEvent.error(container.querySelector('img')!);
+    expect(container.querySelector('img')).toBeNull();
+    expect(screen.getByText('NK')).toBeInTheDocument();
   });
 
   it('Button fills with its tone on hover and turns bold', () => {

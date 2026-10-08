@@ -1,7 +1,7 @@
-import { http, HttpResponse } from 'msw';
+import { delay, http, HttpResponse } from 'msw';
 import { fail, ok, url } from '@/test/msw/handlers';
 import { server } from '@/test/msw/server';
-import { api, ApiError, setSessionExpiredHandler } from '../client';
+import { api, ApiError, setSessionExpiredHandler, timeouts } from '../client';
 import { tokens } from '../tokens';
 
 afterEach(() => {
@@ -83,6 +83,35 @@ describe('api client', () => {
     expect(err.message).toBe('Too many requests');
   });
 
+  it('a 5xx says something people can read and keeps the server text in detail (live pass)', async () => {
+    server.use(
+      http.post(url('/frontend/media'), () =>
+        fail(500, 'S3 media upload not configured: S3_MEDIA_BUCKET is required.'),
+      ),
+    );
+    const err = (await api.post('/frontend/media', {}).catch((e: unknown) => e)) as ApiError;
+    expect(err.status).toBe(500);
+    expect(err.message).toBe('Something went wrong on our side — try again in a moment.');
+    expect(err.detail).toBe('S3 media upload not configured: S3_MEDIA_BUCKET is required.');
+  });
+
+  it('never surfaces an HTML error page as the message (live pass)', async () => {
+    server.use(
+      http.get(
+        url('/frontend/nope'),
+        () =>
+          new HttpResponse('<!DOCTYPE html><pre>Cannot GET /api/frontend/nope</pre>', {
+            status: 404,
+            statusText: 'Not Found',
+            headers: { 'Content-Type': 'text/html' },
+          }),
+      ),
+    );
+    const err = (await api.get('/frontend/nope').catch((e: unknown) => e)) as ApiError;
+    expect(err.status).toBe(404);
+    expect(err.message).toBe('Not Found');
+  });
+
   it('refreshes once on a plain-text 401, then retries with the new token', async () => {
     tokens.set('expired', 'refresh-1');
     const seen: (string | null)[] = [];
@@ -156,7 +185,8 @@ describe('api client', () => {
     Object.defineProperty(navigator, 'locks', {
       configurable: true,
       value: {
-        request: async (_name: string, cb: () => Promise<boolean>) => {
+        // the Web Locks signature with options: (name, { signal }, callback)
+        request: async (_name: string, _opts: { signal?: AbortSignal }, cb: () => Promise<boolean>) => {
           localStorage.setItem('weo.auth.refresh', 'refresh-from-other-tab');
           return cb();
         },
@@ -233,6 +263,48 @@ describe('api client', () => {
     expect(err.status).toBe(401);
     expect(expired).not.toHaveBeenCalled();
     expect(tokens.getRefresh()).toBe('refresh-1');
+  });
+
+  it('a server that never answers is a 504 after the deadline, not a hang (M12)', async () => {
+    const before = { ...timeouts };
+    timeouts.requestMs = 50;
+    try {
+      server.use(
+        http.get(url('/frontend/slow'), async () => {
+          await delay('infinite');
+          return ok(null);
+        }),
+      );
+      tokens.set('acc', 'ref');
+      const err = (await api.get('/frontend/slow').catch((e: unknown) => e)) as ApiError;
+      expect(err).toBeInstanceOf(ApiError);
+      expect(err.status).toBe(504);
+    } finally {
+      Object.assign(timeouts, before);
+    }
+  });
+
+  it('a refresh that never answers keeps the session and frees the next try (M12)', async () => {
+    const before = { ...timeouts };
+    timeouts.refreshMs = 50;
+    const expired = vi.fn();
+    setSessionExpiredHandler(expired);
+    try {
+      server.use(
+        http.get(url('/frontend/wallet'), () => new HttpResponse('Invalid token', { status: 401 })),
+        http.post(url('/frontend/auth/new_access_token'), async () => {
+          await delay('infinite');
+          return ok(null);
+        }),
+      );
+      tokens.set('expired', 'refresh-1');
+      const err = (await api.get('/frontend/wallet').catch((e: unknown) => e)) as ApiError;
+      expect(err.status).toBe(401);
+      expect(expired).not.toHaveBeenCalled();
+      expect(tokens.getRefresh()).toBe('refresh-1');
+    } finally {
+      Object.assign(timeouts, before);
+    }
   });
 
   it('never sends a token or refreshes on auth:false calls', async () => {

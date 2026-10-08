@@ -1,5 +1,5 @@
 // design: js/ds/_ds_bundle.js components/data/Avatar.jsx — converted from the compiled bundle (scripts/ds2tsx.mjs), then typed by hand.
-import { Children } from 'react';
+import { Children, useState } from 'react';
 import type { CSSProperties, HTMLAttributes, ReactNode } from 'react';
 
 export interface AvatarProps extends Omit<HTMLAttributes<HTMLDivElement>, 'style'> {
@@ -24,34 +24,38 @@ export interface AvatarGroupProps extends Omit<HTMLAttributes<HTMLDivElement>, '
  */
 export function Avatar({ src, initials, size = 48, isr, tone = '#17C3D6', style, ...rest }: AvatarProps) {
   const px = typeof size === 'number' ? `${size}px` : size;
-  const inner = src ? (
-    <img
-      src={src}
-      alt=""
-      style={{
-        width: '100%',
-        height: '100%',
-        objectFit: 'cover',
-      }}
-    />
-  ) : (
-    <div
-      style={{
-        width: '100%',
-        height: '100%',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        background: 'linear-gradient(135deg,#3A95F2,#7db0f5)',
-        color: '#fff',
-        fontFamily: 'var(--font-sans)',
-        fontWeight: 700,
-        fontSize: parseFloat(px) * 0.34,
-      }}
-    >
-      {initials}
-    </div>
-  );
+  // a photo that fails to load falls back to the initials instead of a broken-image glyph
+  const [failed, setFailed] = useState<string | null>(null);
+  const inner =
+    src && failed !== src ? (
+      <img
+        src={src}
+        alt=""
+        onError={() => setFailed(src)}
+        style={{
+          width: '100%',
+          height: '100%',
+          objectFit: 'cover',
+        }}
+      />
+    ) : (
+      <div
+        style={{
+          width: '100%',
+          height: '100%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          background: 'linear-gradient(135deg,#3A95F2,#7db0f5)',
+          color: '#fff',
+          fontFamily: 'var(--font-sans)',
+          fontWeight: 700,
+          fontSize: parseFloat(px) * 0.34,
+        }}
+      >
+        {initials}
+      </div>
+    );
   if (isr != null) {
     const deg = (isr / 100) * 360;
     return (

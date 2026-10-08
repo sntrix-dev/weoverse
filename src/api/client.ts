@@ -24,11 +24,13 @@ export class ApiError extends Error {
   /** e.g. ACCOUNT_BANNED / ACCOUNT_SUSPENDED / ACCOUNT_DELETED from `authenticate` */
   readonly code: string | undefined;
   readonly data: unknown;
+  /** what the server said when `message` was replaced by a friendlier one (5xx) */
+  readonly detail: string | undefined;
 
   constructor(
     status: number,
     message: string,
-    opts: { fieldErrors?: FieldError[]; code?: string; data?: unknown } = {},
+    opts: { fieldErrors?: FieldError[]; code?: string; data?: unknown; detail?: string } = {},
   ) {
     super(message);
     this.name = 'ApiError';
@@ -36,6 +38,7 @@ export class ApiError extends Error {
     this.fieldErrors = opts.fieldErrors ?? [];
     this.code = opts.code;
     this.data = opts.data;
+    this.detail = opts.detail;
   }
 }
 
@@ -77,7 +80,22 @@ async function readBody(res: Response): Promise<unknown> {
   return text || null;
 }
 
+/** People see this for any server-side failure; the server's own words stay in `detail`. */
+export const SERVER_TROUBLE = 'Something went wrong on our side — try again in a moment.';
+
 function toError(res: Response, body: unknown): ApiError {
+  const e = readError(res, body);
+  // live pass: a 5xx message is written for operators ("S3_MEDIA_BUCKET is required"), not people
+  if (res.status < 500) return e;
+  return new ApiError(e.status, SERVER_TROUBLE, {
+    fieldErrors: e.fieldErrors,
+    code: e.code,
+    data: e.data,
+    detail: e.message,
+  });
+}
+
+function readError(res: Response, body: unknown): ApiError {
   if (isEnvelope(body)) {
     const data = body.data as { code?: string } | null;
     return new ApiError(res.status, body.message || body.error || res.statusText, {
@@ -89,11 +107,44 @@ function toError(res: Response, body: unknown): ApiError {
   if (body && typeof body === 'object' && 'message' in body) {
     return new ApiError(res.status, String((body as { message: unknown }).message));
   }
-  return new ApiError(
-    res.status,
-    typeof body === 'string' && body ? body : res.statusText || 'Request failed',
-  );
+  // an HTML page (Express "Cannot GET", a proxy error page) is never a message for people
+  const text = typeof body === 'string' && body && !body.trimStart().startsWith('<') ? body : '';
+  return new ApiError(res.status, text || res.statusText || 'Request failed');
 }
+
+/* ---------- time limits ---------- */
+
+/**
+ * How long a call may wait for an answer (M12). Without a limit, a request the server accepted
+ * but never answered (a restart mid-deploy, a stuck proxy) hung for minutes — and a hung refresh
+ * held the cross-tab refresh lock, so every open tab sat with empty screens and then signed out.
+ * Uploads get longer. Mutable only for tests.
+ */
+export const timeouts = { requestMs: 20_000, uploadMs: 120_000, refreshMs: 15_000 };
+
+/** A signal that aborts after `ms` (with a fallback for browsers before AbortSignal.timeout). */
+function timeoutSignal(ms: number): AbortSignal {
+  if (typeof AbortSignal.timeout === 'function') return AbortSignal.timeout(ms);
+  const c = new AbortController();
+  setTimeout(() => c.abort(new DOMException('The operation timed out.', 'TimeoutError')), ms);
+  return c.signal;
+}
+
+/** The caller's signal (if any) and a deadline, as one signal (Safari < 17.4 has no AbortSignal.any). */
+function deadline(ms: number, signal?: AbortSignal): AbortSignal {
+  const limit = timeoutSignal(ms);
+  if (!signal) return limit;
+  if (typeof AbortSignal.any === 'function') return AbortSignal.any([signal, limit]);
+  const c = new AbortController();
+  const stop = (s: AbortSignal) => () => c.abort(s.reason);
+  if (signal.aborted) c.abort(signal.reason);
+  signal.addEventListener('abort', stop(signal), { once: true });
+  limit.addEventListener('abort', stop(limit), { once: true });
+  return c.signal;
+}
+
+// by name: a DOMException from another realm (a test DOM) is not `instanceof` this one
+const isTimeout = (e: unknown) => (e as { name?: unknown } | null)?.name === 'TimeoutError';
 
 /* ---------- refresh (single flight, across tabs) ---------- */
 
@@ -111,10 +162,12 @@ export const setSessionExpiredHandler = (fn: (() => void) | null) => {
 const REFRESH_LOCK = 'weo.auth.refresh';
 
 async function exchange(refreshToken: string): Promise<boolean> {
+  // a timeout throws: the refresh is "unreachable" and the session is kept
   const res = await fetch(buildUrl('/frontend/auth/new_access_token'), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ refresh_token: refreshToken }),
+    signal: deadline(timeouts.refreshMs),
   });
   const body = await readBody(res);
   if (!res.ok || !isEnvelope(body) || !body.success) {
@@ -146,7 +199,15 @@ export function refreshAccessToken(): Promise<boolean> {
     refreshUnreachable = false;
     try {
       const locks = typeof navigator !== 'undefined' ? navigator.locks : undefined;
-      return locks ? await locks.request(REFRESH_LOCK, refreshFromStorage) : await refreshFromStorage();
+      // waiting for another tab's refresh is bounded too: a lock that never frees must not
+      // freeze this tab (aborting the wait throws, which keeps the session)
+      return locks
+        ? await locks.request(
+            REFRESH_LOCK,
+            { signal: timeoutSignal(timeouts.refreshMs * 2) },
+            refreshFromStorage,
+          )
+        : await refreshFromStorage();
     } catch {
       // fetch threw: no answer at all, so nothing says the refresh token is bad (M12)
       refreshUnreachable = true;
@@ -179,18 +240,28 @@ async function request<T>(
   const access = tokens.getAccess();
   if (auth && access) headers.Authorization = `Bearer ${access}`;
 
-  const res = await fetch(buildUrl(path, query), {
-    method,
-    headers,
-    signal,
-    body:
-      body === undefined
-        ? undefined
-        : raw || body instanceof FormData
-          ? (body as BodyInit)
-          : JSON.stringify(body),
-  });
-  const payload = await readBody(res);
+  const slow = raw || body instanceof FormData;
+  let res: Response;
+  let payload: unknown;
+  try {
+    res = await fetch(buildUrl(path, query), {
+      method,
+      headers,
+      signal: deadline(slow ? timeouts.uploadMs : timeouts.requestMs, signal),
+      body:
+        body === undefined
+          ? undefined
+          : raw || body instanceof FormData
+            ? (body as BodyInit)
+            : JSON.stringify(body),
+    });
+    payload = await readBody(res);
+  } catch (e) {
+    // a deadline is a server that did not answer: a 504 the screens and retries already handle
+    if (isTimeout(e))
+      throw new ApiError(504, 'The server is taking too long to answer — try again in a moment.');
+    throw e;
+  }
 
   if (res.status === 401 && auth && !retried) {
     const ok = await refreshAccessToken();

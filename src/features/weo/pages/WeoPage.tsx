@@ -8,7 +8,19 @@ import { PathBar } from '@/components/shell/PathBar';
 import { WeoPriceAtRest } from '@/components/weo/WeoBits';
 import { WeoActions } from '@/components/weo/WeoCards';
 import { weoCardProps } from '@/components/weo/weoCardProps';
-import { Avatar, Button, Chip, EmptyState, ICO, OMark, Progress, svg, WeOCard } from '@/design-system';
+import { ApiError } from '@/api/client';
+import {
+  Avatar,
+  Button,
+  Chip,
+  EmptyState,
+  ICO,
+  OMark,
+  Progress,
+  Spinner,
+  svg,
+  WeOCard,
+} from '@/design-system';
 import { cardModel, type WeoFormat } from '@/lib/cardModel';
 import { useNavSummary } from '@/features/shell/api/navSummary';
 import { useIsTrackingWeo, useTrackWeo } from '@/features/tracking/api/tracking';
@@ -46,7 +58,7 @@ export function WeoPage() {
   if (!w) {
     return (
       <main style={page}>
-        {q.isError ? (
+        {q.isError && q.error instanceof ApiError && q.error.status < 500 ? (
           <EmptyState
             title="This WeO isn’t on the floor"
             description="It may have been removed, or the link is wrong."
@@ -56,8 +68,25 @@ export function WeoPage() {
               </Button>
             }
           />
+        ) : q.isError ? (
+          // live pass: a server failure is not "removed" — say so and offer the retry
+          <EmptyState
+            title="This WeO didn’t open"
+            description="Something went wrong on our side. It’s still there — try again in a moment."
+            action={
+              <Button tone="blue" onClick={() => void q.refetch()}>
+                Try again
+              </Button>
+            }
+          />
         ) : (
-          <div aria-busy="true" style={{ minHeight: '60vh' }} />
+          <div
+            aria-busy="true"
+            aria-label="Opening the WeO"
+            style={{ minHeight: '60vh', display: 'grid', placeItems: 'center' }}
+          >
+            <Spinner size={44} />
+          </div>
         )}
       </main>
     );
@@ -128,7 +157,12 @@ export function WeoPage() {
         title={w.name}
         lede={w.points[0] || 'One WeO, its terms at rest and its passport attached.'}
         feature={
-          <WeoPriceFeature w={w} tone={tone} onAsk={ask} onRehearse={() => openWorld({ weoId: w.id })} />
+          <WeoPriceFeature
+            w={w}
+            tone={tone}
+            onAsk={mine ? undefined : ask}
+            onRehearse={() => openWorld({ weoId: w.id })}
+          />
         }
         stats={[
           { value: String(w.collectors), label: 'Collectors' },

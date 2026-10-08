@@ -17,7 +17,7 @@ function sayBusy(error: unknown) {
 /**
  * Defaults tuned for the backend's global 70 req/min/IP limit: data stays fresh for
  * 30 s, no refetch on window focus, and client errors (4xx) are never retried —
- * except 429, which backs off.
+ * except 429, which backs off. Server errors: only a 502/503 is retried, once.
  */
 export function createQueryClient() {
   return new QueryClient({
@@ -31,6 +31,9 @@ export function createQueryClient() {
           if (error instanceof ApiError) {
             if (error.status === 429) return failureCount < 2;
             if (error.status < 500) return false;
+            // live pass: a 500 answers the same way again and a 504 already waited its full deadline —
+            // retrying them kept a spinner up for ~10 s before the error state; a gateway blip gets one more try
+            return (error.status === 502 || error.status === 503) && failureCount < 1;
           }
           return failureCount < 2;
         },

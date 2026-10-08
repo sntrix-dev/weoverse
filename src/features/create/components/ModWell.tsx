@@ -78,8 +78,9 @@ export function ModWell({
           </span>
           <span
             style={{
-              flex: 1,
-              minWidth: 0,
+              // live pass U2: the title never shrinks under the summary — the summary gives way and ellipsizes
+              flex: '1 0 auto',
+              whiteSpace: 'nowrap',
               fontSize: 13.5,
               fontWeight: open ? 600 : 400,
               letterSpacing: '-.008em',
@@ -92,6 +93,8 @@ export function ModWell({
           {!open && m.summary && (
             <span
               style={{
+                flex: '0 1 auto',
+                minWidth: 0,
                 fontSize: 11.5,
                 color: 'var(--text-faint)',
                 whiteSpace: 'nowrap',

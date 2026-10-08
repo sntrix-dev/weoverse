@@ -2,6 +2,17 @@
 
 All notable changes per module. Newest first.
 
+## Live UX pass on production (2026-10-08)
+
+- A stalled server ends in a readable "taking too long" after a deadline instead of an endless wait; a stalled refresh keeps you signed in.
+- Server faults read "Something went wrong on our side" instead of operator text or an HTML page; a failed upload says your draft is kept.
+- Toasts show above the flow bar and the floating O nav.
+- A WeO page shows a spinner while it opens, and "didn't open · Try again" when the server fails; no "Ask" on your own WeO.
+- Google profile photos load; any avatar that fails shows its initials.
+- Composer: module titles no longer overlap their values; the module rail stays below the breadcrumb.
+- Manage Circles says when no circle is open to join, and when the list failed to load.
+- Report: `docs/reports/live-ux-pass-2026-10-08.md` (with three backend deployment blockers).
+
 ## M12 — Hardening (2026-10-07)
 
 - The bell is live: a new notification lights it without a reload (socket.io, loaded only when signed in); the minute poll stays as the fallback.
