@@ -29,3 +29,20 @@ Backend chain: `phase1/v3 → redesign/m00-setup → redesign/m01-foundation →
 2. Backend: commit on `redesign/mNN-<slug>`, `git push -u origin redesign/mNN-<slug>`.
 3. Frontend: commit on `feat/mNN-<slug>`, push it, `git switch develop && git merge --ff-only feat/mNN-<slug> && git push` (a `--no-ff` merge when `develop` moved on). Never merge or push into `master` (Surya, D-069).
 4. Tag the frontend: `git tag mNN-done && git push --tags`.
+
+## Hosting (Netlify)
+
+The app is a single-page app: every path (`/callback` after O-Wallet sign-in, `/community`, a reload anywhere) must serve `index.html`. `public/_redirects` (`/* /index.html 200`) does that on Netlify; without it the sign-in redirect lands on Netlify's 404.
+
+Build: `npm run build`, publish `dist`. Set these in the Netlify site's environment variables — they are baked in at build time, so redeploy after changing one:
+
+| Variable | Value |
+|---|---|
+| `VITE_API_URL` | `https://api.ocono.me` (the client appends `/api`) |
+| `VITE_WALLET_URL` | `https://wallet.ocono.me` |
+| `VITE_OAUTH_AUTHORIZE_PATH` | `/api/oauth/authorize` |
+| `VITE_OAUTH_CLIENT_ID` | the O-Wallet client id |
+| `VITE_OAUTH_REDIRECT_URI` | `https://<site>/callback` (or leave unset: it defaults to the site's own `/callback`) |
+| `VITE_OAUTH_SCOPE` | `profile` |
+
+Never set `VITE_DEV_ACCESS_TOKEN` there. The site's origin must be in the backend's `CORS_ALLOWED_ORIGINS`, and its `/callback` registered with O-Wallet.
