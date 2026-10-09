@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { api } from '@/api/client';
+import { api, ApiError, timeoutSignal, timeouts } from '@/api/client';
 import type { components } from '@/api/generated/schema';
 import { qk } from '@/api/queryKeys';
 import type { BuiltPayload } from '../model/composer';
@@ -8,6 +8,9 @@ type S = components['schemas'];
 export type TemplateDto = S['WeoTemplate'];
 export type OConfigDto = S['OConfig'];
 export type UploadedMediaDto = S['UploadedMedia'];
+
+/** `POST /frontend/media/presign` — a signed S3 PUT for one file (type and exact size signed). */
+export type PresignedMediaDto = S['PresignedMedia'];
 
 export interface TemplatesDto {
   templates: TemplateDto[];
@@ -76,9 +79,58 @@ export function useAsks() {
   });
 }
 
-/** `POST /frontend/media` — the file is the body; the answer is the `{ url, type }` a WeO holds. */
-export const uploadMedia = (file: File) =>
-  api.post<UploadedMediaDto>('/frontend/media', file, { query: { filename: file.name.slice(0, 200) } });
+/** Some browsers leave `File.type` empty (HEIC on desktop); the extension decides then. */
+const BY_EXT: Record<string, string> = {
+  jpg: 'image/jpeg',
+  jpeg: 'image/jpeg',
+  png: 'image/png',
+  webp: 'image/webp',
+  gif: 'image/gif',
+  avif: 'image/avif',
+  heic: 'image/heic',
+  mp4: 'video/mp4',
+  webm: 'video/webm',
+  mov: 'video/quicktime',
+};
+const typeOf = (file: File) =>
+  file.type || BY_EXT[file.name.split('.').pop()?.toLowerCase() ?? ''] || 'application/octet-stream';
+
+const STORAGE_TROUBLE = 'The file didn’t reach storage — your draft is kept, try again in a moment.';
+
+/**
+ * The browser uploads the file straight to S3 (Surya, 2026-10-09): the backend only signs a
+ * one-file PUT (`POST /frontend/media/presign`), so no cloud credential ever reaches the app
+ * (D-014) and the bytes never pass through the API. The answer is the `{ url, type }` a WeO holds.
+ */
+export async function uploadMedia(file: File): Promise<UploadedMediaDto> {
+  const contentType = typeOf(file);
+  const link = await api.post<PresignedMediaDto>('/frontend/media/presign', {
+    contentType,
+    size: file.size,
+    filename: file.name.slice(0, 200),
+  });
+  let res: Response;
+  try {
+    // no Authorization header: the signature in the URL is the only credential S3 sees
+    res = await fetch(link.uploadUrl, {
+      method: link.method,
+      headers: link.headers,
+      body: file,
+      signal: timeoutSignal(timeouts.uploadMs),
+    });
+  } catch (e) {
+    const name = (e as { name?: unknown } | null)?.name;
+    if (name === 'TimeoutError')
+      throw new ApiError(504, 'The upload is taking too long — try a smaller file.');
+    // a network failure or a bucket without a CORS rule for this origin
+    throw new ApiError(0, STORAGE_TROUBLE, { detail: String((e as Error)?.message ?? e) });
+  }
+  if (!res.ok) {
+    const detail = (await res.text().catch(() => '')).slice(0, 300);
+    throw new ApiError(res.status >= 500 ? res.status : 502, STORAGE_TROUBLE, { detail });
+  }
+  return { url: link.url, type: link.type, size: file.size, contentType: link.contentType };
+}
 
 /** "Ask Mya to draft it" — one to three one-line descriptions. */
 export function useDescribe() {

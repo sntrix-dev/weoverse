@@ -2230,6 +2230,37 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/frontend/media/presign": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * A signed link to upload one image or video straight to S3
+         * @description The browser uploads the file itself: ask here with the file's type and
+         *     exact size, then `PUT` the file to `uploadUrl` with `headers`. The type
+         *     and length are signed, so S3 answers 403 to anything else; the link
+         *     lives `expiresIn` seconds (300). Once the PUT answers 200, `url` is the
+         *     file's public address — the `{ url, type }` a WeO's `media[]` takes.
+         *
+         *     Same limits as `POST /frontend/media`: photos (JPEG, PNG, WebP, GIF,
+         *     AVIF, HEIC) up to 10 MB, a video (MP4, WebM, MOV) up to 100 MB, no SVG.
+         *     The key is `weoverse/app/{userId}/weos/{yyyy}/{mm}/{uuid}.{ext}`.
+         *
+         *     The bucket needs a CORS rule allowing `PUT` from the web app's origin
+         *     with the `Content-Type` header.
+         */
+        post: operations["presignMediaUpload"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/frontend/ai/describe": {
         parameters: {
             query?: never;
@@ -4016,14 +4047,17 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/frontend/request-weos/creators/{creatorId}": {
+    "/frontend/creators/{creatorId}/request-weos": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        /** RFQs created by a specific creator */
+        /**
+         * RFQs created by a specific creator
+         * @description The old path `GET /frontend/request-weos/creators/{creatorId}` still answers identically as a legacy alias (deprecated; not listed here because it is ambiguous with `/frontend/request-weos/{id}/*`).
+         */
         get: operations["getRequestedOffersByCreator"];
         put?: never;
         post?: never;
@@ -7565,7 +7599,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/frontend/weos/creators/{id}": {
+    "/frontend/creators/{id}/weos": {
         parameters: {
             query?: never;
             header?: never;
@@ -7585,7 +7619,10 @@ export interface paths {
          *     to `0..100`). `creator` is `null` when the id resolves to no
          *     user doc (soft-deleted / removed).
          *
-         *     Replaces `GET /frontend/offers/creators/{id}`.
+         *     Replaces `GET /frontend/offers/creators/{id}`. The old path
+         *     `GET /frontend/weos/creators/{id}` still answers identically as a
+         *     legacy alias (deprecated; not listed here because it is ambiguous
+         *     with `/frontend/weos/{id}/*`).
          */
         get: operations["getWeosByCreatorId"];
         put?: never;
@@ -9421,6 +9458,60 @@ export interface components {
         };
         UploadedMediaResponse: components["schemas"]["BaseResponse"] & {
             data?: components["schemas"]["UploadedMedia"];
+        };
+        PresignMediaBody: {
+            /**
+             * @description The file's type — signed, S3 refuses any other
+             * @example image/jpeg
+             */
+            contentType: string;
+            /**
+             * @description The file's exact length in bytes — signed, S3 refuses any other
+             * @example 482113
+             */
+            size: number;
+            /**
+             * @description A hint for the log only; never part of the key
+             * @example cover.jpg
+             */
+            filename?: string;
+        };
+        PresignedMedia: {
+            /**
+             * Format: uri
+             * @description PUT the file here (signed; no credentials in it)
+             */
+            uploadUrl: string;
+            /** @enum {string} */
+            method: "PUT";
+            /**
+             * @description Send exactly these headers with the PUT
+             * @example {
+             *       "Content-Type": "image/jpeg"
+             *     }
+             */
+            headers: {
+                [key: string]: string;
+            };
+            /**
+             * Format: uri
+             * @description Where the file reads once the PUT succeeds — the url for a WeO's media[]
+             */
+            url: string;
+            /** @example weoverse/app/651f8c2a3b9c0d12e4567890/weos/2026/10/0b6c3c1e-8a7e-4f57-9a55-2d0f0d7b1c11.jpg */
+            key: string;
+            /** @enum {string} */
+            type: "image" | "video";
+            /** @example image/jpeg */
+            contentType: string;
+            /**
+             * @description Seconds the link stays valid
+             * @example 300
+             */
+            expiresIn: number;
+        };
+        PresignedMediaResponse: components["schemas"]["BaseResponse"] & {
+            data?: components["schemas"]["PresignedMedia"];
         };
         AiDescribeBody: {
             /** @example Signed edition */
@@ -20489,6 +20580,93 @@ export interface operations {
                 };
             };
             422: components["responses"]["ValidationError"];
+        };
+    };
+    presignMediaUpload: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                /**
+                 * @example {
+                 *       "contentType": "image/jpeg",
+                 *       "size": 482113,
+                 *       "filename": "cover.jpg"
+                 *     }
+                 */
+                "application/json": components["schemas"]["PresignMediaBody"];
+            };
+        };
+        responses: {
+            /** @description Upload link ready */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "success": true,
+                     *       "message": "Upload link ready",
+                     *       "data": {
+                     *         "uploadUrl": "https://weo-media-bucket.s3.us-east-1.amazonaws.com/weoverse/app/651f8c2a3b9c0d12e4567890/weos/2026/10/0b6c3c1e-8a7e-4f57-9a55-2d0f0d7b1c11.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Expires=300&X-Amz-SignedHeaders=content-length%3Bcontent-type%3Bhost&X-Amz-Signature=3f1c0a7e",
+                     *         "method": "PUT",
+                     *         "headers": {
+                     *           "Content-Type": "image/jpeg"
+                     *         },
+                     *         "url": "https://weo-media-bucket.s3.us-east-1.amazonaws.com/weoverse/app/651f8c2a3b9c0d12e4567890/weos/2026/10/0b6c3c1e-8a7e-4f57-9a55-2d0f0d7b1c11.jpg",
+                     *         "key": "weoverse/app/651f8c2a3b9c0d12e4567890/weos/2026/10/0b6c3c1e-8a7e-4f57-9a55-2d0f0d7b1c11.jpg",
+                     *         "type": "image",
+                     *         "contentType": "image/jpeg",
+                     *         "expiresIn": 300
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["PresignedMediaResponse"];
+                };
+            };
+            /** @description The size is not a positive whole number of bytes */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BaseResponse"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            /** @description Past the size limit for its kind (10 MB image, 100 MB video) */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BaseResponse"];
+                };
+            };
+            /** @description Not a photo or a video a WeO can hold */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BaseResponse"];
+                };
+            };
+            422: components["responses"]["ValidationError"];
+            /** @description The server has no bucket configured (`S3_MEDIA_BUCKET`, `AWS_REGION`, AWS credentials) */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BaseResponse"];
+                };
+            };
         };
     };
     describeWeo: {

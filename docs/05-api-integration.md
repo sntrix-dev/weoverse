@@ -85,7 +85,7 @@ Backend: `weo-3.0`, local base URL **`http://localhost:3002/api`**. Full endpoin
 | M06 | Rate | `POST /frontend/weos/:id/rating` | exists |
 | M07 | Post / save an edit | `POST /frontend/weos`, `POST /frontend/request-weos`, `PUT /frontend/weos/:id` | wired (`features/create/api/create.ts`, D-051) |
 | M07 | O peg | `GET /frontend/config/o` (new, M07) | wired — every Os → dollar conversion |
-| M07 | Media upload | `POST /frontend/media` (new, M07; raw body, image ≤ 10 MB, video ≤ 100 MB) | wired (`MediaUploader`) |
+| M07 | Media upload | `POST /frontend/media/presign` → `PUT` the file to the signed S3 link (D-099; image ≤ 10 MB, video ≤ 100 MB). `POST /frontend/media` (raw body) is no longer called | wired (`uploadMedia`, `MediaUploader`) |
 | M07 | Draft with Mya | `POST /frontend/ai/describe` (new, M07; 10/min per user) | wired (`AiDraft`) |
 | M07 | Templates | `GET /frontend/templates` (new, M07; tier gating) | wired (D-050) |
 | M07 | Drafts (autosave, carry on) | `/frontend/me/drafts*` | wired (`useAutosave`, 2.5 s quiet) |
@@ -116,7 +116,7 @@ Backend: `weo-3.0`, local base URL **`http://localhost:3002/api`**. Full endpoin
 | M10 | Careers interest | `POST /weo-website/careers-module` | wired (`CareersSheet`, D-083) |
 | M09 | Passport (hero, standing, tier, orbit, public switches) | `GET /frontend/users/me/passport` (+ `inputs[].do`, `.cap`, M09) | wired (`features/passport`, D-074) |
 | M09 | Your graph | `GET /frontend/users/me/graph` | wired |
-| M09 | Edit profile, photo | `PATCH /frontend/users/me/profile` (+ `avatarUrl`, 409 on a taken handle, M09) · `POST /frontend/media` | wired (`EditProfileSheet`) |
+| M09 | Edit profile, photo | `PATCH /frontend/users/me/profile` (+ `avatarUrl`, 409 on a taken handle, M09) · `POST /frontend/media/presign` + S3 PUT | wired (`EditProfileSheet`) |
 | M09 | Public page switches, who can reach you | `PATCH /frontend/users/me/public-profile` | wired (passport and settings) |
 | M09 | O-Wallet page | `GET /frontend/wallet/overview` (peg = settlement 99, M09) · `GET /frontend/me/collections` (orbit) | wired (`WalletPage`, D-072, D-077) |
 | M09 | Move Os | `POST /frontend/wallet/transfer` | wired (M05 `WalletRow`) |

@@ -1,8 +1,8 @@
 // design: create.jsx MediaUploader — slot 1 is the cover (an image); slots 2 and 3 an image or one video.
-// The design keeps files in the browser; here each one uploads (`POST /frontend/media`) and the
+// The design keeps files in the browser; here each one uploads straight to S3 (a signed PUT) and the
 // slot holds the URL the WeO will carry.
 import { useEffect, useRef, useState } from 'react';
-import { ApiError } from '@/api/client';
+import { ApiError, SERVER_TROUBLE } from '@/api/client';
 import { Spinner, svg } from '@/design-system';
 import { uploadMedia } from '../api/create';
 import {
@@ -66,7 +66,7 @@ export function MediaUploader({
       onChange(placeMedia(f, i, { kind: up.type, src: up.url, name: file.name }));
     } catch (e) {
       toast(
-        e instanceof ApiError && e.status < 500
+        e instanceof ApiError && e.message !== SERVER_TROUBLE
           ? e.message
           : 'Uploads aren’t working on our side right now — your draft is kept, try again later.',
       );

@@ -2,6 +2,11 @@
 
 All notable changes per module. Newest first.
 
+## Direct uploads (2026-10-09)
+
+- Photos and videos upload from the browser straight to S3 through a link the backend signs for that one file (type and size fixed, five minutes). No cloud credentials in the app; the API never carries the bytes.
+- A bucket refusal or an unreachable bucket says the draft is kept; a HEIC whose type the browser leaves empty is read from its extension.
+
 ## Live UX pass on production (2026-10-08)
 
 - A stalled server ends in a readable "taking too long" after a deadline instead of an endless wait; a stalled refresh keeps you signed in.

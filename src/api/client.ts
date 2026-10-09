@@ -123,7 +123,7 @@ function readError(res: Response, body: unknown): ApiError {
 export const timeouts = { requestMs: 20_000, uploadMs: 120_000, refreshMs: 15_000 };
 
 /** A signal that aborts after `ms` (with a fallback for browsers before AbortSignal.timeout). */
-function timeoutSignal(ms: number): AbortSignal {
+export function timeoutSignal(ms: number): AbortSignal {
   if (typeof AbortSignal.timeout === 'function') return AbortSignal.timeout(ms);
   const c = new AbortController();
   setTimeout(() => c.abort(new DOMException('The operation timed out.', 'TimeoutError')), ms);

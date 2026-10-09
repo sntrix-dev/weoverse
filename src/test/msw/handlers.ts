@@ -141,22 +141,35 @@ export const handlers = [
   http.post(url('/frontend/community/circles/:id/invite'), ({ params }) =>
     ok({ invited: true, circleId: String(params.id), userId: 'c-1' }),
   ),
-  http.post(url('/frontend/media'), ({ request }) => {
-    const type = request.headers.get('content-type') ?? '';
+  // uploads: the API signs, the browser PUTs straight to the bucket
+  http.post(url('/frontend/media/presign'), async ({ request }) => {
+    const body = (await request.json()) as { contentType: string; size: number };
+    const ext = body.contentType.split('/')[1] ?? 'bin';
+    const key = `weoverse/app/u/weos/2026/10/up.${ext}`;
     return HttpResponse.json(
       {
         success: true,
-        message: 'Uploaded',
+        message: 'Upload link ready',
         data: {
-          url: `https://cdn.test/weoverse/app/u/weos/2026/10/up.${type.split('/')[1] ?? 'bin'}`,
-          type: type.startsWith('video/') ? 'video' : 'image',
-          size: 9,
-          contentType: type,
+          uploadUrl: `https://s3.test/${key}?X-Amz-Signature=sig`,
+          method: 'PUT',
+          headers: { 'Content-Type': body.contentType },
+          url: `https://cdn.test/${key}`,
+          key,
+          type: body.contentType.startsWith('video/') ? 'video' : 'image',
+          contentType: body.contentType,
+          expiresIn: 300,
         },
       },
       { status: 201 },
     );
   }),
+  http.put('https://s3.test/*', ({ request }) =>
+    // the bucket only ever sees the signed URL — never the app's bearer token
+    request.headers.get('authorization')
+      ? new HttpResponse('<Error><Code>InvalidRequest</Code></Error>', { status: 400 })
+      : new HttpResponse(null, { status: 200 }),
+  ),
   http.post(url('/frontend/ai/describe'), () =>
     ok({ lines: ['Sixty prints, each signed and numbered by hand.', 'One of sixty — yours, signed.'] }),
   ),

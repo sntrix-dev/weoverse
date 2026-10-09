@@ -138,7 +138,7 @@ Page → feature hook (useDiscoverFeed) → api/client (fetch + bearer)
 - Storage: access token in memory; refresh token in `localStorage` (the backend is bearer-only, no cookies).
 - Dev/testing: a backend script mints an access token for the seeded Mya user (`VITE_DEV_ACCESS_TOKEN` in `.env.local`) so tests never depend on the IdP. The dev token path is compiled out of production builds.
 - Frontend env (all in `.env.local`, never committed — the repo is public), named like the previous WeO frontend build: `VITE_API_URL` (backend host; client appends `/api`), `VITE_WALLET_URL` (IdP, `https://wallet.ocono.me`), `VITE_OAUTH_AUTHORIZE_PATH`, `VITE_OAUTH_CLIENT_ID`, `VITE_OAUTH_REDIRECT_URI`, `VITE_OAUTH_SCOPE` (`profile`), `VITE_ENV`, `VITE_DEV_ACCESS_TOKEN`. `.env.example` lists names only.
-- The previous build shipped AWS keys as `VITE_AWS_*` — anything `VITE_` is bundled into public JS, so this app never takes cloud credentials; uploads go through the backend (gap G-12).
+- The previous build shipped AWS keys as `VITE_AWS_*` — anything `VITE_` is bundled into public JS, so this app never takes cloud credentials. Uploads go from the browser straight to S3 with a link the backend signs per file (`POST /frontend/media/presign`, D-099).
 
 ## Styling
 
