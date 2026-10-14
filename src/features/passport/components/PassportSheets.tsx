@@ -227,7 +227,7 @@ export function EditProfileSheet({ p, onClose }: { p: PassportDto; onClose: () =
     setErr(null);
     setUploading(true);
     try {
-      const up = await uploadMedia(f);
+      const up = await uploadMedia(f, 'profile');
       setPhoto(up.url);
     } catch (e) {
       setErr(e instanceof ApiError ? e.message : 'The photo did not upload — try again.');

@@ -38,11 +38,12 @@ Build: `npm run build`, publish `dist`. Set these in the Netlify site's environm
 
 | Variable | Value |
 |---|---|
-| `VITE_API_URL` | `https://api.ocono.me` (the client appends `/api`) |
+| `VITE_API_URL` | `https://dev.weo.ai` (the client appends `/api`) |
 | `VITE_WALLET_URL` | `https://wallet.ocono.me` |
 | `VITE_OAUTH_AUTHORIZE_PATH` | `/api/oauth/authorize` |
 | `VITE_OAUTH_CLIENT_ID` | the O-Wallet client id |
 | `VITE_OAUTH_REDIRECT_URI` | `https://<site>/callback` (or leave unset: it defaults to the site's own `/callback`) |
 | `VITE_OAUTH_SCOPE` | `profile` |
+| `VITE_S3_BUCKET_NAME`, `VITE_AWS_REGION`, `VITE_AWS_ACCESS_KEY_ID`, `VITE_AWS_SECRET_ACCESS_KEY` | media uploads from the browser (D-100). Public in the build — the key's IAM user may only `s3:PutObject` on `<bucket>/weoverse/app/*` |
 
-Never set `VITE_DEV_ACCESS_TOKEN` there. The site's origin must be in the backend's `CORS_ALLOWED_ORIGINS`, and its `/callback` registered with O-Wallet.
+Never set `VITE_DEV_ACCESS_TOKEN` there. The bucket needs a CORS rule allowing `PUT`, `POST` and `GET` from the site's origin (headers `*`, expose `ETag`). The site's origin must be in the backend's `CORS_ALLOWED_ORIGINS`, and its `/callback` registered with O-Wallet.

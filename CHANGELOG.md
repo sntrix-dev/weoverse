@@ -2,6 +2,11 @@
 
 All notable changes per module. Newest first.
 
+## Uploads like the previous build (2026-10-14)
+
+- Photos and videos upload from the browser to S3 with the AWS SDK and the `VITE_S3_BUCKET_NAME` / `VITE_AWS_*` build variables, as the previous build did (D-100). The SDK loads on the first upload only; large files go up in parts. Without those variables the signed-link path (D-099) is used.
+- Type and size are checked in the app before anything is sent; profile photos go under `profile/`.
+
 ## Direct uploads (2026-10-09)
 
 - Photos and videos upload from the browser straight to S3 through a link the backend signs for that one file (type and size fixed, five minutes). No cloud credentials in the app; the API never carries the bytes.

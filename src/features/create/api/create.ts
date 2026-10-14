@@ -1,5 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api, ApiError, timeoutSignal, timeouts } from '@/api/client';
+import { tokens } from '@/api/tokens';
+import { objectKey, putToS3, s3Config } from '@/lib/s3Upload';
 import type { components } from '@/api/generated/schema';
 import { qk } from '@/api/queryKeys';
 import type { BuiltPayload } from '../model/composer';
@@ -97,13 +99,72 @@ const typeOf = (file: File) =>
 
 const STORAGE_TROUBLE = 'The file didn’t reach storage — your draft is kept, try again in a moment.';
 
+/** What a WeO can hold — checked here too, because a direct upload never meets the API's check. */
+const IMAGE_MAX = 10 * 1024 * 1024;
+const VIDEO_MAX = 100 * 1024 * 1024;
+const kindOf = (t: string) =>
+  /^image\/(jpeg|png|webp|gif|avif|heic)$/.test(t)
+    ? 'image'
+    : /^video\/(mp4|webm|quicktime)$/.test(t)
+      ? 'video'
+      : null;
+
+/** The signed-in person's id, read from the access token (`sub`), for the object key. */
+function ownerId(): string {
+  const t = tokens.getAccess();
+  try {
+    const part = t?.split('.')[1];
+    if (!part) return 'web';
+    const json = JSON.parse(atob(part.replace(/-/g, '+').replace(/_/g, '/'))) as { sub?: unknown };
+    return typeof json.sub === 'string' && json.sub ? json.sub : 'web';
+  } catch {
+    return 'web';
+  }
+}
+
+const storageError = (e: unknown): ApiError => {
+  const name = (e as { name?: unknown } | null)?.name;
+  if (name === 'TimeoutError' || name === 'AbortError')
+    return new ApiError(504, 'The upload is taking too long — try a smaller file.');
+  // AccessDenied (key without PutObject), a bucket without a CORS rule for this origin, or no network
+  return new ApiError(502, STORAGE_TROUBLE, { detail: String((e as Error)?.message ?? e).slice(0, 300) });
+};
+
 /**
- * The browser uploads the file straight to S3 (Surya, 2026-10-09): the backend only signs a
- * one-file PUT (`POST /frontend/media/presign`), so no cloud credential ever reaches the app
- * (D-014) and the bytes never pass through the API. The answer is the `{ url, type }` a WeO holds.
+ * The browser uploads the file straight to S3 with the AWS SDK, as the previous build did
+ * (Surya, 2026-10-14, D-100), when the build carries the bucket settings (`VITE_S3_BUCKET_NAME`,
+ * `VITE_AWS_*`). Without them it asks the API for a signed one-file PUT
+ * (`POST /frontend/media/presign`) and sends the file there. Either way the bytes go from the
+ * browser to the bucket; the answer is the `{ url, type }` a WeO holds.
  */
-export async function uploadMedia(file: File): Promise<UploadedMediaDto> {
+export async function uploadMedia(
+  file: File,
+  folder: 'weos' | 'profile' = 'weos',
+): Promise<UploadedMediaDto> {
   const contentType = typeOf(file);
+  const kind = kindOf(contentType);
+  if (!kind)
+    throw new ApiError(415, 'Send a photo (JPEG, PNG, WebP, GIF, AVIF, HEIC) or a video (MP4, WebM, MOV).');
+  if (file.size > (kind === 'image' ? IMAGE_MAX : VIDEO_MAX))
+    throw new ApiError(
+      413,
+      kind === 'image' ? 'A photo can be up to 10 MB.' : 'A video can be up to 100 MB.',
+    );
+
+  const cfg = s3Config();
+  if (cfg) {
+    try {
+      const url = await putToS3(cfg, file, {
+        key: objectKey(ownerId(), folder, contentType),
+        contentType,
+        signal: timeoutSignal(timeouts.uploadMs),
+      });
+      return { url, type: kind, size: file.size, contentType };
+    } catch (e) {
+      throw storageError(e);
+    }
+  }
+
   const link = await api.post<PresignedMediaDto>('/frontend/media/presign', {
     contentType,
     size: file.size,
@@ -119,11 +180,7 @@ export async function uploadMedia(file: File): Promise<UploadedMediaDto> {
       signal: timeoutSignal(timeouts.uploadMs),
     });
   } catch (e) {
-    const name = (e as { name?: unknown } | null)?.name;
-    if (name === 'TimeoutError')
-      throw new ApiError(504, 'The upload is taking too long — try a smaller file.');
-    // a network failure or a bucket without a CORS rule for this origin
-    throw new ApiError(0, STORAGE_TROUBLE, { detail: String((e as Error)?.message ?? e) });
+    throw storageError(e);
   }
   if (!res.ok) {
     const detail = (await res.text().catch(() => '')).slice(0, 300);
