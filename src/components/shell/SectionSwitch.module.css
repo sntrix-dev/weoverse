@@ -56,6 +56,25 @@
 .pillChevron[data-open] {
   transform: rotate(180deg);
 }
+/* a phone: the section's colour and icon say where you are; the menu has the names */
+@media (max-width: 760px) {
+  .pill {
+    min-width: 0;
+    gap: 4px;
+    padding: 0 8px 0 6px;
+  }
+  .pillLabel {
+    display: none;
+  }
+  /* the header is transformed, so `fixed` sits on the bar: full width just under it */
+  .menu {
+    position: fixed;
+    top: calc(100% + 8px);
+    left: 8px;
+    right: 8px;
+    min-width: 0;
+  }
+}
 
 .menu {
   position: absolute;

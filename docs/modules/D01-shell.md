@@ -26,6 +26,18 @@ Not in D1 (they belong to the module that uses them): `ViewBar noView` (D2), `st
 
 `GET /frontend/search` gains a `requests` list (open, not past deadline, `mine` marks your own) and `kind=requests`. Additive. Tests `search/__tests__/search.service.test.ts`; Swagger `SearchRequestHit`.
 
+## Live pass fixes (2026-10-22, after the Netlify deploy)
+
+| Found on the live site | Fix |
+|---|---|
+| Suggestions only for whole words ("st", "sto" → nothing; "crowd" → 4) | Backend: WeOs, circles and requests top up a short `$text` result with a word-start title/name match (`wordStart`, `topUp`), text hits first, score 0, no repeats. The mark prefers a word start. |
+| WeO rows said "WeO · category" | Backend adds `format` and `priceOs` to `SearchWeoHit` (un-migrated docs read as regular); the row says "Drop · O 2,400" as v4 does (category when unpriced). |
+| Phone: the passport pill and bell cut off; the section switch squashed with "every section" | The bar folds at ≤ 760px (D-104); `useMedia`, `useNavMode`. "Every section" needs ≥ 1081px. |
+| Passport ID printed as a 24-character id | `# WEO-XXXXXX` (D-105). |
+| Phone: Mya's orb sat on Log out | The orb steps aside while the sheet is open (≤ 760px). |
+
+Not checkable on the live backend (api.ocono.me): circles (none there) and requests in search (needs `redesign/d01-shell` deployed).
+
 ## Verify
 
-typecheck ✅ · lint ✅ · vitest 37 files / 286 tests ✅ · build ✅ · backend tsc ✅, jest (search) ✅, docs:lint ✅ · browser: v4 design vs build at 1440 and 390, light and dark (review page).
+typecheck ✅ · lint ✅ · vitest 38 files / 290 tests ✅ · build ✅ · backend tsc ✅, lint ✅, jest 87 suites / 1,134 tests ✅, docs:lint ✅ · browser: v4 design vs build at 1440 and 390, light and dark (review page); live Netlify pass 2026-10-22; phone fold at 390 / 700 / 761 / 900 / 1440.

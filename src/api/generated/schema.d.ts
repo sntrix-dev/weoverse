@@ -4213,6 +4213,14 @@ export interface paths {
          *     expects `Sarah`, which `$text` (whole-word, stemmed) does not match at
          *     all, while an anchored regex does — and stays index-eligible.
          *
+         *     **Half-typed words.** `$text` only matches whole words, so a live
+         *     suggestion for `cro` found nothing until `crowd` was typed. When a
+         *     WeO, circle or request text search returns fewer than `limit`, the
+         *     list is topped up with titles/names where the query starts a word
+         *     (`cro` → "Crowd Fund", "Before the Crowds"; not "Microphone"). Text
+         *     hits come first; top-up rows have `score: 0` and never repeat a text
+         *     hit.
+         *
          *     **Exclusions.** Blocked, archived, deleted and expired WeOs never
          *     surface, nor do `requested`-type placeholders (those are request stubs,
          *     not listings — they belong to the Requests module's own search).
@@ -10924,6 +10932,18 @@ export interface components {
              * @enum {string}
              */
             weoType?: "regular" | "crowdfund" | "lottery";
+            /**
+             * @description What the shell's row says (v4 D1) — `formatOfWeo`. A WeO the unify
+             *     migration has not stamped reads as a regular (Listing/Bid/Drop).
+             * @example Listing
+             * @enum {string}
+             */
+            format?: "Listing" | "Bid" | "Drop" | "Pool" | "Hunt";
+            /**
+             * @description The one O figure it is priced at (`priceOsOf`); 0 when none is set.
+             * @example 2400
+             */
+            priceOs?: number;
             /** @example Digital arts */
             categoryName?: string;
             /** @example janedoe */
@@ -10935,7 +10955,8 @@ export interface components {
             mediaUrl?: string | null;
             /**
              * @description MongoDB `$text` score from `WeoTextIndex`. Comparable within this
-             *     list only — see the endpoint description.
+             *     list only — see the endpoint description. 0 for a word-start
+             *     match that topped up a short text result (a half-typed word).
              * @example 2.4
              */
             score?: number;

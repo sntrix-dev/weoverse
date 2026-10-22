@@ -9,6 +9,7 @@ import { MYA } from './mya';
 import { SettingsBody, type SettingsBodyProps } from './SettingsBody';
 import { useDockPlace } from './useDockPlace';
 import s from './MyaDock.module.css';
+import { useNavMode } from '@/app/useNavMode';
 
 /** design: chrome.jsx useDockPlace default — `b: 96` rests the orb above the flow bar's band */
 export const DOCK_REST = { r: 22, b: 96 } as const;
@@ -44,8 +45,10 @@ export function MyaDock({ settings }: { settings: SettingsBodyProps }) {
   const shell = useRef<HTMLDivElement>(null);
   const dock = useUi((u) => u.dock);
   const myaOpen = useUi((u) => u.myaOpen);
+  // on a phone the passport sheet fills the screen; the orb would sit on its Log out
+  const idOpen = useUi((u) => u.idSheet);
   const myaHidden = usePref('myaHidden');
-  const navMode = usePref('navMode');
+  const navMode = useNavMode();
   const railOpen = usePref('railOpen');
   const stored = usePref('dockPosition');
   // the backend default (22, 22) means "never placed": rest above the flow bar like the design (D-023)
@@ -68,7 +71,13 @@ export function MyaDock({ settings }: { settings: SettingsBodyProps }) {
     if (myaHidden || ringHolds) return null;
     return createPortal(
       /* a dimensional shell: outer ring, inset well, specular light — not a bare image */
-      <div ref={shell} onPointerDown={onDown} className={s.orbShell} style={place}>
+      <div
+        ref={shell}
+        onPointerDown={onDown}
+        className={s.orbShell}
+        style={place}
+        data-under-id={idOpen || undefined}
+      >
         <button
           type="button"
           onClick={() => {

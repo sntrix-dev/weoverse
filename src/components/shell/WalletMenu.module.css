@@ -22,6 +22,19 @@
 .pill[data-open] {
   box-shadow: var(--nm-inset);
 }
+.balance {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+@media (max-width: 760px) {
+  .pill {
+    padding: 0 5px;
+  }
+  .balance {
+    display: none;
+  }
+}
 .tierDot {
   width: 6px;
   height: 6px;

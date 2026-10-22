@@ -107,6 +107,8 @@ describe('top bar', () => {
               slug: 'mug',
               title: 'Hand-Thrown Mug',
               weoType: 'regular',
+              format: 'Drop',
+              priceOs: 2400,
               categoryName: 'Crafts',
               creatorName: 'ada',
               mediaUrl: null,
@@ -156,7 +158,7 @@ describe('top bar', () => {
         .getAllByRole('option')
         .map((o) => o.textContent),
     ).toEqual([
-      'Hand-Thrown MugListing · Crafts',
+      'Hand-Thrown MugDrop · O 2,400',
       'Forty mugs for a cafeYour request · Crafts · O 96,000',
       'Muddy Makers1.2k members',
     ]);
@@ -205,6 +207,33 @@ describe('top bar', () => {
     expect(document.documentElement.getAttribute('data-nav')).toBe('bar');
     // coming back is the same optimistic write
     expect(usePrefs.getState().prefs.navMode).toBe('bar');
+  });
+
+  it('folds to one bar on a phone, whatever the saved layout (v4 parity at 390px)', async () => {
+    const real = window.matchMedia;
+    window.matchMedia = ((q: string) => ({
+      matches: q === '(max-width: 760px)',
+      media: q,
+      onchange: null,
+      addEventListener: () => {},
+      removeEventListener: () => {},
+      addListener: () => {},
+      removeListener: () => {},
+      dispatchEvent: () => false,
+    })) as typeof window.matchMedia;
+    try {
+      renderApp('/discover', { summary: navSummaryFixture({}, { navMode: 'split', navSections: 'all' }) });
+      // the top bar, not the split rail; one section pill, not every section
+      expect(
+        await screen.findByRole('button', { name: 'You are in Discover — switch section' }),
+      ).toBeInTheDocument();
+      await waitFor(() => expect(usePrefs.getState().prefs.navMode).toBe('split'));
+      expect(screen.queryByRole('navigation', { name: 'Sections' })).not.toBeInTheDocument();
+      expect(document.documentElement.getAttribute('data-nav')).toBe('bar');
+      expect(document.documentElement.style.getPropertyValue('--shell-left')).toBe('0px');
+    } finally {
+      window.matchMedia = real;
+    }
   });
 
   it('opens the wordmark on the home chosen in settings', async () => {

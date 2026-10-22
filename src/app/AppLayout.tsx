@@ -15,11 +15,12 @@ import { WorldHost } from '@/features/worlds/components/WorldHost';
 import { SectionIntro } from '@/components/intro/SectionIntro';
 import { useNavSummary } from '@/features/shell/api/navSummary';
 import { useLogout } from '@/features/shell/useLogout';
-import { usePref, usePrefs } from '@/stores/prefs';
+import { usePrefs } from '@/stores/prefs';
 import { toast, useUi } from '@/stores/ui';
 import { ROUTE_META, routes, type RouteName } from './routes';
 import { useGoHome, useJump, useSearch } from './useJump';
 import { useShellRoute, type SectionKey } from './useShellRoute';
+import { useNavMode } from './useNavMode';
 
 export interface RouteHandle {
   route?: RouteName;
@@ -95,7 +96,7 @@ export function AppLayout() {
   const navigate = useNavigate();
   const { route, section } = useShellRoute();
   const { data: me } = useNavSummary();
-  const navMode = usePref('navMode');
+  const navMode = useNavMode();
   const idSheet = useUi((u) => u.idSheet);
   const jump = useJump();
   const goHome = useGoHome();

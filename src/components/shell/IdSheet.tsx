@@ -15,6 +15,13 @@ export interface IdSheetProps {
   onLogout: () => void;
 }
 
+/**
+ * The passport number in the design's short form (`# WEO-223FEE`): `WEO-` and the last six of
+ * the O-Wallet id, upper-case. The full id is the title and is what the copy button copies.
+ */
+export const shortWeoId = (id: string) =>
+  /^[0-9a-f]{24}$/i.test(id) ? `WEO-${id.slice(-6).toUpperCase()}` : id;
+
 const SETTINGS_ICON = (
   <>
     <circle cx="12" cy="12" r="3" />
@@ -106,7 +113,9 @@ export function IdSheet({ me, onWallet, onSettings, onPassport, onLogout }: IdSh
       {me.weoId && (
         <div className={s.idRow}>
           <PassportIcon size={18} color="var(--text-faint)" />
-          <span className={s.weoId}># {me.weoId}</span>
+          <span className={s.weoId} title={me.weoId}>
+            # {shortWeoId(me.weoId)}
+          </span>
           <CopyBtn text={me.weoId} what="Your WeO ID" size={26} />
           {me.verified && (
             <span title="Verified original" className={s.verified}>

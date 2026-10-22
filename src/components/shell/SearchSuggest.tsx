@@ -33,7 +33,13 @@ export function toGroups(r: GlobalSearchDto | undefined, go: (to: string) => voi
   const weos: Suggestion[] = (r.weos ?? []).slice(0, CAP.weos).map((w) => ({
     id: `w-${w.id}`,
     title: w.title ?? '',
-    sub: [formatOfKind(w.weoType) ?? 'WeO', w.categoryName].filter(Boolean).join(' · '),
+    // design: "Sell · O 2,400" — the format, then the price (the category when it has none)
+    sub: [
+      w.format ?? formatOfKind(w.weoType) ?? 'WeO',
+      (w.priceOs ?? 0) > 0 ? `O ${osFmt(w.priceOs ?? 0)}` : w.categoryName,
+    ]
+      .filter(Boolean)
+      .join(' · '),
     img: w.mediaUrl ?? null,
     round: false,
     go: () => go(routes.weo(String(w.id))),
@@ -80,10 +86,21 @@ export function toGroups(r: GlobalSearchDto | undefined, go: (to: string) => voi
   ).filter((g) => g.items.length);
 }
 
-/** the typed part, marked where it matches (case-insensitive, first match) */
+/** where the typed part sits: the first match at the start of a word, else the first anywhere */
+export function markAt(text: string, q: string): number {
+  const t = q.trim().toLowerCase();
+  if (!t) return -1;
+  const low = text.toLowerCase();
+  for (let i = low.indexOf(t); i >= 0; i = low.indexOf(t, i + 1)) {
+    if (i === 0 || /[\s\-_/.,:;'"(&]/.test(low[i - 1]!)) return i;
+  }
+  return low.indexOf(t);
+}
+
+/** the typed part, marked where it matches (case-insensitive, a word start first) */
 function Mark({ text, q }: { text: string; q: string }): ReactNode {
   const t = q.trim();
-  const i = t ? text.toLowerCase().indexOf(t.toLowerCase()) : -1;
+  const i = markAt(text, t);
   if (i < 0) return text;
   return (
     <>

@@ -10,6 +10,7 @@ All notable changes per module. Newest first.
 - The passport dropdown is one column with the O-Wallet beside the balance.
 - Leaving a circle asks first.
 - The breadcrumb names only the section; pipeline steps read Rehearse it, Ask for reactions, Get Review, View WeO, Post now.
+- After the live check: search suggests while a word is half typed and WeO rows say their format and price; on a phone the top bar fits (icon section pill, your face for the passport, search opens across the bar); the passport ID reads `WEO-XXXXXX`.
 
 ## Uploads like the previous build (2026-10-14)
 

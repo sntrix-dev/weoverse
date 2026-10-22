@@ -6,7 +6,8 @@ import s from './WalletMenu.module.css';
 
 /**
  * design: chrome.jsx WalletMenu — one control on the right: your Os, your tier and your face.
- * The balance is not a second button — it rides in the passport pill it opens.
+ * The balance is not a second button — it rides in the passport pill it opens. On a phone the pill
+ * is your face only; the balance is the first thing the sheet shows.
  */
 export function WalletMenu({ me }: { me: ShellMe | undefined }) {
   const open = useUi((u) => u.idSheet);
@@ -22,10 +23,16 @@ export function WalletMenu({ me }: { me: ShellMe | undefined }) {
         className={s.pill}
         data-open={open || undefined}
       >
-        <OMark size={13} /> {me ? osFmt(me.available) : '—'}
-        {t && (
-          <span title={`Tier ${t.rank} · ${t.label}`} className={s.tierDot} style={{ background: t.tone }} />
-        )}
+        <span className={s.balance}>
+          <OMark size={13} /> {me ? osFmt(me.available) : '—'}
+          {t && (
+            <span
+              title={`Tier ${t.rank} · ${t.label}`}
+              className={s.tierDot}
+              style={{ background: t.tone }}
+            />
+          )}
+        </span>
         <Avatar src={me?.avatarUrl} initials={me?.initials} isr={me?.isr} size={34} />
       </button>
     </span>

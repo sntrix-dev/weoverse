@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { Icon, Toggle } from '@/design-system';
 import type { SectionKey } from '@/app/useShellRoute';
+import { PHONE, TOO_NARROW_FOR_ALL, useMedia } from '@/lib/useMedia';
 import { setPrefs, usePref } from '@/stores/prefs';
 import { MARKET, type MarketItem } from './market';
 import { Tip, tipHandlers } from './Tip';
@@ -17,12 +18,16 @@ export interface SectionSwitchProps {
 /**
  * design: chrome.jsx SectionSwitch — ONE pill says where you are; press it for the rest.
  * The full set, in the WeOverse order, arrives on intent. v4: the "Next · section" pill is gone. Preference: one pill (default) or
- * every section in the bar (`uiPreferences.navSections`).
+ * every section in the bar (`uiPreferences.navSections`). Below 1080px it is always the one pill,
+ * and on a phone (≤ 760px) the pill is its icon and chevron only.
  */
 export function SectionSwitch({ section, onJump }: SectionSwitchProps) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
-  const all = usePref('navSections') === 'all';
+  // a narrow screen has room for one pill only, whatever the preference says
+  const phone = useMedia(PHONE);
+  const narrow = useMedia(TOO_NARROW_FOR_ALL);
+  const all = usePref('navSections') === 'all' && !phone && !narrow;
   const key = MARKET.some((m) => m.key === section) ? section : 'create';
   const cur = MARKET.find((m) => m.key === key) ?? MARKET[0]!;
 
@@ -77,18 +82,20 @@ export function SectionSwitch({ section, onJump }: SectionSwitchProps) {
           </button>
         );
       })}
-      {/* the preference: every section in the bar, if you would rather see them all */}
-      <label className={s.pref} htmlFor="weo-nav-sections">
-        <span className={s.prefLabel}>Show every section in the bar</span>
-        <Toggle
-          id="weo-nav-sections"
-          checked={all}
-          onChange={(v) => {
-            setPrefs({ navSections: v ? 'all' : 'one' });
-            setOpen(false);
-          }}
-        />
-      </label>
+      {/* the preference: every section in the bar, if you would rather see them all (wide screens) */}
+      {!phone && !narrow && (
+        <label className={s.pref} htmlFor="weo-nav-sections">
+          <span className={s.prefLabel}>Show every section in the bar</span>
+          <Toggle
+            id="weo-nav-sections"
+            checked={all}
+            onChange={(v) => {
+              setPrefs({ navSections: v ? 'all' : 'one' });
+              setOpen(false);
+            }}
+          />
+        </label>
+      )}
     </div>
   );
 
@@ -132,7 +139,7 @@ export function SectionSwitch({ section, onJump }: SectionSwitchProps) {
             {cur.icon}
           </Icon>
         </span>
-        {cur.label}
+        <span className={s.pillLabel}>{cur.label}</span>
         <span className={s.pillChevron} data-open={open || undefined}>
           <Icon size={24} sw={2.2}>
             {chevron}

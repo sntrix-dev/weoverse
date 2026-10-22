@@ -62,3 +62,21 @@
   background: transparent;
   color: var(--text-dim);
 }
+
+/* a box that is not there on wide screens; it only lets a phone hide what it wraps */
+.phoneHide {
+  display: contents;
+}
+
+/* a phone: the bar keeps where you are, search, the bell and you. Make lives in the section
+   menu (Create), and splitting the nav needs a wider screen. */
+@media (max-width: 760px) {
+  .split,
+  .phoneHide {
+    display: none;
+  }
+  .inner {
+    padding: 0 8px 0 14px;
+    gap: 6px;
+  }
+}

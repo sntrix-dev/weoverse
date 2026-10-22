@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { usePref } from '@/stores/prefs';
+import { useNavMode } from './useNavMode';
 
 /**
  * design: app.jsx effects — `data-theme`, `data-motion`, `data-nav` on <html> (+ the view
@@ -9,7 +10,7 @@ import { usePref } from '@/stores/prefs';
 export function useApplyPrefs() {
   const theme = usePref('theme');
   const motion = usePref('motion');
-  const navMode = usePref('navMode');
+  const navMode = useNavMode();
   const density = usePref('density');
   const media = usePref('media');
   const value = usePref('valueDisplay');

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Icon, SICO } from '@/design-system';
 import type { SectionKey } from '@/app/useShellRoute';
 import type { ShellMe } from '@/features/shell/model/me';
+import { PHONE, useMedia } from '@/lib/useMedia';
 import { setPrefs, usePref } from '@/stores/prefs';
 import { toast } from '@/stores/ui';
 import { BarDivider, BellNode, MakeNode, WeOverseBadge } from './Nodes';
@@ -31,12 +32,14 @@ export const setNavMode = (v: 'bar' | 'split') => {
  * the section switch, then the support row: search, Make, the split toggle, the bell and the
  * passport pill, every icon 24px. Mya lives in her dock only. The parked O nav shows here only
  * while it is parked (v4 dropped it from the bar; without it a parked nav had no way back).
- * On Create the search and Make leave the bar.
+ * On Create the search and Make leave the bar. On a phone (≤ 760px) it folds: the section pill
+ * shows its icon only, Make, the split toggle and the divider go, and the passport pill is your face.
  */
 export function TopBar({ me, section, onJump, onHome, onSearch, onNotifications }: ShellNavProps) {
   const [small, setSmall] = useState(false);
   const parked = usePref('navDock') === 'top';
   const making = section === 'create';
+  const phone = useMedia(PHONE);
   useEffect(() => {
     const f = () => setSmall(window.scrollY > 40);
     f();
@@ -48,12 +51,14 @@ export function TopBar({ me, section, onJump, onHome, onSearch, onNotifications 
       <div className={s.spacer} data-small={small || undefined} />
       <header className={s.header} data-small={small || undefined}>
         <div className={s.inner} data-small={small || undefined}>
-          <WeOverseBadge h={small ? 26 : 31} onClick={onHome} />
+          <WeOverseBadge h={phone ? 22 : small ? 26 : 31} onClick={onHome} />
           <SectionSwitch section={section} onJump={onJump} />
           <div className={s.grow} />
           {!making && <SearchField onSearch={onSearch} variant="bar" iconSize={24} />}
           {parked && <NavDockNode section={section} onJump={onJump} />}
-          <MakeNode here={making} onMake={() => onJump('create')} iconSize={24} />
+          <span className={s.phoneHide}>
+            <MakeNode here={making} onMake={() => onJump('create')} iconSize={24} />
+          </span>
           <button
             type="button"
             onClick={() => setNavMode('split')}
@@ -65,7 +70,9 @@ export function TopBar({ me, section, onJump, onHome, onSearch, onNotifications 
               {SICO.panel}
             </Icon>
           </button>
-          <BarDivider />
+          <span className={s.phoneHide}>
+            <BarDivider />
+          </span>
           <BellNode unread={me?.unread ?? 0} onOpen={onNotifications} iconSize={24} />
           <WalletMenu me={me} />
         </div>

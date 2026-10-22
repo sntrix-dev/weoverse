@@ -226,3 +226,11 @@
   box-shadow: var(--nm-inset);
   outline: none;
 }
+
+/* a phone: while the passport sheet is open the orb steps aside (it would cover Log out) */
+@media (max-width: 760px) {
+  .orbShell[data-under-id] {
+    opacity: 0;
+    pointer-events: none;
+  }
+}

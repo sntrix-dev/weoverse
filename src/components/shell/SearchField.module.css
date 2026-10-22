@@ -1,5 +1,6 @@
 /* design: chrome.jsx TopBar search field / shell.jsx SupportSearch */
 .root {
+  flex: 0 0 auto;
   display: flex;
   align-items: center;
   height: 40px;
@@ -52,4 +53,18 @@
 }
 .input[data-open] {
   opacity: 1;
+}
+
+/* a phone: the open field takes the whole bar (over the wordmark and the rest) */
+@media (max-width: 760px) {
+  .root[data-open][data-variant='bar'] {
+    position: absolute;
+    z-index: 2;
+    top: 50%;
+    left: 10px;
+    right: 10px;
+    width: auto;
+    height: 44px;
+    transform: translateY(-50%);
+  }
 }
