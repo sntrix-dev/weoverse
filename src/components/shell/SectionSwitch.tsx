@@ -9,9 +9,6 @@ import s from './SectionSwitch.module.css';
 const tone = (c: string) => ({ '--c': c }) as CSSProperties;
 const chevron = <polyline points="6 9.5 12 15.5 18 9.5" />;
 
-/** the O's own order: Discover → Collect → Create/Community → Exchange → Discover */
-const FLOW: SectionKey[] = ['discover', 'collect', 'hub', 'earn'];
-
 export interface SectionSwitchProps {
   section: SectionKey;
   onJump: (key: SectionKey) => void;
@@ -19,7 +16,7 @@ export interface SectionSwitchProps {
 
 /**
  * design: chrome.jsx SectionSwitch — ONE pill says where you are; press it for the rest.
- * The full set, in the WeOverse order, arrives on intent. Preference: one pill (default) or
+ * The full set, in the WeOverse order, arrives on intent. v4: the "Next · section" pill is gone. Preference: one pill (default) or
  * every section in the bar (`uiPreferences.navSections`).
  */
 export function SectionSwitch({ section, onJump }: SectionSwitchProps) {
@@ -28,8 +25,6 @@ export function SectionSwitch({ section, onJump }: SectionSwitchProps) {
   const all = usePref('navSections') === 'all';
   const key = MARKET.some((m) => m.key === section) ? section : 'create';
   const cur = MARKET.find((m) => m.key === key) ?? MARKET[0]!;
-  const at = FLOW.indexOf(key === 'create' ? 'hub' : key);
-  const nx = MARKET.find((m) => m.key === FLOW[(Math.max(0, at) + 1) % 4]);
 
   useEffect(() => {
     if (!open) return;
@@ -97,25 +92,6 @@ export function SectionSwitch({ section, onJump }: SectionSwitchProps) {
     </div>
   );
 
-  const nextPill = nx && (
-    <button
-      type="button"
-      onClick={() => onJump(nx.key)}
-      title={nx.long}
-      aria-label={`Next · ${nx.label} — ${nx.long}`}
-      className={s.next}
-      style={tone(nx.color)}
-    >
-      <span className={s.nextEyebrow}>Next</span>
-      {nx.label}
-      <span className={s.nextIcon}>
-        <Icon size={14} sw={1.9}>
-          {nx.icon}
-        </Icon>
-      </span>
-    </button>
-  );
-
   if (all)
     return (
       <div ref={ref} className={`weo-nav ${s.root} ${s.rootAll}`}>
@@ -132,7 +108,7 @@ export function SectionSwitch({ section, onJump }: SectionSwitchProps) {
           aria-label="Section options"
           className={s.options}
         >
-          <Icon size={12} sw={2.2}>
+          <Icon size={24} sw={2.2}>
             {chevron}
           </Icon>
         </button>
@@ -152,18 +128,17 @@ export function SectionSwitch({ section, onJump }: SectionSwitchProps) {
         data-open={open || undefined}
       >
         <span className={s.pillIcon} style={tone(cur.color)}>
-          <Icon size={16} sw={1.9}>
+          <Icon size={24} sw={1.9}>
             {cur.icon}
           </Icon>
         </span>
         {cur.label}
         <span className={s.pillChevron} data-open={open || undefined}>
-          <Icon size={12} sw={2.2}>
+          <Icon size={24} sw={2.2}>
             {chevron}
           </Icon>
         </span>
       </button>
-      {nextPill}
       {menu}
     </div>
   );
@@ -196,7 +171,7 @@ export function NavPill({
         data-active={active || undefined}
         style={tone(item.color)}
       >
-        <Icon size={create ? 21 : 17} sw={create ? 2 : 1.7}>
+        <Icon size={24} sw={create ? 2 : 1.7}>
           {item.icon}
         </Icon>
         {active && <span>{item.label}</span>}

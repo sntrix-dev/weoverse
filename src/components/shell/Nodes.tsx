@@ -35,11 +35,20 @@ export function WeOverseBadge({
 }
 
 /**
- * design: chrome.jsx MakeNode — Make, from anywhere. Neutral at rest; the green arrives on
- * approach, and inside Make itself it sits filled. Fixed 40px footprint (NAV-04).
+ * design: chrome.jsx MakeNode (v4) — Make, from anywhere: a 32px ring, neutral at rest, green
+ * on approach. It leaves the bar while you are already making a WeO.
  */
-export function MakeNode({ here, onMake }: { here: boolean; onMake: () => void }) {
+export function MakeNode({
+  here,
+  onMake,
+  iconSize = 20,
+}: {
+  here: boolean;
+  onMake: () => void;
+  iconSize?: number;
+}) {
   const [tip, setTip] = useState<DOMRect | null>(null);
+  if (here) return null;
   return (
     <span className={s.wrap}>
       <button
@@ -48,9 +57,9 @@ export function MakeNode({ here, onMake }: { here: boolean; onMake: () => void }
         {...tipHandlers(setTip)}
         aria-label="Make a WeO"
         className={s.make}
-        data-lit={!!tip || here || undefined}
+        data-lit={!!tip || undefined}
       >
-        <Icon size={16} sw={2.2}>
+        <Icon size={iconSize} sw={2.2}>
           <path d="M12 7.6v8.8M7.6 12h8.8" />
         </Icon>
       </button>
@@ -85,7 +94,15 @@ export function MyaNode() {
  * design: the bell OButton in TopBar/SupportCluster. The design always draws the violet dot;
  * here it shows only when there is something unread (nav-summary `notifications.unread`).
  */
-export function BellNode({ unread, onOpen }: { unread: number; onOpen: () => void }) {
+export function BellNode({
+  unread,
+  onOpen,
+  iconSize = 18,
+}: {
+  unread: number;
+  onOpen: () => void;
+  iconSize?: number;
+}) {
   return (
     <OButton
       variant="ghost"
@@ -94,7 +111,7 @@ export function BellNode({ unread, onOpen }: { unread: number; onOpen: () => voi
       onClick={onOpen}
       style={{ position: 'relative' }}
     >
-      <Icon size={18} sw={1.7}>
+      <Icon size={iconSize} sw={1.7}>
         {ICO.bell}
       </Icon>
       {unread > 0 && <span className={s.bellDot} />}

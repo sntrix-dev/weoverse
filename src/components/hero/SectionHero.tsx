@@ -198,7 +198,7 @@ export function SectionHero({
         }}
       >
         <div style={{ flex: '1 1 320px', minWidth: 0, display: 'flex', flexDirection: 'column' }}>
-          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 9 }}>
+          <span style={{ display: 'inline-flex', flexWrap: 'wrap', alignItems: 'center', gap: 9 }}>
             {icon &&
               (isIntroKey(id) ? (
                 // the section's intro, again (D-088)
@@ -220,8 +220,10 @@ export function SectionHero({
                     fontWeight: 700,
                     letterSpacing: '.12em',
                     textTransform: 'uppercase',
-                    color: t,
-                    background: `color-mix(in srgb, ${t} 13%, var(--surface))`,
+                    // v4: a neutral chip; only the play disc carries the section colour
+                    color: 'var(--text-dim)',
+                    background: 'var(--surface)',
+                    boxShadow: 'var(--nm-sm), inset 0 0 0 1px var(--border)',
                   }}
                 >
                   <span

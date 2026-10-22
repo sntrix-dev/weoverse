@@ -278,7 +278,7 @@ export function HubPage() {
           screen="hub"
           next={{
             label: 'Exchange',
-            lead: 'Move with the market',
+            lead: 'View WeO',
             go: () => void navigate(routes.listed()),
             tone: '#F7C62B',
           }}

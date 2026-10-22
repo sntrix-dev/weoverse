@@ -710,9 +710,6 @@ export function PublicProfileSheet({ p, onClose }: { p: PassportDto; onClose: ()
               {id.handle} · ISR {Math.round(p.standing.isr)}
             </span>
           </span>
-          <Button size="sm" variant="primary" tone="green" onClick={() => openCreator(id.id)}>
-            Preview it
-          </Button>
         </div>
 
         <div
@@ -843,9 +840,13 @@ export function PublicProfileSheet({ p, onClose }: { p: PassportDto; onClose: ()
             trusting.
           </p>
         </div>
-        <div style={{ display: 'flex', gap: 9, justifyContent: 'flex-end' }}>
+        {/* v4: Preview it moves down beside Done */}
+        <div style={{ display: 'flex', gap: 9, justifyContent: 'center', alignItems: 'center' }}>
           <Button size="sm" variant="ghost" tone="violet" onClick={onClose}>
             Done
+          </Button>
+          <Button size="sm" variant="primary" tone="green" onClick={() => openCreator(id.id)}>
+            Preview it
           </Button>
         </div>
       </div>

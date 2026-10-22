@@ -2,8 +2,10 @@
 .footer {
   position: relative;
   z-index: 2;
-  margin-left: calc(var(--shell-left, 0px) * -1);
-  width: calc(100% + var(--shell-left, 0px));
+  /* bleed past #root's side padding (v4) and, in split nav, under the rail */
+  margin-left: calc(var(--root-l, 0px) * -1);
+  margin-right: calc(var(--root-pad, 0px) * -1);
+  width: auto;
   margin-top: clamp(36px, 5vw, 72px);
   overflow-x: clip;
   color: var(--text);
@@ -40,7 +42,7 @@
 }
 .inner {
   position: relative;
-  max-width: var(--page-w);
+  max-width: none;
   margin: 0 auto;
   padding: 0 clamp(14px, 2.4vw, 26px) 0 calc(var(--shell-left, 0px) + clamp(14px, 2.4vw, 26px));
 }

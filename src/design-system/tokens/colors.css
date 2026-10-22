@@ -32,8 +32,8 @@
   --ink-400: #97a1b6;
 
   /* ---- Surfaces (light) ---- */
-  --bg-a:      #ffffff;
-  --bg-b:      #ffffff;
+  --bg-a:      #e8e8ea;
+  --bg-b:      #e8e8ea;
   --atmo:      transparent;   /* neutral by default — no ambient color wash */
   --surface:   #ffffff;
   --surface-2: #f3f4f6;

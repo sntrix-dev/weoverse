@@ -1,6 +1,7 @@
 import { Outlet, ScrollRestoration } from 'react-router';
 import { AccountGate } from '@/components/feedback/AccountGate';
 import { AckRipple } from '@/components/feedback/AckRipple';
+import { ConfirmDialog } from '@/components/feedback/ConfirmDialog';
 import { ExternalGate } from '@/components/feedback/ExternalGate';
 import { Toasts } from '@/components/feedback/Toasts';
 import { useApplyPrefs } from './useApplyPrefs';
@@ -18,6 +19,7 @@ export function RootLayout() {
       <ScrollRestoration />
       <AckRipple />
       <ExternalGate />
+      <ConfirmDialog />
       <Toasts />
       <AccountGate />
     </>

@@ -53,7 +53,7 @@ const FLOW: readonly FlowStop[] = [
     label: 'Exchange',
     tone: '#F7C62B',
     icon: 'left',
-    lead: 'Move with the market',
+    lead: 'View WeO',
   },
 ];
 const flowAt = (screen: FlowScreen) =>

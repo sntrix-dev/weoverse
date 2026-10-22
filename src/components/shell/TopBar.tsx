@@ -2,9 +2,9 @@ import { useEffect, useState } from 'react';
 import { Icon, SICO } from '@/design-system';
 import type { SectionKey } from '@/app/useShellRoute';
 import type { ShellMe } from '@/features/shell/model/me';
-import { setPrefs } from '@/stores/prefs';
+import { setPrefs, usePref } from '@/stores/prefs';
 import { toast } from '@/stores/ui';
-import { BarDivider, BellNode, MakeNode, MyaNode, WeOverseBadge } from './Nodes';
+import { BarDivider, BellNode, MakeNode, WeOverseBadge } from './Nodes';
 import { NavDockNode } from './NavDock';
 import { SearchField } from './SearchField';
 import { SectionSwitch } from './SectionSwitch';
@@ -27,12 +27,16 @@ export const setNavMode = (v: 'bar' | 'split') => {
 };
 
 /**
- * design: chrome.jsx TopBar — a fixed glass pill that tightens once you scroll. Wordmark,
- * the section switch, then the support row: search, the parked O nav, Make, the split
- * toggle, Mya, the bell and the passport pill.
+ * design: chrome.jsx TopBar (v4) — a fixed glass pill that tightens once you scroll. Wordmark,
+ * the section switch, then the support row: search, Make, the split toggle, the bell and the
+ * passport pill, every icon 24px. Mya lives in her dock only. The parked O nav shows here only
+ * while it is parked (v4 dropped it from the bar; without it a parked nav had no way back).
+ * On Create the search and Make leave the bar.
  */
 export function TopBar({ me, section, onJump, onHome, onSearch, onNotifications }: ShellNavProps) {
   const [small, setSmall] = useState(false);
+  const parked = usePref('navDock') === 'top';
+  const making = section === 'create';
   useEffect(() => {
     const f = () => setSmall(window.scrollY > 40);
     f();
@@ -47,9 +51,9 @@ export function TopBar({ me, section, onJump, onHome, onSearch, onNotifications 
           <WeOverseBadge h={small ? 26 : 31} onClick={onHome} />
           <SectionSwitch section={section} onJump={onJump} />
           <div className={s.grow} />
-          <SearchField onSearch={onSearch} variant="bar" />
-          <NavDockNode section={section} onJump={onJump} />
-          <MakeNode here={section === 'create'} onMake={() => onJump('create')} />
+          {!making && <SearchField onSearch={onSearch} variant="bar" iconSize={24} />}
+          {parked && <NavDockNode section={section} onJump={onJump} />}
+          <MakeNode here={making} onMake={() => onJump('create')} iconSize={24} />
           <button
             type="button"
             onClick={() => setNavMode('split')}
@@ -57,13 +61,12 @@ export function TopBar({ me, section, onJump, onHome, onSearch, onNotifications 
             aria-label="Split the nav"
             className={s.split}
           >
-            <Icon size={17} sw={1.7}>
+            <Icon size={24} sw={1.7}>
               {SICO.panel}
             </Icon>
           </button>
           <BarDivider />
-          <MyaNode />
-          <BellNode unread={me?.unread ?? 0} onOpen={onNotifications} />
+          <BellNode unread={me?.unread ?? 0} onOpen={onNotifications} iconSize={24} />
           <WalletMenu me={me} />
         </div>
       </header>

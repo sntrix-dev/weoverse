@@ -5,13 +5,14 @@
   z-index: 200;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   width: fit-content;
   max-width: 100%;
   margin: 0 0 22px;
-  padding: 6px 14px 6px 6px;
+  padding: 6px 16px 6px 6px;
   border-radius: 999px;
-  background: var(--glass);
+  /* v4: the page grey, frosted (design: rgba(232,232,236,.88)); follows the theme */
+  background: color-mix(in srgb, var(--bg-a) 88%, transparent);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   box-shadow:
@@ -31,42 +32,9 @@
   background: var(--surface);
   box-shadow: var(--nm-sm);
 }
-.dot {
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  background: var(--o-violet);
-  flex: 0 0 auto;
-  animation: weo-breathe-sm 3.4s var(--ease-standard) infinite;
-}
-.crumbs {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  min-width: 0;
-  overflow-x: auto;
-  white-space: nowrap;
-}
-.sep {
-  display: flex;
-  color: var(--text-faint);
-  flex: 0 0 auto;
-}
-.crumb {
-  border: none;
-  background: transparent;
-  padding: 0;
-  cursor: pointer;
-  font-size: 12.5px;
-  font-weight: 600;
-  color: var(--text-dim);
-  flex: 0 0 auto;
-}
-.crumb:hover {
-  color: var(--o-violet);
-}
 .current {
-  font-size: 12.5px;
+  font-size: 13px;
+  white-space: nowrap;
   font-weight: 700;
   color: var(--text);
   flex: 0 0 auto;

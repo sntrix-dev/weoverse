@@ -95,8 +95,11 @@ describe('community models', () => {
     const h = { onMarket: vi.fn() } as unknown as FlightHandlers;
     expect(nextAct(vetted!, h)).toMatchObject({
       note: 'Live · validated',
-      get: 'Validated mark · ahead on the floor',
+      get: 'Live with a Validated mark',
     });
-    expect(nextAct(plain!, h)).toMatchObject({ note: 'Live in Exchange', get: 'On the floor, earning' });
+    expect(nextAct(plain!, h)).toMatchObject({
+      note: 'Live in Exchange',
+      get: 'Live in Exchange and selling',
+    });
   });
 });

@@ -4,7 +4,7 @@ import type { WeoCardModel } from '@/lib/cardModel';
 import { useWeoHandlers } from '@/features/weo/useWeoHandlers';
 import { useNavSummary } from '@/features/shell/api/navSummary';
 import { askAbout } from '@/stores/flow';
-import { toast } from '@/stores/ui';
+import { askConfirm, toast } from '@/stores/ui';
 import { useCircleNotification, useFollow, useMembership } from './api/community';
 import type { StewardModel } from './model/community';
 
@@ -19,13 +19,25 @@ export function useCommunityActions() {
     () => ({
       toggleJoin: (c: { id: string; name: string; joined: boolean }) => {
         const will = !c.joined;
-        membership.mutate(
-          { id: c.id, join: will },
-          {
-            onSuccess: () => toast(will ? `Joined ${c.name}` : `Left ${c.name} · re-join anytime`),
-            onError: (e) => failed(e, 'That did not go through — try again.'),
-          },
-        );
+        const apply = () =>
+          membership.mutate(
+            { id: c.id, join: will },
+            {
+              onSuccess: () => toast(will ? `Joined ${c.name}` : `Left ${c.name} · re-join anytime`),
+              onError: (e) => failed(e, 'That did not go through — try again.'),
+            },
+          );
+        // v4: joining is instant; leaving asks first
+        if (will) apply();
+        else
+          askConfirm({
+            title: `Leave ${c.name}?`,
+            body: 'You will stop getting its updates and can’t post or reply until you join again.',
+            confirm: 'Leave circle',
+            cancel: 'Stay',
+            danger: true,
+            onConfirm: apply,
+          });
       },
       toggleMute: (c: { id: string; name: string; muted: boolean }) => {
         notif.mutate(

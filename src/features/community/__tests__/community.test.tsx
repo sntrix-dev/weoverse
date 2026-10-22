@@ -34,9 +34,11 @@ describe('community hub', () => {
     const user = userEvent.setup();
     const { router, container } = renderApp('/community');
     expect(await screen.findByRole('heading', { level: 1, name: 'Community' })).toBeInTheDocument();
-    // a draft and a live WeO, each with its one step (a draft's is Rehearse; Post it stays one tap away)
-    expect(await screen.findByRole('button', { name: 'Night Market Print — Rehearse' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Tide Pool — Move with the market' })).toBeInTheDocument();
+    // a draft and a live WeO, each with its one step (a draft's is Rehearse; Post now stays one tap away)
+    expect(
+      await screen.findByRole('button', { name: 'Night Market Print — Rehearse it' }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Tide Pool — View WeO' })).toBeInTheDocument();
 
     await user.click(screen.getByRole('button', { name: /Your circles/ }));
     expect(await screen.findByText('Digital Arts')).toBeInTheDocument();
@@ -54,7 +56,7 @@ describe('community hub', () => {
     expect(screen.getAllByText('1,700').length).toBeGreaterThan(0);
 
     // the direct path goes to the composer with the draft
-    await user.click(screen.getByRole('button', { name: 'Post it' }));
+    await user.click(screen.getByRole('button', { name: 'Post now' }));
     await waitFor(() => expect(router.state.location.search).toBe('?draft=d-1'));
   });
 
@@ -99,6 +101,15 @@ describe('circle page', () => {
     const left = spy('delete', '/frontend/community/circles/circ-1/leave', { isJoined: false });
     renderApp('/community/circles/circ-1');
     await user.click(await screen.findByRole('button', { name: '✓ Joined' }));
+    // v4: leaving asks first — Stay keeps you in, Leave circle writes it
+    const ask = await screen.findByRole('alertdialog', { name: 'Leave Digital Arts?' });
+    await user.click(within(ask).getByRole('button', { name: 'Stay' }));
+    expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
+    expect(left).not.toHaveBeenCalled();
+    await user.click(screen.getByRole('button', { name: '✓ Joined' }));
+    await user.click(
+      within(await screen.findByRole('alertdialog')).getByRole('button', { name: 'Leave circle' }),
+    );
     await waitFor(() => expect(left).toHaveBeenCalled());
     expect(await screen.findByText('Left Digital Arts · re-join anytime')).toBeInTheDocument();
   });

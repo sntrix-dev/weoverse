@@ -2,6 +2,15 @@
 
 All notable changes per module. Newest first.
 
+## D1 — Shell & system, WeOverse v4 (2026-10-22, in review)
+
+- Grey page, flatter shadows, a 60px page inset on desktop.
+- Top bar: one section pill (no Next), 24px icons, Make and search leave the bar on Create; Mya lives in her dock.
+- Search suggests WeOs, requests, circles and creators as you type (↑/↓, Enter, See all results).
+- The passport dropdown is one column with the O-Wallet beside the balance.
+- Leaving a circle asks first.
+- The breadcrumb names only the section; pipeline steps read Rehearse it, Ask for reactions, Get Review, View WeO, Post now.
+
 ## Uploads like the previous build (2026-10-14)
 
 - Photos and videos upload from the browser to S3 with the AWS SDK and the `VITE_S3_BUCKET_NAME` / `VITE_AWS_*` build variables, as the previous build did (D-100). The SDK loads on the first upload only; large files go up in parts. Without those variables the signed-link path (D-099) is used.

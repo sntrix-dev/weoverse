@@ -39,13 +39,15 @@ describe('in flight: every stage with its next step', () => {
   it('derives the one verb per stage, and the waiting ones carry their counts', async () => {
     withDrafts();
     renderApp('/community');
-    expect(await screen.findByRole('button', { name: 'Night Market Print — Rehearse' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Harbour Lights — Open to reactions' })).toBeInTheDocument();
+    expect(
+      await screen.findByRole('button', { name: 'Night Market Print — Rehearse it' }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Harbour Lights — Ask for reactions' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Paper Moons — 7 of 12 reactions' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Salt Study — Open pledges' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Salt Study — Get Review' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Kiln Set — 14 of 20 pledges' })).toBeInTheDocument();
     // what pledges promise, never Os held
-    expect(screen.getByText('Pre-sold · O 16,800 committed')).toBeInTheDocument();
+    expect(screen.getByText('O 16,800 pledged · live at 20')).toBeInTheDocument();
   });
 
   it('opens a rehearsed draft to reactions only after one explicit confirm, with the WeO it will post', async () => {
@@ -59,7 +61,7 @@ describe('in flight: every stage with its next step', () => {
       notified: 4,
     });
     renderApp('/community');
-    await user.click(await screen.findByRole('button', { name: 'Harbour Lights — Open to reactions' }));
+    await user.click(await screen.findByRole('button', { name: 'Harbour Lights — Ask for reactions' }));
     const dialog = await screen.findByRole('dialog', { name: 'Open to reactions' });
     expect(opened).not.toHaveBeenCalled();
     await user.click(within(dialog).getByRole('button', { name: 'Open to Digital Arts' }));
@@ -79,7 +81,7 @@ describe('in flight: every stage with its next step', () => {
     server.use(http.get(url('/frontend/me/drafts/d-r'), () => ok(fullDraft('d-r', { price: 0, catId: '' }))));
     const user = userEvent.setup();
     const { router } = renderApp('/community');
-    await user.click(await screen.findByRole('button', { name: 'Harbour Lights — Open to reactions' }));
+    await user.click(await screen.findByRole('button', { name: 'Harbour Lights — Ask for reactions' }));
     const dialog = await screen.findByRole('dialog', { name: 'Finish it first' });
     await user.click(within(dialog).getByRole('button', { name: 'Open the composer' }));
     await waitFor(() => expect(router.state.location.search).toBe('?draft=d-r'));
@@ -95,7 +97,7 @@ describe('in flight: every stage with its next step', () => {
       pledges: {},
     });
     renderApp('/community');
-    await user.click(await screen.findByRole('button', { name: 'Salt Study — Open pledges' }));
+    await user.click(await screen.findByRole('button', { name: 'Salt Study — Get Review' }));
     await waitFor(() => expect(pledges).toHaveBeenCalledTimes(1));
   });
 });
@@ -183,7 +185,7 @@ describe('the World Studio', () => {
     });
     const user = userEvent.setup();
     renderApp('/community');
-    await user.click(await screen.findByRole('button', { name: 'Night Market Print — Rehearse' }));
+    await user.click(await screen.findByRole('button', { name: 'Night Market Print — Rehearse it' }));
     const studio = await screen.findByRole('dialog', { name: 'Rehearse in a world' });
     // no WebGL in the test DOM: the flat stage stands in
     expect(

@@ -4187,16 +4187,16 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * Global search — WeOs, circles and creators
+         * Global search — WeOs, requests, circles and creators
          * @description The navigation shell's one search field. Its placeholder names the
-         *     contract: **"WeOs, circles, creators"**.
+         *     contract: **"WeOs, requests, circles, creators"**.
          *
-         *     Those three live in three collections with three different indexes, so
-         *     results come back as **three separate ranked lists**. They are
+         *     Those four live in four collections with four different indexes, so
+         *     results come back as **four separate ranked lists**. They are
          *     deliberately *not* merged into one ordered list: `$text` scores are
          *     normalised per index, so a circle scoring `1.4` is not "better" than a
          *     WeO scoring `1.1`, and merging them would invent a ranking the data
-         *     does not support. The shell renders three labelled groups.
+         *     does not support. The shell renders four labelled groups.
          *
          *     **Index usage**
          *
@@ -4204,6 +4204,7 @@ export interface paths {
          *     |----------|----------|-------|
          *     | WeOs     | `$text`  | `WeoTextIndex` on the shared `offers` collection |
          *     | Circles  | `$text`  | `CommunityCircleTextIndex` |
+         *     | Requests | `$text`  | `RequestOfferTextIndex` — `active` and not past `deadline`; `mine` marks the caller's own |
          *     | Creators | anchored `^prefix` regex | existing `creatorName` index |
          *
          *     Creators are a prefix match rather than `$text` on purpose. MongoDB
@@ -10982,11 +10983,35 @@ export interface components {
             weos: components["schemas"]["SearchWeoHit"][];
             circles: components["schemas"]["GlobalSearchCircleHit"][];
             creators: components["schemas"]["SearchCreatorHit"][];
+            /** @description Open requests (added for the v4 search; older clients ignore it). */
+            requests?: components["schemas"]["SearchRequestHit"][];
             /**
-             * @description Sum across the three lists — what the shell shows as "N results".
+             * @description Sum across the lists — what the shell shows as "N results".
              * @example 9
              */
             total: number;
+        };
+        SearchRequestHit: {
+            id: components["schemas"]["ObjectId"];
+            /** @example sunset print for a cafe wall */
+            title: string;
+            /** @example sam */
+            creatorName: string;
+            /** @example digital arts */
+            categoryName: string;
+            /** @description What the requester will pay, in Os */
+            budget: {
+                /** @example 50 */
+                min: number;
+                /** @example 120 */
+                max: number;
+            };
+            /** Format: date-time */
+            deadline: string | null;
+            /** @description The caller posted it */
+            mine: boolean;
+            /** @example 1.8 */
+            score: number;
         };
         GlobalSearchResponse: components["schemas"]["BaseResponse"] & {
             data?: components["schemas"]["GlobalSearchResult"];
@@ -24756,12 +24781,12 @@ export interface operations {
                 limit?: number;
                 /**
                  * @description Narrow to one kind. Omitted (the shell's own case) searches all
-                 *     three. A `kind` filter skips the other branches entirely rather
+                 *     four. A `kind` filter skips the other branches entirely rather
                  *     than running and discarding them, so a section's scoped search does
                  *     not cost the same as the global one.
                  * @example creators
                  */
-                kind?: "weos" | "circles" | "creators";
+                kind?: "weos" | "circles" | "creators" | "requests";
             };
             header?: never;
             path?: never;
@@ -24816,7 +24841,22 @@ export interface operations {
                      *             "isr": 78
                      *           }
                      *         ],
-                     *         "total": 3
+                     *         "requests": [
+                     *           {
+                     *             "id": "651f8c2a3b9c0d12e4567893",
+                     *             "title": "sunset print for a cafe wall",
+                     *             "creatorName": "sam",
+                     *             "categoryName": "digital arts",
+                     *             "budget": {
+                     *               "min": 50,
+                     *               "max": 120
+                     *             },
+                     *             "deadline": "2026-11-01T00:00:00.000Z",
+                     *             "mine": false,
+                     *             "score": 1.8
+                     *           }
+                     *         ],
+                     *         "total": 4
                      *       }
                      *     }
                      */

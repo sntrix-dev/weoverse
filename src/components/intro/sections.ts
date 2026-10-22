@@ -56,7 +56,7 @@ export const INTRO_SECTIONS: Record<IntroKey, IntroSection> = {
     title: 'Exchange',
     tone: '#F7C62B',
     clip: '/media/ListingsWeO.mp4',
-    line: 'Move with the market',
+    line: 'View WeO',
     why: 'Where a WeO earns: live on the floor, with the market moving around it.',
     edge: 'left',
   },

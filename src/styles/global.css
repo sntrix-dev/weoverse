@@ -41,6 +41,11 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;tra
    (the floating nav, docks) and shrank the centred screen wrappers. The footer's own
    100vh shadow paints the band to the bottom of the viewport, so no layout trick is needed. */
 #root{position:relative;z-index:1;min-height:100dvh}
+/* v4: every page sits 60px in from the window edges at desktop width, less as it narrows, none on phones
+   (the design applied 60px at every width); the footer bleeds back out (Footer.module.css) */
+:root{--root-pad:clamp(0px,calc(6vw - 26px),60px);--root-l:var(--root-pad)}
+#root{padding-left:var(--root-pad);padding-right:var(--root-pad)}
+[data-nav="split"]{--root-l:var(--shell-left,270px)}
 /* the footer band bleeds past its last pixel via its own shadow — nothing below it */
 html{background:#23272e}
 [data-theme="dark"] body::before,#root [data-theme="dark"]{--wash-strength:1}

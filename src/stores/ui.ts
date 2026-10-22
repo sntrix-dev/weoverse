@@ -21,12 +21,24 @@ export interface ExternalGateData {
   onConfirm?: () => void;
 }
 
+/** A two-button question before something you can't undo with one tap (design `weoConfirmLeave`). */
+export interface ConfirmData {
+  title: string;
+  body: string;
+  confirm: string;
+  cancel?: string;
+  /** red confirm (leaving, removing) */
+  danger?: boolean;
+  onConfirm: () => void;
+}
+
 export type DockTab = 'mya' | 'settings';
 
 interface UiState {
   toasts: Toast[];
   ack: { play: number; label: string; tone: string };
   external: ExternalGateData | null;
+  confirm: ConfirmData | null;
   idSheet: boolean;
   dock: { open: boolean; tab: DockTab };
   /** design `mya.open` — Mya's conversation is the live one in the dock */
@@ -42,6 +54,7 @@ export const useUi = create<UiState>(() => ({
   toasts: [],
   ack: { play: 0, label: '', tone: '' },
   external: null,
+  confirm: null,
   idSheet: false,
   dock: { open: false, tab: 'mya' },
   myaOpen: false,
@@ -66,6 +79,9 @@ export function ack(label = '', tone = 'var(--o-green)') {
 
 export const openExternal = (g: ExternalGateData) => set({ external: g });
 export const closeExternal = () => set({ external: null });
+
+export const askConfirm = (c: ConfirmData) => set({ confirm: c });
+export const closeConfirm = () => set({ confirm: null });
 
 export const openId = () => set({ idSheet: true });
 export const closeId = () => set({ idSheet: false });

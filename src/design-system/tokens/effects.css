@@ -11,8 +11,8 @@
      lifted, not heavily sculpted. Depth is a whisper here so it never competes
      with the hero elements (orbs, rings, O-toggle, nav/fan) that own dimension.
      Use --nm-hero ONLY on those signature interactive elements. */
-  --nm-raised: 5px 5px 14px rgba(170,182,208,.26), -5px -5px 12px rgba(255,255,255,.78);
-  --nm-sm:     3px 3px 8px rgba(170,182,208,.2), -2px -2px 6px rgba(255,255,255,.7);
+  --nm-raised: 5px 5px 14px rgba(170,182,208,.26);
+  --nm-sm:     3px 3px 8px rgba(170,182,208,.2);
   --nm-inset:  inset 3px 3px 7px rgba(170,182,208,.28), inset -3px -3px 6px rgba(255,255,255,.72);
 
   /* ---- Hero depth — the ONLY bold neumorphism ----
@@ -75,6 +75,9 @@
 @keyframes weo-ring-burst { 0%{ transform:translate(-50%,-50%) scale(.42); opacity:.85; } 100%{ transform:translate(-50%,-50%) scale(1.85); opacity:0; } }
 @keyframes weo-float      { 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-9px); } }
 @keyframes weo-pop        { 0%{ transform:scale(.62); } 60%{ transform:scale(1.05); } 100%{ transform:scale(1); } }
+/* design-system v8 (WeOverse v4): MsgOrb arrival and the haptic echo ring */
+@keyframes weo-orb-arrive { from{ transform:scale(.42); opacity:0; } to{ transform:scale(1); opacity:1; } }
+@keyframes weo-echo { 0%{ transform:scale(.86); opacity:0; } 30%{ opacity:1; } 100%{ transform:scale(1.16); opacity:0; } }
 @keyframes weo-cardin     { 0%{ transform:scale(.84) translateY(12px); opacity:0; filter:blur(4px); } 100%{ transform:scale(1) translateY(0); opacity:1; filter:blur(0); } }
 /* Tier-3 container choreography: list records glide 30px into place on a long
    deceleration (pair with --stagger-list) — smooth and dynamic, never bouncy. */

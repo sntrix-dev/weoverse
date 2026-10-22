@@ -37,6 +37,9 @@ export const qk = {
   tracking: {
     all: ['tracking'] as const,
   },
+  search: {
+    global: (q: string) => ['search', 'global', q] as const,
+  },
   notifications: {
     all: ['notifications'] as const,
     list: (category: string, unreadOnly: boolean) => ['notifications', 'list', category, unreadOnly] as const,

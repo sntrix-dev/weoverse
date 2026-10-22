@@ -36,15 +36,16 @@ describe('top bar', () => {
     expect(within(pill).getByTitle('Tier 2 · Player')).toBeInTheDocument();
   });
 
-  it('names the section you are in and queues the next one', async () => {
+  it('names the section you are in; v4 drops the Next pill, and on Create the search and Make', async () => {
     renderApp('/create');
     expect(
       await screen.findByRole('button', { name: 'You are in Create — switch section' }),
     ).toBeInTheDocument();
-    // Create sits with Community on the O; next is Exchange
-    expect(
-      screen.getByRole('button', { name: 'Next · Exchange — Move with the market' }),
-    ).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /^Next · / })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Search the WeOverse' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Make a WeO' })).not.toBeInTheDocument();
+    // Mya lives in her dock; the parked-nav button only shows while the nav is parked
+    expect(screen.queryByRole('button', { name: 'Ask Mya' })).not.toBeInTheDocument();
   });
 
   it('switches section from the menu', async () => {
@@ -82,11 +83,108 @@ describe('top bar', () => {
 
   it('searches onto the Discover floor', async () => {
     const user = userEvent.setup();
-    const { router } = renderApp('/create');
+    const { router } = renderApp('/discover');
     await user.click(await screen.findByRole('button', { name: 'Search the WeOverse' }));
-    await user.type(screen.getByRole('textbox', { name: 'Search WeOs, circles, creators' }), 'mug{Enter}');
+    await user.type(
+      screen.getByRole('combobox', { name: 'Search WeOs, requests, circles, creators' }),
+      'mug{Enter}',
+    );
     await waitFor(() => expect(router.state.location.pathname).toBe('/discover'));
     expect(router.state.location.search).toBe('?q=mug');
+  });
+
+  it('suggests WeOs, requests, circles and creators as you type (v4)', async () => {
+    const user = userEvent.setup();
+    const asked: string[] = [];
+    server.use(
+      http.get(url('/frontend/search'), ({ request }) => {
+        asked.push(new URL(request.url).searchParams.get('q') ?? '');
+        return ok({
+          query: 'mu',
+          weos: [
+            {
+              id: 'w-1',
+              slug: 'mug',
+              title: 'Hand-Thrown Mug',
+              weoType: 'regular',
+              categoryName: 'Crafts',
+              creatorName: 'ada',
+              mediaUrl: null,
+              score: 2,
+            },
+          ],
+          circles: [
+            {
+              id: 'c-1',
+              slug: 'makers',
+              name: 'Muddy Makers',
+              axisLabel: 'By Category',
+              coverColor: '#111',
+              coverImage: '',
+              memberCount: 1240,
+              score: 1,
+            },
+          ],
+          creators: [],
+          requests: [
+            {
+              id: 'r-1',
+              title: 'forty mugs for a cafe',
+              creatorName: 'sam',
+              categoryName: 'crafts',
+              budget: { min: 0, max: 96000 },
+              deadline: null,
+              mine: true,
+              score: 1,
+            },
+          ],
+          total: 3,
+        });
+      }),
+    );
+    const { router } = renderApp('/discover');
+    await user.click(await screen.findByRole('button', { name: 'Search the WeOverse' }));
+    const field = screen.getByRole('combobox', { name: 'Search WeOs, requests, circles, creators' });
+    await user.type(field, 'm');
+    // one character asks nothing
+    expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
+    await user.type(field, 'u');
+    const list = await screen.findByRole('listbox', { name: 'Search suggestions' });
+    expect(asked).toEqual(['mu']);
+    expect(
+      within(list)
+        .getAllByRole('option')
+        .map((o) => o.textContent),
+    ).toEqual([
+      'Hand-Thrown MugListing · Crafts',
+      'Forty mugs for a cafeYour request · Crafts · O 96,000',
+      'Muddy Makers1.2k members',
+    ]);
+    // the first is active; ↓ moves, Enter opens
+    expect(within(list).getAllByRole('option')[0]).toHaveAttribute('aria-selected', 'true');
+    await user.keyboard('{ArrowDown}{Enter}');
+    await waitFor(() => expect(router.state.location.pathname).toBe('/requests/r-1'));
+  });
+
+  it('“See all results” lands on the Discover floor', async () => {
+    const user = userEvent.setup();
+    server.use(
+      http.get(url('/frontend/search'), () =>
+        ok({
+          query: 'mu',
+          weos: [{ id: 'w-1', title: 'Hand-Thrown Mug', weoType: 'regular' }],
+          circles: [],
+          creators: [],
+          requests: [],
+          total: 1,
+        }),
+      ),
+    );
+    const { router } = renderApp('/collect');
+    await user.click(await screen.findByRole('button', { name: 'Search the WeOverse' }));
+    await user.type(screen.getByRole('combobox'), 'mug');
+    await user.click(await screen.findByRole('button', { name: 'See all results for “mug”' }));
+    await waitFor(() => expect(router.state.location.search).toBe('?q=mug'));
   });
 
   it('splits the nav and comes back to the bar', async () => {
@@ -95,6 +193,8 @@ describe('top bar', () => {
     const bodies = patches();
     await user.click(await screen.findByRole('button', { name: 'Split the nav' }));
     expect(await screen.findByText('Sections on the left, support up top')).toBeInTheDocument();
+    // the split is saved (batched, 400 ms)
+    await waitFor(() => expect(bodies).toContainEqual({ navMode: 'split' }));
     expect(document.documentElement.getAttribute('data-nav')).toBe('split');
     expect(document.documentElement.style.getPropertyValue('--shell-left')).toBe('270px');
     const panel = screen.getByRole('navigation', { name: 'Sections' });
@@ -103,8 +203,7 @@ describe('top bar', () => {
     expect(document.documentElement.style.getPropertyValue('--shell-left')).toBe('86px');
     await user.click(screen.getAllByRole('button', { name: 'Back to the top bar' })[0]!);
     expect(document.documentElement.getAttribute('data-nav')).toBe('bar');
-    // the split was saved; coming back is the same optimistic write (batched, 400 ms)
-    expect(bodies).toContainEqual({ navMode: 'split' });
+    // coming back is the same optimistic write
     expect(usePrefs.getState().prefs.navMode).toBe('bar');
   });
 
@@ -140,7 +239,7 @@ describe('passport dropdown', () => {
       ['Circles', '4'],
       ['Campaigns', '3'],
     ] as const)
-      expect(within(sheet).getByText(k).parentElement).toHaveTextContent(`${k}${v}`);
+      expect(within(sheet).getByText(k).parentElement).toHaveTextContent(`${v}${k}`);
     await user.click(within(sheet).getByRole('button', { name: 'Copy Your WeO ID' }));
     expect(await screen.findByText('Your WeO ID copied · OW-4F82C1')).toBeInTheDocument();
     await user.click(within(sheet).getByRole('button', { name: 'Show buckets' }));
@@ -173,7 +272,8 @@ describe('Mya dock', () => {
     const user = userEvent.setup();
     renderApp('/create');
     const bodies = patches();
-    await user.click(await screen.findByRole('button', { name: 'Ask Mya' }));
+    // v4: Mya left the top bar; her corner orb opens the dock
+    await user.click(await screen.findByRole('button', { name: "Open Mya's panel" }));
     const dock = await screen.findByRole('dialog', { name: 'Mya' });
     await user.click(within(dock).getByRole('button', { name: 'What is a WeO?' }));
     expect(await within(dock).findByText(/Wealth Exchange Offer/, {}, { timeout: 3000 })).toBeInTheDocument();
@@ -189,8 +289,7 @@ describe('Mya dock', () => {
   it('hides the corner orb when Mya is switched off', async () => {
     const user = userEvent.setup();
     renderApp('/create');
-    expect(await screen.findByRole('button', { name: "Open Mya's panel" })).toBeInTheDocument();
-    await user.click(await screen.findByRole('button', { name: 'Ask Mya' }));
+    await user.click(await screen.findByRole('button', { name: "Open Mya's panel" }));
     await user.click(screen.getByRole('tab', { name: 'Settings' }));
     await user.click(screen.getByRole('switch', { name: 'Mya in the corner' }));
     // only Settings remains in the dock
@@ -205,7 +304,9 @@ describe('O nav', () => {
     const user = userEvent.setup();
     renderApp('/create');
     expect(await screen.findByLabelText('Floating O navigation')).toBeInTheDocument();
-    await user.click(screen.getByRole('button', { name: 'Park the O nav in the top bar' }));
+    // v4: the top bar shows the parked nav only while it is parked; the ring's centre O parks it
+    expect(screen.queryByRole('button', { name: 'Park the O nav in the top bar' })).not.toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Return to the O toggle — home' }));
     expect(screen.queryByLabelText('Floating O navigation')).not.toBeInTheDocument();
     await act(() => new Promise((r) => setTimeout(r, 700)));
     const confirm = await screen.findByRole('dialog', { name: 'O nav parked here' });

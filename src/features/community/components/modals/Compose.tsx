@@ -209,20 +209,8 @@ export function ComposeSheet({ circleId }: { circleId: string | null }) {
             aria-label="Your question"
             style={wellInput}
           />
-          {!question.trim() && (
-            <span style={{ fontSize: 11.5, color: 'var(--text-faint)' }}>
-              Ask something before you carry on — the rest is optional.
-            </span>
-          )}
-          <textarea
-            value={detail}
-            onChange={(e) => setDetail(e.target.value)}
-            rows={3}
-            placeholder="Add detail (optional)"
-            aria-label="Add detail"
-            style={{ ...wellInput, resize: 'none' }}
-          />
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 7 }}>
+          {/* v4: the starters sit right under the question; the detail follows */}
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 7, marginTop: -4 }}>
             {[
               'How do I reach my first collectors?',
               'Is my price right for this edition?',
@@ -240,6 +228,14 @@ export function ComposeSheet({ circleId }: { circleId: string | null }) {
               </Chip>
             ))}
           </div>
+          <textarea
+            value={detail}
+            onChange={(e) => setDetail(e.target.value)}
+            rows={3}
+            placeholder="Add detail (optional)"
+            aria-label="Add detail"
+            style={{ ...wellInput, resize: 'none' }}
+          />
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>

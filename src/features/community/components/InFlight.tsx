@@ -61,26 +61,26 @@ export function nextAct(it: FlightItem, h: FlightHandlers): FlightAct {
     waiting: false,
     alt: null,
   };
-  const postNow = { label: 'Post it', act: () => h.onPost(it) };
+  const postNow = { label: 'Post now', act: () => h.onPost(it) };
   switch (s) {
     case 'draft':
       // a Request is a buy: it posts, it is not vetted
       return it.buy
-        ? { ...base, verb: 'Post it', note: 'Draft', get: null, act: () => h.onPost(it) }
+        ? { ...base, verb: 'Post now', note: 'Draft', get: null, act: () => h.onPost(it) }
         : {
             ...base,
-            verb: 'Rehearse',
+            verb: 'Rehearse it',
             note: 'Try its terms in a world',
-            get: 'A tested price and a collect-through forecast',
+            get: 'Test the price in a world before anyone sees it',
             act: () => h.onRehearse(it),
             alt: postNow,
           };
     case 'rehearsed':
       return {
         ...base,
-        verb: 'Open to reactions',
+        verb: 'Ask for reactions',
         note: it.world ? `Rehearsed in ${it.world}` : 'Rehearsed',
-        get: `${NEED_REACT} collectors say what they’d pay — before you commit`,
+        get: `${NEED_REACT} collectors would pay — before you post`,
         act: () => h.onOpenReactions(it),
         alt: postNow,
       };
@@ -94,15 +94,15 @@ export function nextAct(it: FlightItem, h: FlightHandlers): FlightAct {
         of: NEED_REACT,
         unit: 'reactions',
         note: it.audience ? `Open to ${it.audience}` : '',
-        get: 'Their notes, as they land',
+        get: 'Collectors are reacting · their notes land here',
         act: () => h.onWatch(it),
       };
     case 'reacted':
       return {
         ...base,
-        verb: 'Open pledges',
+        verb: 'Get Review',
         note: `${it.reactions} reactions in`,
-        get: `${THRESHOLD} pledges pre-sell it — it posts itself, validated`,
+        get: `${THRESHOLD} pledges and it goes live with a Validated mark`,
         act: () => h.onOpenPledges(it),
         alt: postNow,
       };
@@ -115,17 +115,17 @@ export function nextAct(it: FlightItem, h: FlightHandlers): FlightAct {
         count: it.pledges,
         of: THRESHOLD,
         unit: 'pledges',
-        note: `Posts itself at ${THRESHOLD}`,
-        get: `Pre-sold · O ${osFmt(it.promisedOs)} committed`,
+        note: `Goes live at ${THRESHOLD} pledges`,
+        get: `O ${osFmt(it.promisedOs)} pledged · live at ${THRESHOLD}`,
         act: () => h.onWatch(it),
       };
     default:
       return {
         ...base,
         fill: 1,
-        verb: 'Move with the market',
+        verb: 'View WeO',
         note: it.validated ? 'Live · validated' : 'Live in Exchange',
-        get: it.validated ? 'Validated mark · ahead on the floor' : 'On the floor, earning',
+        get: it.validated ? 'Live with a Validated mark' : 'Live in Exchange and selling',
         act: () => h.onMarket(it),
       };
   }

@@ -1,0 +1,65 @@
+/* design: app.jsx weoConfirmLeave (v4) */
+.scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 3000;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(20, 16, 30, 0.32);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  animation: weo-cardin 0.22s var(--ease-portal) both;
+}
+.card {
+  width: min(100%, 400px);
+  border-radius: 28px;
+  padding: 26px;
+  background: var(--surface);
+  box-shadow:
+    var(--nm-raised),
+    0 24px 60px rgba(20, 16, 30, 0.18),
+    inset 0 0 0 1px var(--border);
+}
+.title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+.body {
+  margin: 10px 0 0;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--text-dim);
+}
+.row {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 22px;
+}
+.stay,
+.go {
+  height: 42px;
+  padding: 0 20px;
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+}
+.stay {
+  color: var(--text);
+  background: var(--surface-2);
+  box-shadow: var(--nm-inset);
+}
+.go {
+  color: #fff;
+  background: var(--o-violet);
+}
+.go[data-danger] {
+  background: var(--status-error);
+}
