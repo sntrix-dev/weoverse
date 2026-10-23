@@ -278,7 +278,7 @@ export function CollectPage() {
           rows={[
             {
               id: 'c-snapshot',
-              title: 'Snapshot · 7d',
+              title: `Snapshot · ${range}`,
               tone: '#D946EF',
               body: Object.keys(boards).length ? (
                 <SnapshotPanel

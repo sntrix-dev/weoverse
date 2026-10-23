@@ -144,7 +144,8 @@ export function DiscoverPage() {
             {
               label: 'Jump to',
               items: [
-                { key: 'd-stage', label: 'On the stage' },
+                // nothing live, no stage — the menu does not offer a place that is not there
+                ...(stage.length ? [{ key: 'd-stage', label: 'On the stage' }] : []),
                 { key: 'd-feed', label: 'Your feed' },
                 { key: 'd-creators', label: 'Who is trading', count: creatorCount },
                 { key: 'd-circles', label: 'Circles behind the floor', count: circles.length },

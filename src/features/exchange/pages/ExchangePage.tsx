@@ -238,7 +238,7 @@ export function ExchangePage() {
           rows={[
             {
               id: 'l-snapshot',
-              title: 'Snapshot · 7d',
+              title: `Snapshot · ${range}`,
               tone: '#F7C62B',
               body: Object.keys(boards).length ? (
                 <SnapshotPanel
