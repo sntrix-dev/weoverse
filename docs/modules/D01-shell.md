@@ -36,6 +36,8 @@ Not in D1 (they belong to the module that uses them): `ViewBar noView` (D2), `st
 | Passport ID printed as a 24-character id | `# WEO-XXXXXX` (D-105). |
 | Phone: Mya's orb sat on Log out | The orb steps aside while the sheet is open (≤ 760px). |
 
+Re-test on Netlify (2026-10-23): the new build is live; `# WEO-B5B63A` ✅; desktop bar and every-section mode ✅; no console errors ✅. At a 386px window with a desktop scrollbar the passport pill still poked 16px past the bar, so the phone row was tightened (gaps 5px, 20px wordmark, 36px search and nav-dock buttons) to fit 360px screens. Search rows still read "WeO · category" and "cro" finds nothing there until the backend branch is deployed.
+
 Not checkable on the live backend (api.ocono.me): circles (none there) and requests in search (needs `redesign/d01-shell` deployed).
 
 ## Verify

@@ -29,7 +29,7 @@
 }
 @media (max-width: 760px) {
   .pill {
-    padding: 0 5px;
+    padding: 0 3px;
   }
   .balance {
     display: none;

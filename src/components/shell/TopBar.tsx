@@ -51,7 +51,7 @@ export function TopBar({ me, section, onJump, onHome, onSearch, onNotifications 
       <div className={s.spacer} data-small={small || undefined} />
       <header className={s.header} data-small={small || undefined}>
         <div className={s.inner} data-small={small || undefined}>
-          <WeOverseBadge h={phone ? 22 : small ? 26 : 31} onClick={onHome} />
+          <WeOverseBadge h={phone ? 20 : small ? 26 : 31} onClick={onHome} />
           <SectionSwitch section={section} onJump={onJump} />
           <div className={s.grow} />
           {!making && <SearchField onSearch={onSearch} variant="bar" iconSize={24} />}

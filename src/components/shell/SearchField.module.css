@@ -57,6 +57,10 @@
 
 /* a phone: the open field takes the whole bar (over the wordmark and the rest) */
 @media (max-width: 760px) {
+  .root[data-variant='bar'],
+  .root[data-variant='bar'] .icon {
+    width: 36px;
+  }
   .root[data-open][data-variant='bar'] {
     position: absolute;
     z-index: 2;

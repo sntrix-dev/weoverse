@@ -60,8 +60,8 @@
 @media (max-width: 760px) {
   .pill {
     min-width: 0;
-    gap: 4px;
-    padding: 0 8px 0 6px;
+    gap: 2px;
+    padding: 0 6px 0 5px;
   }
   .pillLabel {
     display: none;
