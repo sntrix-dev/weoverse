@@ -1,0 +1,4 @@
+/* design: app.css v4 "feed tabs: white tiles at rest" — the chip row's resting chips are white */
+.chips > [role='button']:not([aria-pressed='true']) {
+  background: var(--surface) !important;
+}

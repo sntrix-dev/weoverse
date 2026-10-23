@@ -6,10 +6,12 @@ import { SectionHero } from '@/components/hero/SectionHero';
 import { Scene } from '@/components/layout/Scene';
 import { SectionHead } from '@/components/layout/SectionMark';
 import { PathBar } from '@/components/shell/PathBar';
-import { SnapshotPanel } from '@/components/snapshot/Snapshot';
+import { SnapshotPanel, WhatWinsRail } from '@/components/snapshot/Snapshot';
 import { WeoView } from '@/components/weo/WeoView';
 import { ICO } from '@/design-system';
 import { useContributors } from '@/features/community/api/community';
+import { useInterests } from '@/features/discover/api/discover';
+import { interest } from '@/features/discover/model/rails';
 import { useWeos } from '@/features/weo/api/weos';
 import { useWeoHandlers } from '@/features/weo/useWeoHandlers';
 import { cardModel } from '@/lib/cardModel';
@@ -50,6 +52,9 @@ export default function CreatorsPage() {
 
   const list = useMemo(() => (dir.data?.items ?? []).map(creatorModel), [dir.data]);
   const boards = useMemo(() => creatorBoards(list), [list]);
+  // v4: the board's rail is "What wins where" (the design's default rail), from the floor's interests
+  const interestsQ = useInterests();
+  const contexts = useMemo(() => (interestsQ.data ?? []).map(interest).slice(0, 5), [interestsQ.data]);
   const pulse = useMemo(() => creatorPulse(list), [list]);
   const theirWeos = useMemo(() => (their.data?.items ?? []).map((w) => cardModel(w)), [their.data]);
   const theirCount = their.data?.pagination.total ?? theirWeos.length;
@@ -132,7 +137,7 @@ export default function CreatorsPage() {
                 pulse={pulse}
                 board={board}
                 onBoard={setBoard}
-                eyebrow="Creators · 7d"
+                rail={contexts.length ? <WhatWinsRail contexts={contexts} /> : undefined}
                 onPick={(r) => openCreator(r.id)}
               />
             ) : (

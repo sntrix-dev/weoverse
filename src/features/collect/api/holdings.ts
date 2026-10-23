@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/api/client';
 import type { components, operations } from '@/api/generated/schema';
 import { qk } from '@/api/queryKeys';
@@ -13,11 +13,13 @@ export type ResellQuoteDto =
 export type DisputeReason = 'not_received' | 'not_as_described' | 'other';
 
 /** `GET /frontend/me/collections/snapshot` — every holding, measured in Os, with the boards and pulse. */
-export function useCollectionsSnapshot(window: '7d' | '30d' = '7d') {
+export function useCollectionsSnapshot(window: '7d' | '14d' | '30d' = '7d') {
   return useQuery({
     queryKey: qk.holdings.snapshot(window),
     queryFn: () =>
       api.get<CollectionsSnapshotDto>('/frontend/me/collections/snapshot', { query: { window } }),
+    // a new window keeps the last board on screen until it arrives
+    placeholderData: keepPreviousData,
     staleTime: 30_000,
   });
 }

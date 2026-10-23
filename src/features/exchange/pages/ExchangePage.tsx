@@ -11,7 +11,12 @@ import { SectionHead } from '@/components/layout/SectionMark';
 import { FlowFoot } from '@/components/shell/FlowBar';
 import { PathBar } from '@/components/shell/PathBar';
 import { useHubPath } from '@/components/shell/useHubPath';
-import { SnapshotChart, SnapshotPanel, type BoardRow } from '@/components/snapshot/Snapshot';
+import {
+  SnapshotChart,
+  SnapshotPanel,
+  type BoardRow,
+  type SnapshotRange,
+} from '@/components/snapshot/Snapshot';
 import { SnapshotRail } from '@/components/snapshot/SnapshotRail';
 import { Button, O_SECTION_ICONS, Tabs } from '@/design-system';
 import { useDrafts, useFollow } from '@/features/community/api/community';
@@ -59,7 +64,8 @@ export function ExchangePage() {
   const navigate = useNavigate();
   const qc = useQueryClient();
   const path = useHubPath([{ label: 'Exchange' }]);
-  const snap = useListingsSnapshot('7d');
+  const [range, setRange] = useState<SnapshotRange>('7d');
+  const snap = useListingsSnapshot(range);
   const drafts = useDrafts();
   const me = useNavSummary().data;
   const creatorsQ = useCircleCreators(6);
@@ -233,7 +239,8 @@ export function ExchangePage() {
                   pulse={pulse}
                   board={board}
                   onBoard={setBoard}
-                  eyebrow="Your listings · 7d"
+                  range={range}
+                  onRange={setRange}
                   rail={rail}
                   onPick={onPick}
                 />

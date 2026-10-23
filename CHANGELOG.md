@@ -2,6 +2,14 @@
 
 All notable changes per module. Newest first.
 
+## D2 — Discover, WeOverse v4 (2026-10-23, in review)
+
+- Discover is one feed with filters: a sticky bar (Jump to, Closing soonest, Moving now; view switch and Enter a world once pinned) beside a small pill of three figures.
+- The stage is a full-width carousel that moves on its own.
+- The feed filters by kind or by Closing soon / Moving now / From creators you circle, nine at a time with numbered pages; the cover is shorter.
+- The rails under the feed are gone; Who is trading, Circles and Interests stay.
+- Stall tiles open a drawer with the price and Place a bid / Collect; the snapshot board on Collect and Exchange switches between 7 days, 14 days and 1 month.
+
 ## D1 — Shell & system, WeOverse v4 (2026-10-22, in review)
 
 - Grey page, flatter shadows, a 60px page inset on desktop.

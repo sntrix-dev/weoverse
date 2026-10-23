@@ -1,6 +1,5 @@
 import { useState, type ReactNode } from 'react';
-import { Avatar, Orb, svg } from '@/design-system';
-import { SectionMark } from '@/components/layout/SectionMark';
+import { Avatar, Orb, svg, Tabs } from '@/design-system';
 import { OsText } from '@/components/text/OsText';
 
 /**
@@ -312,7 +311,11 @@ export function SnapshotChart({
   );
 }
 
-/** design: SnapshotPanel's default rail ("What wins where", `HUB.CONTEXTS`) as its own part. */
+/**
+ * design: SnapshotPanel's default rail ("What wins where", `HUB.CONTEXTS`) as its own part —
+ * v4: its own card, with a subtitle; each context in larger type, the format by a dot, the rate
+ * at 20px and a thicker bar.
+ */
 export function WhatWinsRail({
   contexts,
 }: {
@@ -321,51 +324,74 @@ export function WhatWinsRail({
   return (
     <div
       style={{
-        borderRadius: 24,
-        padding: 18,
-        background: 'var(--surface-2)',
-        boxShadow: 'var(--nm-inset)',
+        alignSelf: 'start',
+        borderRadius: 26,
+        padding: 'clamp(22px,2.6vw,30px)',
+        background: 'var(--surface)',
+        boxShadow: 'var(--nm-raised), inset 0 0 0 1px var(--border)',
         minWidth: 0,
       }}
     >
-      <p
-        style={{
-          margin: 0,
-          fontSize: 10.5,
-          fontWeight: 700,
-          letterSpacing: '.14em',
-          textTransform: 'uppercase',
-          color: 'var(--text-faint)',
-        }}
-      >
+      <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700, letterSpacing: '-.02em', color: 'var(--text)' }}>
         What wins where
+      </h3>
+      <p style={{ margin: '8px 0 0', fontSize: 13, lineHeight: 1.5, color: 'var(--text-dim)' }}>
+        Best-clearing format per context
       </p>
-      <div style={{ height: 14 }} />
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 11 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 24, marginTop: 28 }}>
         {contexts.map((c) => (
-          <div key={c.context}>
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
-              <span style={{ fontSize: 12.5, fontWeight: 600, color: 'var(--text)' }}>{c.context}</span>
-              <span style={{ marginLeft: 'auto', fontSize: 11, fontWeight: 700, color: c.tone }}>
-                {c.type}
+          <div
+            key={c.context}
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'minmax(0,1fr) auto',
+              columnGap: 14,
+              rowGap: 10,
+              alignItems: 'center',
+            }}
+          >
+            <span style={{ display: 'flex', flexDirection: 'column', gap: 5, minWidth: 0 }}>
+              <span
+                style={{
+                  fontSize: 14,
+                  fontWeight: 700,
+                  color: 'var(--text)',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                }}
+              >
+                {c.context}
               </span>
               <span
                 style={{
-                  fontSize: 12,
-                  fontWeight: 700,
-                  color: 'var(--text)',
-                  fontVariantNumeric: 'tabular-nums',
-                  width: 34,
-                  textAlign: 'right',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 7,
+                  fontSize: 12.5,
+                  fontWeight: 600,
+                  color: 'var(--text-dim)',
                 }}
               >
-                {Math.round(c.rate * 100)}%
+                <span style={{ width: 8, height: 8, borderRadius: '50%', background: c.tone }} />
+                {c.type}
               </span>
-            </div>
+            </span>
+            <span
+              style={{
+                fontSize: 20,
+                fontWeight: 700,
+                letterSpacing: '-.02em',
+                color: 'var(--text)',
+                fontVariantNumeric: 'tabular-nums',
+              }}
+            >
+              {Math.round(c.rate * 100)}%
+            </span>
             <div
               style={{
-                marginTop: 5,
-                height: 6,
+                gridColumn: '1 / -1',
+                height: 8,
                 borderRadius: 999,
                 background: 'var(--surface)',
                 boxShadow: 'var(--nm-inset)',
@@ -383,12 +409,27 @@ export function WhatWinsRail({
   );
 }
 
+export type SnapshotRange = '7d' | '14d' | '30d';
+export const SNAPSHOT_RANGES: { value: SnapshotRange; label: string }[] = [
+  { value: '7d', label: 'Last 7 days' },
+  { value: '14d', label: '14 days' },
+  { value: '30d', label: '1 month' },
+];
+
+const card = {
+  borderRadius: 26,
+  padding: 'clamp(16px,2vw,22px)',
+  background: 'var(--surface)',
+  boxShadow: 'var(--nm-raised), inset 0 0 0 1px var(--border)',
+} as const;
+
 export function SnapshotPanel({
   boards,
   pulse,
   board: boardKey,
   onBoard,
-  eyebrow,
+  range,
+  onRange,
   rail,
   onPick,
   onOpenSection,
@@ -398,7 +439,9 @@ export function SnapshotPanel({
   pulse: Record<string, Pulse>;
   board: string;
   onBoard: (key: string) => void;
-  eyebrow?: ReactNode;
+  /** v4: the board's window (7 days · 14 days · 1 month), where the data can change it */
+  range?: SnapshotRange;
+  onRange?: (r: SnapshotRange) => void;
   /** the right column; without one the board takes the full width */
   rail?: ReactNode;
   onPick: (row: BoardRow) => void;
@@ -412,40 +455,9 @@ export function SnapshotPanel({
   if (!board) return null;
   const rest = board.rows.slice(3);
   return (
-    <section
-      style={{
-        borderRadius: 30,
-        padding: 'clamp(18px,2.4vw,26px)',
-        background: 'var(--surface)',
-        boxShadow: 'var(--nm-raised), inset 0 0 0 1px var(--border)',
-      }}
-    >
-      <div
-        style={{
-          display: 'flex',
-          flexWrap: 'wrap',
-          alignItems: 'flex-end',
-          gap: 16,
-          justifyContent: 'space-between',
-        }}
-      >
-        <div>
-          <SectionMark n={1} label={eyebrow || 'Snapshot · 7d'} rule={false} />
-          <h2
-            style={{
-              margin: '8px 0 0',
-              fontSize: 'clamp(21px,2.5vw,27px)',
-              fontWeight: 700,
-              letterSpacing: '-.025em',
-              color: 'var(--text)',
-            }}
-          >
-            {board.label}
-          </h2>
-        </div>
-      </div>
-
-      <div style={{ marginTop: 18 }}>
+    // v4: the chart and the board are separate cards; the board names itself and its window
+    <section style={{ display: 'grid', gap: 16 }}>
+      <div style={card}>
         <SnapshotChart
           pulse={pulse}
           keys={keys}
@@ -457,17 +469,48 @@ export function SnapshotPanel({
 
       <div
         key={cur}
-        className="weo-snap-grid"
+        className="weo-board-grid"
         style={{
           display: 'grid',
-          gridTemplateColumns: rail ? 'minmax(0,1.55fr) minmax(240px,.85fr)' : 'minmax(0,1fr)',
-          gap: 'clamp(16px,2vw,26px)',
-          marginTop: 22,
+          gridTemplateColumns: rail ? 'minmax(0,1fr) minmax(220px,280px)' : 'minmax(0,1fr)',
+          gap: 16,
           alignItems: 'start',
           animation: 'weo-cardin .42s var(--ease-settle) both',
         }}
       >
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 12, minWidth: 0 }}>
+        <div style={{ ...card, display: 'flex', flexDirection: 'column', gap: 12, minWidth: 0 }}>
+          <div
+            style={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              alignItems: 'center',
+              gap: 16,
+              justifyContent: 'space-between',
+              marginBottom: 6,
+            }}
+          >
+            <h2
+              style={{
+                margin: 0,
+                fontSize: 'clamp(21px,2.5vw,27px)',
+                fontWeight: 700,
+                letterSpacing: '-.025em',
+                color: 'var(--text)',
+              }}
+            >
+              {board.label}
+            </h2>
+            {onRange && (
+              <div className="weo-range-tabs" style={{ flex: '0 1 380px', minWidth: 0 }}>
+                <Tabs
+                  tabs={SNAPSHOT_RANGES.map((r) => ({ value: r.value, label: r.label }))}
+                  value={range ?? '7d'}
+                  onChange={(v) => onRange(v as SnapshotRange)}
+                  tone="var(--o-blue)"
+                />
+              </div>
+            )}
+          </div>
           {board.rows.length ? (
             <Podium rows={board.rows} onPick={onPick} />
           ) : (

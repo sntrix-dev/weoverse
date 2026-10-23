@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/api/client';
 import type { components } from '@/api/generated/schema';
 import { qk } from '@/api/queryKeys';
@@ -9,10 +9,12 @@ export type ListingsSnapshotDto = S['ListingsSnapshot'];
 export type ListingRowDto = S['ListingSnapshotRow'];
 
 /** `GET /frontend/me/listings/snapshot` — your storefront, measured in Os, with the boards and pulse. */
-export function useListingsSnapshot(window: '7d' | '30d' = '7d') {
+export function useListingsSnapshot(window: '7d' | '14d' | '30d' = '7d') {
   return useQuery({
     queryKey: qk.listings.snapshot(window),
     queryFn: () => api.get<ListingsSnapshotDto>('/frontend/me/listings/snapshot', { query: { window } }),
+    // a new window keeps the last board on screen until it arrives
+    placeholderData: keepPreviousData,
     staleTime: 30_000,
   });
 }

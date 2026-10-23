@@ -1,93 +1,155 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { OsRun } from '@/components/text/OsRun';
-import { Avatar, OButton, OMark, Orb, svg } from '@/design-system';
+import { Avatar, OMark, Orb } from '@/design-system';
 import type { WeoCardModel } from '@/lib/cardModel';
 import { osFmt } from '@/lib/format';
 import { askAbout, openCollect, openCreator, openWorld } from '@/stores/flow';
+import s from './Stage.module.css';
 
-/** design: discover.jsx StageDeck — every candidate present, neutral until it is the one on stage. */
+/** the current card's width; its neighbours peek at the sides (design `cw`) */
+const CW = 'min(70vw, 1080px)';
+const AUTO_MS = 4000;
+
+/**
+ * design: discover.jsx StageDeck (v4) — a full-width carousel: the live WeO on stage up to
+ * 1080px wide, its neighbours peeking at half opacity. It moves on its own every 4s and holds
+ * still while the pointer is over it; swipe, drag, a sideways wheel, the dots and a click on
+ * a neighbour move it too. (v4 drops the header row of orbs and its arrows; the export defines
+ * card-edge arrows but never draws them.)
+ */
 export function StageDeck({ list }: { list: WeoCardModel[] }) {
   const [i, setI] = useState(0);
-  if (!list.length) return null;
-  const at = ((i % list.length) + list.length) % list.length;
+  const [paused, setPaused] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  const n = list.length;
+  const calm = useRef(
+    typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches,
+  );
+
+  useEffect(() => {
+    if (paused || calm.current || n < 2) return;
+    const id = setInterval(() => setI((x) => x + 1), AUTO_MS);
+    return () => clearInterval(id);
+  }, [paused, n, i]);
+
+  // design: swipe / drag past 50px, or a sideways wheel past 40px, moves one card
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    let lock = 0;
+    let acc = 0;
+    let sx: number | null = null;
+    let moved = false;
+    const wheel = (e: WheelEvent) => {
+      const dx = e.shiftKey && !e.deltaX ? e.deltaY : e.deltaX;
+      if (Math.abs(dx) <= Math.abs(e.shiftKey ? 0 : e.deltaY)) return;
+      e.preventDefault();
+      const now = Date.now();
+      if (now < lock) return;
+      acc += dx;
+      if (Math.abs(acc) > 40) {
+        const step = acc > 0 ? 1 : -1;
+        setI((x) => x + step);
+        acc = 0;
+        lock = now + 650;
+      }
+    };
+    const down = (e: PointerEvent) => {
+      if (e.pointerType === 'mouse' && e.button !== 0) return;
+      sx = e.clientX;
+      moved = false;
+    };
+    const move = (e: PointerEvent) => {
+      if (sx != null && Math.abs(e.clientX - sx) > 8) moved = true;
+    };
+    const up = (e: PointerEvent) => {
+      if (sx == null) return;
+      const d = e.clientX - sx;
+      sx = null;
+      if (Math.abs(d) > 50) setI((x) => x + (d < 0 ? 1 : -1));
+    };
+    // a drag is not a click on the card under it
+    const click = (e: MouseEvent) => {
+      if (moved) {
+        e.stopPropagation();
+        e.preventDefault();
+        moved = false;
+      }
+    };
+    el.addEventListener('wheel', wheel, { passive: false });
+    el.addEventListener('pointerdown', down);
+    window.addEventListener('pointermove', move);
+    window.addEventListener('pointerup', up);
+    el.addEventListener('click', click, true);
+    return () => {
+      el.removeEventListener('wheel', wheel);
+      el.removeEventListener('pointerdown', down);
+      window.removeEventListener('pointermove', move);
+      window.removeEventListener('pointerup', up);
+      el.removeEventListener('click', click, true);
+    };
+  }, []);
+
+  if (!n) return null;
+  const at = ((i % n) + n) % n;
   const w = list[at] as WeoCardModel;
-  const go = (n: number) => setI((x) => x + n);
+  const go = (d: number) => setI((x) => x + d);
+  const side = (dir: 1 | -1) => {
+    if (n < 2) return null;
+    const it = list[(((at + dir) % n) + n) % n] as WeoCardModel;
+    return (
+      <div
+        key={`side${dir}${it.id}`}
+        aria-hidden="true"
+        className={s.side}
+        data-dir={dir > 0 ? 'next' : 'prev'}
+        style={{ '--cw': CW } as CSSProperties}
+      >
+        <div style={{ height: '100%' }}>
+          <StageWeo w={it} />
+        </div>
+        <button type="button" tabIndex={-1} className={s.sideHit} onClick={() => go(dir)} />
+      </div>
+    );
+  };
   return (
-    <div id="d-stage">
-      <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 12, marginBottom: 14 }}>
-        <span
-          style={{
-            fontSize: 10,
-            fontWeight: 600,
-            letterSpacing: '.15em',
-            textTransform: 'uppercase',
-            color: 'var(--text-faint)',
-            flex: '0 0 auto',
-          }}
-        >
-          On the stage
-        </span>
-        <span
-          style={{
-            fontSize: 11.5,
-            fontWeight: 400,
-            color: 'var(--text-faint)',
-            flex: '1 1 auto',
-            minWidth: 0,
-          }}
-        >
-          {at + 1} of {list.length} · {w.name}
-        </span>
-        <span style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 7, flex: '0 0 auto' }}>
-          {list.map((it, n) => {
-            const on = n === at;
+    <div
+      id="d-stage"
+      ref={ref}
+      role="region"
+      aria-roledescription="carousel"
+      aria-label="On the stage"
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+      onFocusCapture={() => setPaused(true)}
+      onBlurCapture={() => setPaused(false)}
+    >
+      <div className={`weo-stage-track ${s.track}`} style={{ '--cw': CW } as CSSProperties}>
+        {side(-1)}
+        <div key={w.id} className={s.current} aria-live="polite" aria-label={`${at + 1} of ${n} · ${w.name}`}>
+          <StageWeo w={w} />
+        </div>
+        {side(1)}
+      </div>
+      {n > 1 && (
+        <div role="tablist" aria-label="Stage cards" className={s.dots}>
+          {list.map((it, k) => {
+            const on = k === at;
             return (
               <button
-                type="button"
                 key={it.id}
-                onClick={() => setI(n)}
-                title={it.name}
-                aria-label={it.name}
-                aria-current={on ? 'true' : undefined}
-                style={{
-                  position: 'relative',
-                  width: 40,
-                  height: 40,
-                  padding: 0,
-                  border: 'none',
-                  borderRadius: '50%',
-                  cursor: 'pointer',
-                  background: 'transparent',
-                  flex: '0 0 auto',
-                  transform: on ? 'scale(1.08)' : 'none',
-                  opacity: on ? 1 : 0.62,
-                  transition: 'transform .26s var(--ease-portal), opacity .24s',
-                }}
-              >
-                <Orb
-                  size={40}
-                  fill="image"
-                  src={it.img}
-                  ring
-                  ringColor={on ? it.hex : 'var(--border)'}
-                  matcap
-                  breathe={on}
-                />
-              </button>
+                type="button"
+                role="tab"
+                aria-selected={on}
+                aria-label={`${k + 1} of ${n} · ${it.name}`}
+                onClick={() => setI(k)}
+                className={s.dot}
+                data-on={on || undefined}
+              />
             );
           })}
-          <span style={{ width: 1, height: 22, background: 'var(--border)', margin: '0 2px' }} />
-          <OButton variant="ghost" size={38} aria-label="Previous" onClick={() => go(-1)}>
-            {svg(<polyline points="15 18 9 12 15 6" />, 16, 'currentColor', 2)}
-          </OButton>
-          <OButton variant="ghost" size={38} aria-label="Next" onClick={() => go(1)}>
-            {svg(<polyline points="9 6 15 12 9 18" />, 16, 'currentColor', 2)}
-          </OButton>
-        </span>
-      </div>
-      <div key={w.id} style={{ animation: 'weo-cardin .46s var(--ease-settle) both' }}>
-        <StageWeo w={w} />
-      </div>
+        </div>
+      )}
     </div>
   );
 }

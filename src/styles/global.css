@@ -225,3 +225,6 @@ div:has(> [aria-label="Floating O navigation"]) > div:first-child{left:-12px;top
 
 /* settings: the section rail becomes a scrolling row on narrow screens */
 @media (max-width:900px){.weo-settings-grid{grid-template-columns:minmax(0,1fr) !important}.weo-settings-nav{position:static !important;flex-direction:row !important;overflow-x:auto}}
+
+/* v4: full-bleed parts (the Discover stage) never widen the page */
+html,body{overflow-x:clip}

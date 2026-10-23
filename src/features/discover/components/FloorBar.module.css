@@ -1,0 +1,177 @@
+/* design: discover.jsx sticky filters + app.css (v4) */
+.bar {
+  position: sticky;
+  top: 62px;
+  z-index: 290;
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 8px 0;
+  border-radius: 999px;
+  transition:
+    border-radius 0.2s,
+    background 0.2s,
+    box-shadow 0.2s,
+    padding 0.2s;
+}
+/* pinned: frosted glass tucked under the nav bar */
+.bar[data-stuck] {
+  padding: 8px 10px 8px 8px;
+  border-radius: 0 0 16px 16px;
+  background: color-mix(in srgb, var(--surface) 55%, transparent);
+  backdrop-filter: blur(26px) saturate(1.5);
+  -webkit-backdrop-filter: blur(26px) saturate(1.5);
+  box-shadow:
+    inset 0 0 0 1px var(--glass-brd),
+    var(--nm-sm);
+}
+.inner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding: 2px 0;
+}
+.inner::-webkit-scrollbar {
+  display: none;
+}
+/* the pinned-only controls */
+.bar:not([data-stuck]) :global(.weo-stuck-views) {
+  display: none;
+}
+
+.pill {
+  position: relative;
+  flex: 0 1 auto;
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  height: 44px;
+  box-sizing: border-box;
+  max-width: 100%;
+  padding: 0 8px 0 18px;
+  border-radius: 999px;
+  background: var(--surface);
+  box-shadow:
+    var(--nm-sm),
+    inset 0 0 0 1px var(--border);
+}
+.stats {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: max-content;
+  align-items: center;
+  min-width: 0;
+}
+.stat {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+  padding: 0 14px;
+  border-left: 1px solid var(--border);
+}
+.stat:first-child {
+  padding-left: 0;
+  border-left: none;
+}
+.statValue {
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.035em;
+  color: var(--text-dim);
+  font-variant-numeric: tabular-nums;
+}
+.statLabel {
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  white-space: nowrap;
+}
+.mark {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding-left: 14px;
+  border-left: 1px solid var(--border);
+}
+.intro {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 26px;
+  padding: 0 10px 0 4px;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+  font: inherit;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  background: var(--surface);
+  box-shadow:
+    var(--nm-sm),
+    inset 0 0 0 1px var(--border);
+}
+.introDisc {
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  color: #fff;
+  background: var(--t);
+}
+.note {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 8px);
+  z-index: 20;
+  width: min(380px, calc(100vw - 32px));
+  padding: 12px 16px;
+  border-radius: 18px;
+  background: var(--surface);
+  box-shadow:
+    var(--shadow-card),
+    inset 0 0 0 1px var(--border);
+}
+
+/* a phone: the bar and the pill each take a line; what does not fit scrolls sideways */
+@media (max-width: 640px) {
+  .bar {
+    flex: 1 0 100%;
+  }
+  .pill {
+    flex: 1 0 100%;
+    margin-left: 0;
+    margin-top: 2px;
+  }
+  /* the shared phone rule hides hero figures; v4 keeps this pill's */
+  .pill .stats {
+    display: grid !important;
+    flex: 1 1 auto;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .stats::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}

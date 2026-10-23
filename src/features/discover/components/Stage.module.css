@@ -1,0 +1,79 @@
+/* design: discover.jsx stageTrack / stageDots / stageArrow (v4) */
+.track {
+  position: relative;
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  overflow: hidden;
+  padding: 6px 0;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: pan-y;
+}
+.track:active {
+  cursor: grabbing;
+}
+.track img {
+  -webkit-user-drag: none;
+}
+.current {
+  position: relative;
+  width: var(--cw);
+  margin: 0 auto;
+  animation: weo-cardin 0.46s var(--ease-settle) both;
+}
+/* the neighbours peek in, half-lit and a touch smaller */
+.side {
+  position: absolute;
+  top: 6px;
+  bottom: 6px;
+  width: var(--cw);
+  overflow: hidden;
+  border-radius: 34px;
+  opacity: 0.5;
+  transform: scale(0.92);
+  transition: opacity 0.3s;
+  animation: weo-cardin 0.46s var(--ease-settle) both;
+}
+.side[data-dir='prev'] {
+  right: calc(50% + var(--cw) / 2 + 24px);
+  transform-origin: right center;
+}
+.side[data-dir='next'] {
+  left: calc(50% + var(--cw) / 2 + 24px);
+  transform-origin: left center;
+}
+.side > div > div {
+  height: 100%;
+  box-sizing: border-box;
+}
+.sideHit {
+  position: absolute;
+  inset: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+.dots {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin-top: 16px;
+}
+.dot {
+  width: 8px;
+  height: 8px;
+  padding: 0;
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  background: color-mix(in srgb, var(--text) 22%, transparent);
+  transition:
+    width 0.3s var(--ease-portal),
+    background 0.25s;
+}
+.dot[data-on] {
+  width: 24px;
+  background: var(--text);
+}

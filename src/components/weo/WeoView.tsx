@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { IconSegs, type SegItem } from '@/components/layout/SectionMark';
 import { Rail } from '@/components/layout/Rail';
 import type { WeoCardModel } from '@/lib/cardModel';
@@ -40,6 +40,15 @@ export function useWeoView<V extends string = WeoViewKind>(
     if (!initial && fromPref) return fromPref.value;
     return (initial || opts[0]?.value || 'cards') as V;
   });
+  // two controls on one view (the board's and a pinned bar's, v4) stay in step
+  useEffect(() => {
+    const on = (e: Event) => {
+      const d = (e as CustomEvent<{ key: string; v: string }>).detail;
+      if (d?.key === key && opts.some((o) => o.value === d.v)) setV(d.v as V);
+    };
+    window.addEventListener(VIEW_EVENT, on);
+    return () => window.removeEventListener(VIEW_EVENT, on);
+  }, [key, opts]);
   return [
     v,
     (nv) => {
@@ -49,9 +58,12 @@ export function useWeoView<V extends string = WeoViewKind>(
       } catch {
         /* ignore */
       }
+      window.dispatchEvent(new CustomEvent(VIEW_EVENT, { detail: { key, v: nv } }));
     },
   ];
 }
+
+const VIEW_EVENT = 'weo-view';
 
 export interface WeoViewProps {
   id: string;

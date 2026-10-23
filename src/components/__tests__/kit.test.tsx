@@ -130,11 +130,38 @@ describe('SnapshotPanel', () => {
     expect(onOpenSection).toHaveBeenCalledWith('collected');
   });
 
+  it('v4: the board shows its window where the page can change it', () => {
+    const onRange = vi.fn();
+    const { rerender } = render(
+      <SnapshotPanel
+        boards={boards}
+        pulse={pulse}
+        board="missing"
+        onBoard={() => {}}
+        onPick={() => {}}
+        range="7d"
+        onRange={onRange}
+      />,
+    );
+    const tabs = document.querySelector('.weo-range-tabs') as HTMLElement;
+    expect(
+      within(tabs)
+        .getAllByRole('button')
+        .map((t) => t.textContent),
+    ).toEqual(['Last 7 days', '14 days', '1 month']);
+    fireEvent.click(within(tabs).getByRole('button', { name: '1 month' }));
+    expect(onRange).toHaveBeenCalledWith('30d');
+    rerender(
+      <SnapshotPanel boards={boards} pulse={pulse} board="missing" onBoard={() => {}} onPick={() => {}} />,
+    );
+    expect(document.querySelector('.weo-range-tabs')).toBeNull();
+  });
+
   it('without a rail the board takes the full width', () => {
     const { container } = render(
       <SnapshotPanel boards={boards} pulse={pulse} board="missing" onBoard={() => {}} onPick={() => {}} />,
     );
-    const grid = container.querySelector('.weo-snap-grid') as HTMLElement;
+    const grid = container.querySelector('.weo-board-grid') as HTMLElement;
     expect(grid.style.gridTemplateColumns).toBe('minmax(0,1fr)');
     expect(screen.getByRole('heading', { name: 'Where the Os flowed' })).toBeInTheDocument();
   });
@@ -150,6 +177,35 @@ describe('WeO views', () => {
     const tile = screen.getByRole('button', { name: `${w.name} · Hunt` });
     fireEvent.keyDown(tile, { key: 'Enter' });
     expect(onOpen).toHaveBeenCalledWith(w);
+  });
+
+  it('StallTile (v4): the drawer opens on approach with the one action, which opens Collect', async () => {
+    const { useFlow } = await import('@/stores/flow');
+    const w = cardModel(huntWeo(), 'discover', FIXTURE_NOW);
+    const onOpen = vi.fn();
+    render(<StallTile w={w} onOpen={onOpen} />);
+    const tile = screen.getByRole('button', { name: `${w.name} · Hunt` });
+    fireEvent.mouseEnter(tile);
+    const cta = within(tile).getByRole('button', { name: w.timer ? 'Place a bid' : 'Collect' });
+    fireEvent.click(cta);
+    expect(useFlow.getState().collect).toBe(w.id);
+    expect(onOpen).not.toHaveBeenCalled();
+  });
+
+  it('two view controls on one group stay in step', () => {
+    const list = models();
+    const h = { onOpen: vi.fn() };
+    render(
+      <>
+        <WeoView id="t3" list={list} h={h} head={(segs) => <div data-testid="a">{segs}</div>} />
+        <WeoView id="t3" list={[]} h={h} head={(segs) => <div data-testid="b">{segs}</div>} />
+      </>,
+    );
+    fireEvent.click(within(screen.getByTestId('a')).getByRole('button', { name: 'List' }));
+    expect(within(screen.getByTestId('b')).getByRole('button', { name: 'List' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
   });
 
   it('starts from the weoView pref, switches view and remembers it per group', () => {

@@ -144,6 +144,7 @@ export function Fold({
   title,
   count,
   tone,
+  note,
   children,
 }: {
   id: string;
@@ -152,6 +153,8 @@ export function Fold({
   title: string;
   count?: number | string | null;
   tone?: string;
+  /** v4: one line under the title */
+  note?: ReactNode;
   children?: ReactNode;
 }) {
   const open = !shut;
@@ -192,10 +195,11 @@ export function Fold({
           style={{
             minWidth: 0,
             flex: 1,
-            fontSize: 12.5,
+            // v4: the fold's title is the section's title, at heading size
+            fontSize: 'clamp(19px,2.2vw,24px)',
             fontWeight: 700,
-            letterSpacing: '-.014em',
-            color: open ? 'var(--text-faint)' : 'var(--text)',
+            letterSpacing: '-.028em',
+            color: 'var(--text)',
             overflow: 'hidden',
             textOverflow: 'ellipsis',
             whiteSpace: 'nowrap',
@@ -227,6 +231,22 @@ export function Fold({
           {svg(<polyline points="6 9 12 15 18 9" />, 14, 'currentColor', 2.2)}
         </span>
       </button>
+      {note && (
+        <p
+          style={{
+            margin: '-6px 0 14px',
+            padding: '0 14px 0 31px',
+            fontSize: 12.5,
+            lineHeight: 1.5,
+            color: 'var(--text-dim)',
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+          }}
+        >
+          {note}
+        </p>
+      )}
       <div
         style={{
           display: 'grid',

@@ -22,6 +22,7 @@ export const qk = {
     all: ['discover'] as const,
     snapshot: () => ['discover', 'snapshot'] as const,
     feed: () => ['discover', 'feed'] as const,
+    feedPage: (kind: string, page: number) => ['discover', 'feed', kind, page] as const,
     interests: () => ['discover', 'interests'] as const,
   },
   creators: {

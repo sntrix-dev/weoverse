@@ -9218,10 +9218,11 @@ export interface components {
          */
         SnapshotWindowMeta: {
             /**
+             * @description `14d` only on the listings and collections snapshots
              * @example 7d
              * @enum {string}
              */
-            window: "7d" | "30d" | "all";
+            window: "7d" | "14d" | "30d" | "all";
             /** Format: date-time */
             start: string;
             /** Format: date-time */
@@ -18327,9 +18328,10 @@ export interface operations {
                 /**
                  * @description Rolling lookback. An enum for the same reason as everywhere
                  *     else in this family — an arbitrary lookback is an unbounded
-                 *     aggregate on a growing collection, once per page load.
+                 *     aggregate on a growing collection, once per page load. `14d`
+                 *     is the v4 board's middle range tab.
                  */
-                window?: "7d" | "30d";
+                window?: "7d" | "14d" | "30d";
             };
             header?: never;
             path?: never;
@@ -28825,7 +28827,7 @@ export interface operations {
                  *     an unbounded aggregate over a growing collection, once per
                  *     page load, is a DoS surface.
                  */
-                window?: "7d" | "30d";
+                window?: "7d" | "14d" | "30d";
             };
             header?: never;
             path?: never;

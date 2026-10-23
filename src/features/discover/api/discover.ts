@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { api } from '@/api/client';
 import type { components } from '@/api/generated/schema';
 import { qk } from '@/api/queryKeys';
@@ -27,6 +27,28 @@ export function useFeed() {
       api.get<{ items: FeedItemDto[]; total: number; page: number; totalPages: number }>('/frontend/feed', {
         query: { limit: 24 },
       }),
+    staleTime: 60_000,
+  });
+}
+
+/** v4: the feed comes in pages of nine ("Showing 1–9 of N", numbered pages). */
+export const FEED_PER = 9;
+
+type FeedPageDto = { items: FeedItemDto[]; total: number; page: number; totalPages: number };
+
+/**
+ * `GET /frontend/feed?kind=&page=&limit=9` — one page of the board. The server filters by kind
+ * so a page is always nine (or the last few), never a client filter over one page.
+ */
+export function useFeedPage(kind: 'all' | FeedItemDto['kind'], page: number, enabled = true) {
+  return useQuery({
+    queryKey: qk.discover.feedPage(kind, page),
+    queryFn: () =>
+      api.get<FeedPageDto>('/frontend/feed', {
+        query: { ...(kind === 'all' ? {} : { kind }), page, limit: FEED_PER },
+      }),
+    enabled,
+    placeholderData: keepPreviousData,
     staleTime: 60_000,
   });
 }

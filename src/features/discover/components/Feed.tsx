@@ -1,15 +1,20 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { useNavigate } from 'react-router';
 import { routes } from '@/app/routes';
 import { useViewPrefs } from '@/components/hero/ViewBar';
-import { IconSegs, type SegItem } from '@/components/layout/SectionMark';
+import { type SegItem } from '@/components/layout/SectionMark';
 import { useWeoView } from '@/components/weo/WeoView';
-import { Avatar, AvatarGroup, Chip, OMark, Orb, svg, WeOverseLettering } from '@/design-system';
+import { Avatar, Chip, OMark, Orb, svg, WeOverseLettering } from '@/design-system';
 import { MARK_O, MARK_VERSE } from '@/design-system';
 import { FEED_KIND, FEED_KINDS, type FeedKind } from '@/lib/feedKinds';
+import { cardModel } from '@/lib/cardModel';
 import { osFmt } from '@/lib/format';
+import { glide } from '@/lib/glide';
+import { useWeos, type WeoListParams } from '@/features/weo/api/weos';
 import { openCollect } from '@/stores/flow';
-import { coverLine, URGENCY, type FeedItemModel } from '../model/feed';
+import { FEED_PER, useFeedPage } from '../api/discover';
+import { coverLine, feedItemModel, URGENCY, weoFeedItem, type FeedItemModel } from '../model/feed';
+import s from './Feed.module.css';
 import { cssUrl } from '@/lib/cssUrl';
 
 /*
@@ -56,7 +61,6 @@ export function FeedCover({ items }: { items: FeedItemModel[] }) {
         .slice(0, 3),
     [items],
   );
-  const lines = useMemo(() => items.filter((i) => !pool.includes(i)).slice(0, 4), [items, pool]);
   const [at, setAt] = useState(0);
   const [hold, setHold] = useState(false);
   const calm = useRef(
@@ -73,10 +77,6 @@ export function FeedCover({ items }: { items: FeedItemModel[] }) {
   const tone = it.tone;
   const live = items.filter((i) => i.kind === 'weo').length;
   const inMotion = items.reduce((s, i) => s + (i.kind === 'weo' ? (i.os ?? 0) : 0), 0);
-  const faces = items
-    .filter((i) => i.byAvatar)
-    .slice(0, 5)
-    .map((i) => ({ src: i.byAvatar as string, name: i.byName }));
 
   return (
     <section
@@ -88,7 +88,8 @@ export function FeedCover({ items }: { items: FeedItemModel[] }) {
         overflow: 'hidden',
         marginBottom: 18,
         borderRadius: 'clamp(26px,2.6vw,36px)',
-        minHeight: 'clamp(400px, 44vw, 560px)',
+        // v4: a shorter cover
+        minHeight: 'clamp(300px, 30vw, 400px)',
         display: 'grid',
         gridTemplateRows: 'auto 1fr auto',
         padding: 'clamp(18px,2.2vw,30px)',
@@ -125,17 +126,6 @@ export function FeedCover({ items }: { items: FeedItemModel[] }) {
           background: hold
             ? 'linear-gradient(180deg, rgba(8,10,18,.32) 0%, transparent 24%, transparent 58%, rgba(8,10,18,.76) 100%)'
             : 'linear-gradient(180deg, rgba(8,10,18,.5) 0%, rgba(8,10,18,.05) 30%, rgba(8,10,18,.32) 66%, rgba(8,10,18,.86) 100%)',
-        }}
-      />
-      <div
-        aria-hidden="true"
-        style={{
-          position: 'absolute',
-          inset: 0,
-          zIndex: 1,
-          opacity: hold ? 0 : 1,
-          transition: 'opacity .5s var(--ease-portal)',
-          background: `linear-gradient(180deg, transparent 56%, color-mix(in srgb, ${tone} 13%, transparent) 100%)`,
         }}
       />
 
@@ -218,7 +208,7 @@ export function FeedCover({ items }: { items: FeedItemModel[] }) {
 
       <span />
 
-      {/* the cover story, and the lines beside it */}
+      {/* the cover story (v4: the controls sit at the bottom centre; no cover lines) */}
       <div
         style={{
           position: 'relative',
@@ -227,6 +217,7 @@ export function FeedCover({ items }: { items: FeedItemModel[] }) {
           alignItems: 'flex-end',
           gap: 'clamp(18px,2.6vw,42px)',
           flexWrap: 'wrap',
+          paddingBottom: pool.length > 1 ? 56 : 0,
         }}
       >
         <div style={{ flex: '1 1 min(560px, 100%)', minWidth: 0, paddingLeft: COVER_INDENT }}>
@@ -338,7 +329,19 @@ export function FeedCover({ items }: { items: FeedItemModel[] }) {
             </span>
           </div>
           {pool.length > 1 && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 18 }}>
+            <div
+              className="weo-cover-nav"
+              style={{
+                position: 'absolute',
+                left: 0,
+                right: 0,
+                bottom: 0,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 10,
+              }}
+            >
               <button
                 type="button"
                 onClick={() => setAt((a) => (a - 1 + pool.length) % pool.length)}
@@ -391,130 +394,6 @@ export function FeedCover({ items }: { items: FeedItemModel[] }) {
             </div>
           )}
         </div>
-
-        {/* cover lines — the rest of the issue, in one column */}
-        <div
-          className="weo-cover-lines"
-          style={{
-            flex: '0 1 268px',
-            minWidth: 210,
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 2,
-            padding: 12,
-            borderRadius: 24,
-            background: 'rgba(10,13,22,.42)',
-            backdropFilter: 'blur(16px)',
-            WebkitBackdropFilter: 'blur(16px)',
-            boxShadow: 'inset 0 0 0 1px rgba(255,255,255,.14)',
-          }}
-        >
-          <span
-            style={{
-              padding: '2px 6px 8px',
-              fontSize: 9.5,
-              fontWeight: 600,
-              letterSpacing: '.2em',
-              textTransform: 'uppercase',
-              color: 'rgba(255,255,255,.6)',
-            }}
-          >
-            Also in the feed
-          </span>
-          {lines.map((l) => (
-            <button
-              type="button"
-              key={l.id}
-              onClick={() => open(l)}
-              className="weo-cover-line"
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 10,
-                border: 'none',
-                background: 'transparent',
-                cursor: 'pointer',
-                textAlign: 'left',
-                borderRadius: 16,
-                padding: '7px 6px',
-                color: '#fff',
-              }}
-            >
-              {l.img ? (
-                <Orb
-                  size={34}
-                  fill="image"
-                  src={l.img}
-                  ring
-                  ringColor={l.tone}
-                  matcap
-                  style={{ flex: '0 0 auto' }}
-                />
-              ) : (
-                <span
-                  style={{
-                    width: 34,
-                    height: 34,
-                    borderRadius: '50%',
-                    flex: '0 0 auto',
-                    display: 'grid',
-                    placeItems: 'center',
-                    background: `color-mix(in srgb, ${l.tone} 32%, rgba(255,255,255,.08))`,
-                  }}
-                >
-                  <span style={{ width: 8, height: 8, borderRadius: '50%', background: l.tone }} />
-                </span>
-              )}
-              <span style={{ minWidth: 0, flex: 1 }}>
-                <span
-                  style={{
-                    display: 'block',
-                    fontSize: 12.5,
-                    fontWeight: 600,
-                    lineHeight: 1.25,
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
-                  }}
-                >
-                  {l.title}
-                </span>
-                <span
-                  style={{
-                    display: 'block',
-                    marginTop: 2,
-                    fontSize: 10,
-                    fontWeight: 600,
-                    letterSpacing: '.12em',
-                    textTransform: 'uppercase',
-                    color: l.tone,
-                  }}
-                >
-                  {coverLine(l)}
-                </span>
-              </span>
-            </button>
-          ))}
-          {faces.length > 0 && (
-            <span
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 9,
-                marginTop: 6,
-                padding: '9px 6px 3px',
-                borderTop: '1px solid rgba(255,255,255,.14)',
-              }}
-            >
-              <AvatarGroup size={24} extra={faces.length > 4 ? faces.length - 4 : undefined}>
-                {faces.slice(0, 4).map((f) => (
-                  <Avatar key={f.name + f.src} src={f.src} size={24} />
-                ))}
-              </AvatarGroup>
-              <span style={{ fontSize: 10.5, color: 'rgba(255,255,255,.64)' }}>creators on the cover</span>
-            </span>
-          )}
-        </div>
       </div>
     </section>
   );
@@ -537,7 +416,8 @@ export function FeedCard({ it, w, plain }: { it: FeedItemModel; w: number; plain
   const open = useOpen();
   const [hov, setHov] = useState(false);
   const kind = FEED_KIND[it.kind];
-  const big = w >= 4;
+  // v4: the lead is a card like the rest, in the same grid; only its chip says it leads
+  const big = false;
   const mid = w === 3;
   const show = hov;
   /* a question or a brief has no object photograph — the person who asked is the imagery */
@@ -703,11 +583,19 @@ export function FeedCard({ it, w, plain }: { it: FeedItemModel; w: number; plain
           </span>
           {urg && <Chip tone={it.tone}>{urg}</Chip>}
           {it.timer && (
+            // v4: the countdown is a red pill
             <span
               style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 5,
+                padding: '2px 8px',
+                borderRadius: 999,
                 fontSize: 11,
-                fontWeight: 500,
-                color: 'var(--text-faint)',
+                fontWeight: 600,
+                color: 'color-mix(in srgb, #E5484D 78%, var(--text))',
+                background: 'color-mix(in srgb, #E5484D 9%, var(--surface))',
+                boxShadow: 'inset 0 0 0 1px color-mix(in srgb, #E5484D 18%, transparent)',
                 fontVariantNumeric: 'tabular-nums',
               }}
             >
@@ -983,75 +871,195 @@ export const FEED_VIEWS: SegItem<FeedView>[] = [
   { value: 'list', label: 'List' },
 ];
 
-export function FeedBoard({ items }: { items: FeedItemModel[] }) {
-  const [view, setView] = useWeoView<FeedView>('feed.board', FEED_VIEWS, 'editorial');
-  const [kind, setKind] = useState<'all' | FeedKind>('all');
+/** v4: the WeO lenses that sit in the board's chip row (design FEED_LENSES) */
+export type FeedLens = 'ending' | 'moving' | 'followed';
+export type FeedTab = 'all' | FeedKind | FeedLens;
+const FEED_LENSES: { k: FeedLens; label: string; urgent?: boolean }[] = [
+  { k: 'ending', label: 'Closing soon', urgent: true },
+  { k: 'moving', label: 'Moving now' },
+  { k: 'followed', label: 'From creators you circle' },
+];
+const LENS_QUERY: Record<FeedLens, WeoListParams> = {
+  ending: { sort: 'ending_soon', status: 'active' },
+  moving: { sort: 'trending', status: 'active' },
+  followed: { feed: 'following', status: 'active' },
+};
+const isLens = (t: FeedTab): t is FeedLens => FEED_LENSES.some((l) => l.k === t);
+
+/** design: discover.jsx feedPager (v4) — "Showing 1–9 of N", then prev · 1 2 3 · next. */
+function FeedPager({
+  page,
+  pages,
+  total,
+  per,
+  onPage,
+}: {
+  page: number;
+  pages: number;
+  total: number;
+  per: number;
+  onPage: (p: number) => void;
+}) {
+  if (pages < 2) return null;
+  const chev = (pts: string) => svg(<polyline points={pts} />, 15, 'currentColor', 2.2);
+  const btn = (key: string, label: ReactNode, p: number, on: boolean, disabled: boolean, aria: string) => (
+    <button
+      key={key}
+      type="button"
+      onClick={() => {
+        if (!disabled && !on) onPage(p);
+      }}
+      disabled={disabled}
+      aria-current={on ? 'page' : undefined}
+      aria-label={aria}
+      style={{
+        display: 'grid',
+        placeItems: 'center',
+        minWidth: 40,
+        height: 40,
+        padding: '0 12px',
+        borderRadius: 999,
+        border: 'none',
+        font: 'inherit',
+        fontSize: 13,
+        fontWeight: on ? 700 : 600,
+        fontVariantNumeric: 'tabular-nums',
+        cursor: disabled || on ? 'default' : 'pointer',
+        opacity: disabled ? 0.4 : 1,
+        color: on ? '#fff' : 'var(--text)',
+        background: on ? 'var(--o-blue)' : 'var(--surface)',
+        boxShadow: on ? 'none' : 'var(--nm-sm), inset 0 0 0 1px var(--border)',
+      }}
+    >
+      {label}
+    </button>
+  );
+  return (
+    <nav
+      aria-label="Feed pages"
+      style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, marginTop: 24 }}
+    >
+      <span style={{ fontSize: 12.5, color: 'var(--text-dim)', fontVariantNumeric: 'tabular-nums' }}>
+        Showing {page * per + 1}–{Math.min(total, (page + 1) * per)} of {total}
+      </span>
+      <span
+        style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap', justifyContent: 'center' }}
+      >
+        {btn('prev', chev('15 6 9 12 15 18'), page - 1, false, page === 0, 'Previous page')}
+        {Array.from({ length: pages }, (_, p) =>
+          btn(`p${p}`, String(p + 1), p, p === page, false, `Page ${p + 1}`),
+        )}
+        {btn('next', chev('9 6 15 12 9 18'), page + 1, false, page >= pages - 1, 'Next page')}
+      </span>
+    </nav>
+  );
+}
+
+/**
+ * design: discover.jsx FeedBoard (v4) — the cover, then one chip row (Everything, the three
+ * WeO lenses, then the kinds) and the board in pages of nine. The view switch moved to the
+ * pinned filter bar (`StuckViews`, same `feed.board` view). Kinds page on the server
+ * (`/frontend/feed?kind=`); the lenses are the floor's own WeO lists, drawn as feed cards.
+ */
+export function FeedBoard({
+  cover,
+  tab,
+  onTab,
+}: {
+  cover: FeedItemModel[];
+  tab: FeedTab;
+  onTab: (t: FeedTab) => void;
+}) {
+  const [view] = useWeoView<FeedView>('feed.board', FEED_VIEWS, 'editorial');
   const { prefs } = useViewPrefs();
+  const [page, setPage] = useState(0);
+  const [prevTab, setPrevTab] = useState(tab);
+  if (prevTab !== tab) {
+    setPrevTab(tab);
+    setPage(0);
+  }
+  const lens = isLens(tab) ? tab : null;
+  const kindQ = useFeedPage(lens ? 'all' : (tab as 'all' | FeedKind), page + 1, !lens);
+  const lensQ = useWeos({ ...LENS_QUERY[lens ?? 'ending'], limit: FEED_PER, page: page + 1 }, !!lens);
+  const items = useMemo(
+    () =>
+      lens
+        ? (lensQ.data?.items ?? []).map((w) => weoFeedItem(cardModel(w)))
+        : (kindQ.data?.items ?? []).map((i) => feedItemModel(i)),
+    [lens, lensQ.data, kindQ.data],
+  );
+  const total = lens ? (lensQ.data?.pagination.total ?? 0) : (kindQ.data?.total ?? 0);
+  const pages = Math.max(1, Math.ceil(total / FEED_PER));
+  const loading = lens ? lensQ.isLoading : kindQ.isLoading;
   const shown = items.filter(
     (i) =>
-      (kind === 'all' || i.kind === kind) &&
       !prefs.mutedKinds.includes(i.kind) &&
-      !(i.kind === 'weo' && prefs.mutedFormats.some((f) => i.sub.startsWith(`${f} ·`))),
+      !(i.kind === 'weo' && prefs.mutedFormats.some((f) => i.sub.startsWith(`${f} ·`) || i.sub === f)),
   );
   const lead = shown.slice().sort((a, b) => b.weight - a.weight)[0];
+  const goPage = (p: number) => {
+    setPage(p);
+    const el = document.getElementById('d-feed');
+    if (el) glide(window, el.getBoundingClientRect().top + window.scrollY - 120);
+  };
+  const chip = (key: FeedTab, label: string, color: string, order: number) => (
+    <Chip
+      key={key}
+      role="button"
+      tabIndex={0}
+      aria-pressed={tab === key}
+      selected={tab === key}
+      tone={color}
+      onClick={() => onTab(key)}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter') onTab(key);
+      }}
+      style={{ flex: '0 0 auto', cursor: 'pointer', order }}
+    >
+      {label}
+    </Chip>
+  );
   return (
     <>
-      <FeedCover items={items} />
-      <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-end', gap: 14, marginBottom: 16 }}>
-        <div style={{ minWidth: 240, flex: 1 }}>
-          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
-            <span style={{ width: 7, height: 7, borderRadius: '50%', background: 'var(--o-blue)' }} />
-            <h2
-              style={{
-                margin: 0,
-                fontSize: 'clamp(19px,2.2vw,24px)',
-                fontWeight: 700,
-                letterSpacing: '-.028em',
-                color: 'var(--text)',
-              }}
-            >
-              Your feed
-            </h2>
-          </span>
-          <p
-            style={{
-              margin: '5px 0 0',
-              maxWidth: '64ch',
-              fontSize: 12.5,
-              lineHeight: 1.5,
-              color: 'var(--text-dim)',
-            }}
-          >
-            Size is urgency: whatever closes first, or leads this week, takes the big frame.
-          </p>
+      {cover.length > 0 && <FeedCover items={cover} />}
+      <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 14, marginBottom: 16 }}>
+        <div
+          className={s.chips}
+          style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: 7,
+            flex: '1 1 240px',
+            minWidth: 0,
+            padding: '2px 2px 5px',
+          }}
+        >
+          {FEED_KINDS.map((k) =>
+            k.k !== 'all' && prefs.mutedKinds.includes(k.k)
+              ? null
+              : chip(
+                  k.k,
+                  k.label,
+                  k.k === 'all' ? 'var(--o-blue)' : FEED_KIND[k.k].color,
+                  k.k === 'all' ? 0 : 2,
+                ),
+          )}
+          {FEED_LENSES.map((l) => chip(l.k, l.label, l.urgent ? '#E5484D' : 'var(--o-blue)', 1))}
         </div>
-        <IconSegs items={FEED_VIEWS} value={view} onChange={setView} tone="var(--o-blue)" />
       </div>
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 7, marginBottom: 16, padding: '2px 2px 5px' }}>
-        {FEED_KINDS.map((k) =>
-          k.k !== 'all' && prefs.mutedKinds.includes(k.k) ? null : (
-            <Chip
-              key={k.k}
-              role="button"
-              tabIndex={0}
-              aria-pressed={kind === k.k}
-              selected={kind === k.k}
-              tone={k.k === 'all' ? 'var(--o-blue)' : FEED_KIND[k.k].color}
-              onClick={() => setKind(k.k)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') setKind(k.k);
-              }}
-              style={{ flex: '0 0 auto', cursor: 'pointer' }}
-            >
-              {k.label}
-            </Chip>
-          ),
-        )}
-      </div>
-      {view === 'editorial' && (
+      {!shown.length && (
+        <p style={quietWell}>
+          {loading
+            ? 'Reading the feed…'
+            : tab === 'followed'
+              ? 'Nothing yet — circle a creator and their WeOs arrive here.'
+              : 'Nothing here yet.'}
+        </p>
+      )}
+      {view === 'editorial' && shown.length > 0 && (
         <div
           className="weo-edit-grid"
-          key={`ed${kind}`}
+          key={`ed${tab}${page}`}
           style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(12, minmax(0,1fr))',
@@ -1065,9 +1073,9 @@ export function FeedBoard({ items }: { items: FeedItemModel[] }) {
           ))}
         </div>
       )}
-      {view === 'cards' && (
+      {view === 'cards' && shown.length > 0 && (
         <div
-          key={`ca${kind}`}
+          key={`ca${tab}${page}`}
           style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fill,minmax(260px,1fr))',
@@ -1081,9 +1089,9 @@ export function FeedBoard({ items }: { items: FeedItemModel[] }) {
           ))}
         </div>
       )}
-      {view === 'list' && (
+      {view === 'list' && shown.length > 0 && (
         <div
-          key={`li${kind}`}
+          key={`li${tab}${page}`}
           style={{
             display: 'grid',
             gap: 1,
@@ -1098,6 +1106,24 @@ export function FeedBoard({ items }: { items: FeedItemModel[] }) {
           ))}
         </div>
       )}
+      <FeedPager
+        page={Math.min(page, pages - 1)}
+        pages={pages}
+        total={total}
+        per={FEED_PER}
+        onPage={goPage}
+      />
     </>
   );
 }
+
+const quietWell: CSSProperties = {
+  margin: 0,
+  padding: 30,
+  textAlign: 'center',
+  fontSize: 13,
+  color: 'var(--text-dim)',
+  borderRadius: 24,
+  background: 'var(--surface-2)',
+  boxShadow: 'var(--nm-inset)',
+};

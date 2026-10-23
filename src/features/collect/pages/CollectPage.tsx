@@ -10,7 +10,12 @@ import { SectionHead } from '@/components/layout/SectionMark';
 import { FlowFoot } from '@/components/shell/FlowBar';
 import { PathBar } from '@/components/shell/PathBar';
 import { useHubPath } from '@/components/shell/useHubPath';
-import { SnapshotChart, SnapshotPanel, type BoardRow } from '@/components/snapshot/Snapshot';
+import {
+  SnapshotChart,
+  SnapshotPanel,
+  type BoardRow,
+  type SnapshotRange,
+} from '@/components/snapshot/Snapshot';
 import { ICO, Tabs, ValueLadder } from '@/design-system';
 import { useWalletView } from '@/features/wallet/api/wallet';
 import { WalletRow } from '@/features/wallet/components/WalletRow';
@@ -58,7 +63,8 @@ const fail = (e: unknown) => (e instanceof ApiError ? e.message : 'That did not 
 export function CollectPage() {
   const navigate = useNavigate();
   const path = useHubPath([{ label: 'Collect' }]);
-  const snap = useCollectionsSnapshot('7d');
+  const [range, setRange] = useState<SnapshotRange>('7d');
+  const snap = useCollectionsSnapshot(range);
   const wallet = useWalletView();
   const redeem = useRedeem();
   const dispute = useDispute();
@@ -273,7 +279,8 @@ export function CollectPage() {
                   pulse={pulse}
                   board={board}
                   onBoard={setBoard}
-                  eyebrow="Your collection · 7d"
+                  range={range}
+                  onRange={setRange}
                   rail={rail}
                   onPick={onPick}
                 />

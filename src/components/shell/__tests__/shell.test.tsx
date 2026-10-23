@@ -1,6 +1,7 @@
 import { act, fireEvent, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { http } from 'msw';
+import { routes } from '@/app/routes';
 import { tokens } from '@/api/tokens';
 import { usePrefs } from '@/stores/prefs';
 import { navSummaryFixture } from '@/test/fixtures/navSummary';
@@ -357,12 +358,12 @@ describe('flow bar', () => {
   it('gives the way back and the next section', async () => {
     const user = userEvent.setup();
     usePrefs.getState().hydrate({ ...navSummaryFixture().uiPreferences!, navDock: 'top' });
-    const { router } = renderApp('/discover', { summary: navSummaryFixture({}, { navDock: 'top' }) });
+    // v4: Discover has no flow bar; Collect still does
+    const { router } = renderApp('/collect', { summary: navSummaryFixture({}, { navDock: 'top' }) });
     const bar = await screen.findByRole('region', { name: 'Where you are and what is next' });
-    expect(within(bar).getByText('Next section')).toBeInTheDocument();
-    expect(within(bar).getByText('Next · What you hold, still moving')).toBeInTheDocument();
-    await user.click(within(bar).getByRole('button', { name: /^Collect/ }));
-    expect(router.state.location.pathname).toBe('/collect');
+    expect(within(bar).getByText('Next · Make one of your own')).toBeInTheDocument();
+    await user.click(within(bar).getByRole('button', { name: /^Create/ }));
+    expect(router.state.location.pathname).toBe(routes.create());
   });
 
   it('folds to a pill and back (remembered)', async () => {

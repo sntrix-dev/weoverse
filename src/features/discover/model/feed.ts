@@ -1,5 +1,6 @@
 import { routes } from '@/app/routes';
-import { formatHex, hhmmss, type WeoFormat } from '@/lib/cardModel';
+import { formatHex, hhmmss, type WeoCardModel, type WeoFormat } from '@/lib/cardModel';
+import { osFmt } from '@/lib/format';
 import { FEED_KIND, type FeedKind } from '@/lib/feedKinds';
 import type { FeedItemDto } from '../api/discover';
 
@@ -91,4 +92,33 @@ export function coverLine(it: FeedItemModel): string {
       : it.kind === 'question'
         ? 'Open question'
         : 'Story';
+}
+
+/**
+ * A WeO from the floor lists (`GET /frontend/weos`) as a feed card — the v4 board's lenses
+ * (Closing soon · Moving now · From creators you circle) are WeOs ranked by the floor, drawn in
+ * the same grid as the rest of the feed. Weight follows the design's urgency: closing within
+ * 12h → 5, within 48h → 4, ten or more in the room → 3.
+ */
+export function weoFeedItem(w: WeoCardModel): FeedItemModel {
+  const hrs = hoursLeft(w.timer);
+  const weight = hrs != null && hrs <= 12 ? 5 : hrs != null && hrs <= 48 ? 4 : w.activeNow >= 10 ? 3 : 2;
+  return {
+    id: `w-${w.id}`,
+    kind: 'weo',
+    title: w.name,
+    blurb: '',
+    img: w.img,
+    byName: w.creator.handle,
+    byAvatar: w.creator.avatarUrl,
+    sub: [w.format, w.category].filter(Boolean).join(' · '),
+    readout: `O ${osFmt(w.os)}`,
+    os: w.os,
+    timer: w.timer,
+    tone: w.hex,
+    weight,
+    metrics: w.activeNow > 0 ? [[String(w.activeNow), 'here now']] : [],
+    to: routes.weo(w.id),
+    weoId: w.id,
+  };
 }

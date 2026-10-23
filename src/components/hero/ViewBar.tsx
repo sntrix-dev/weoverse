@@ -357,11 +357,14 @@ export function ViewBar({
   filters,
   summary,
   bare,
+  noView,
 }: {
   tone?: string;
   filters?: ReactNode;
   summary?: ReactNode;
   bare?: boolean;
+  /** v4: the filters alone, without the "View" curation button (Discover's sticky bar) */
+  noView?: boolean;
 }) {
   const t = tone || 'var(--o-blue)';
   const [open, setOpen] = useState(false);
@@ -427,57 +430,59 @@ export function ViewBar({
       >
         {filters || (summary && <span style={{ fontSize: 12, color: 'var(--text-faint)' }}>{summary}</span>)}
       </div>
-      <div ref={wrap} style={{ position: 'relative', flex: '0 0 auto' }}>
-        <button
-          ref={btn}
-          type="button"
-          onClick={() => {
-            if (!open && btn.current) setAt(btn.current.getBoundingClientRect());
-            setOpen((o) => !o);
-          }}
-          aria-expanded={open}
-          title="Curate this view"
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 8,
-            minHeight: 40,
-            padding: '0 14px',
-            borderRadius: 999,
-            border: 'none',
-            cursor: 'pointer',
-            font: 'inherit',
-            fontSize: 12,
-            fontWeight: 600,
-            color: open ? '#fff' : t,
-            background: open ? t : `color-mix(in srgb, ${t} 11%, var(--surface))`,
-            boxShadow: open ? 'none' : 'var(--nm-sm)',
-            transition: 'background .22s, color .22s',
-          }}
-        >
-          {svg(<path d="M4 6h16M7 12h10M10 18h4" />, 15, 'currentColor', 1.9)}
-          View
-          {hidden > 0 && (
-            <span
-              style={{
-                display: 'grid',
-                placeItems: 'center',
-                minWidth: 18,
-                height: 18,
-                padding: '0 5px',
-                borderRadius: 999,
-                fontSize: 10,
-                fontWeight: 700,
-                color: open ? t : '#fff',
-                background: open ? '#fff' : t,
-              }}
-            >
-              {hidden}
-            </span>
-          )}
-        </button>
-        {open && createPortal(<ViewPanel tone={t} at={at} />, document.body)}
-      </div>
+      {!noView && (
+        <div ref={wrap} style={{ position: 'relative', flex: '0 0 auto' }}>
+          <button
+            ref={btn}
+            type="button"
+            onClick={() => {
+              if (!open && btn.current) setAt(btn.current.getBoundingClientRect());
+              setOpen((o) => !o);
+            }}
+            aria-expanded={open}
+            title="Curate this view"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 8,
+              minHeight: 40,
+              padding: '0 14px',
+              borderRadius: 999,
+              border: 'none',
+              cursor: 'pointer',
+              font: 'inherit',
+              fontSize: 12,
+              fontWeight: 600,
+              color: open ? '#fff' : t,
+              background: open ? t : `color-mix(in srgb, ${t} 11%, var(--surface))`,
+              boxShadow: open ? 'none' : 'var(--nm-sm)',
+              transition: 'background .22s, color .22s',
+            }}
+          >
+            {svg(<path d="M4 6h16M7 12h10M10 18h4" />, 15, 'currentColor', 1.9)}
+            View
+            {hidden > 0 && (
+              <span
+                style={{
+                  display: 'grid',
+                  placeItems: 'center',
+                  minWidth: 18,
+                  height: 18,
+                  padding: '0 5px',
+                  borderRadius: 999,
+                  fontSize: 10,
+                  fontWeight: 700,
+                  color: open ? t : '#fff',
+                  background: open ? '#fff' : t,
+                }}
+              >
+                {hidden}
+              </span>
+            )}
+          </button>
+          {open && createPortal(<ViewPanel tone={t} at={at} />, document.body)}
+        </div>
+      )}
     </div>
   );
 }
