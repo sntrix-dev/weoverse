@@ -14,7 +14,8 @@ import {
   SnapshotChart,
   SnapshotPanel,
   type BoardRow,
-  type SnapshotRange,
+  SNAPSHOT_RANGES,
+  useSnapshotRange,
 } from '@/components/snapshot/Snapshot';
 import { ICO, Tabs, ValueLadder } from '@/design-system';
 import { useWalletView } from '@/features/wallet/api/wallet';
@@ -63,8 +64,14 @@ const fail = (e: unknown) => (e instanceof ApiError ? e.message : 'That did not 
 export function CollectPage() {
   const navigate = useNavigate();
   const path = useHubPath([{ label: 'Collect' }]);
-  const [range, setRange] = useState<SnapshotRange>('7d');
+  const [snapErr, setSnapErr] = useState(false);
+  const [range, setRange] = useSnapshotRange(snapErr, (r) =>
+    toast(
+      `${SNAPSHOT_RANGES.find((x) => x.value === r)?.label ?? r} isn’t available yet — showing the last 7 days`,
+    ),
+  );
   const snap = useCollectionsSnapshot(range);
+  if (snap.isError !== snapErr) setSnapErr(snap.isError);
   const wallet = useWalletView();
   const redeem = useRedeem();
   const dispute = useDispute();

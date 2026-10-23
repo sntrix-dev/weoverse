@@ -15,7 +15,8 @@ import {
   SnapshotChart,
   SnapshotPanel,
   type BoardRow,
-  type SnapshotRange,
+  SNAPSHOT_RANGES,
+  useSnapshotRange,
 } from '@/components/snapshot/Snapshot';
 import { SnapshotRail } from '@/components/snapshot/SnapshotRail';
 import { Button, O_SECTION_ICONS, Tabs } from '@/design-system';
@@ -64,8 +65,14 @@ export function ExchangePage() {
   const navigate = useNavigate();
   const qc = useQueryClient();
   const path = useHubPath([{ label: 'Exchange' }]);
-  const [range, setRange] = useState<SnapshotRange>('7d');
+  const [snapErr, setSnapErr] = useState(false);
+  const [range, setRange] = useSnapshotRange(snapErr, (r) =>
+    toast(
+      `${SNAPSHOT_RANGES.find((x) => x.value === r)?.label ?? r} isn’t available yet — showing the last 7 days`,
+    ),
+  );
   const snap = useListingsSnapshot(range);
+  if (snap.isError !== snapErr) setSnapErr(snap.isError);
   const drafts = useDrafts();
   const me = useNavSummary().data;
   const creatorsQ = useCircleCreators(6);

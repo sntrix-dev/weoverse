@@ -1,9 +1,9 @@
-import { fireEvent, render, screen, within } from '@testing-library/react';
+import { act, fireEvent, render, renderHook, screen, within } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { CircleChip, CircleRecord } from '@/components/circle/Circle';
 import { SectionHero } from '@/components/hero/SectionHero';
 import { OAvatarOrb, Spark } from '@/components/people/People';
-import { SnapshotPanel, type Board, type Pulse } from '@/components/snapshot/Snapshot';
+import { SnapshotPanel, useSnapshotRange, type Board, type Pulse } from '@/components/snapshot/Snapshot';
 import { StageRing } from '@/components/weo/StageRing';
 import { StallTile } from '@/components/weo/WeoBits';
 import { WeoView } from '@/components/weo/WeoView';
@@ -155,6 +155,21 @@ describe('SnapshotPanel', () => {
       <SnapshotPanel boards={boards} pulse={pulse} board="missing" onBoard={() => {}} onPick={() => {}} />,
     );
     expect(document.querySelector('.weo-range-tabs')).toBeNull();
+  });
+
+  it('a refused window falls back to 7 days and says so once', () => {
+    const said = vi.fn();
+    const { result, rerender } = renderHook(({ err }) => useSnapshotRange(err, said), {
+      initialProps: { err: false },
+    });
+    act(() => result.current[1]('14d'));
+    expect(result.current[0]).toBe('14d');
+    rerender({ err: true });
+    expect(result.current[0]).toBe('7d');
+    expect(said).toHaveBeenCalledTimes(1);
+    expect(said).toHaveBeenCalledWith('14d');
+    rerender({ err: true });
+    expect(said).toHaveBeenCalledTimes(1);
   });
 
   it('without a rail the board takes the full width', () => {

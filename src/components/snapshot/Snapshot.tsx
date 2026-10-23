@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { Avatar, Orb, svg, Tabs } from '@/design-system';
 import { OsText } from '@/components/text/OsText';
 
@@ -415,6 +415,30 @@ export const SNAPSHOT_RANGES: { value: SnapshotRange; label: string }[] = [
   { value: '14d', label: '14 days' },
   { value: '30d', label: '1 month' },
 ];
+
+/**
+ * A board's window, falling back to 7 days when the server refuses a longer one (an older
+ * backend knows only `7d` and `30d`) — said once, never a blank board.
+ */
+export function useSnapshotRange(
+  isError: boolean,
+  onRefused: (r: SnapshotRange) => void,
+): [SnapshotRange, (r: SnapshotRange) => void] {
+  const [range, setRange] = useState<SnapshotRange>('7d');
+  const [refused, setRefused] = useState<SnapshotRange | null>(null);
+  if (isError && range !== '7d' && refused !== range) {
+    setRefused(range);
+    setRange('7d');
+  }
+  const said = useRef(refused);
+  useEffect(() => {
+    if (refused && said.current !== refused) {
+      said.current = refused;
+      onRefused(refused);
+    }
+  }, [refused, onRefused]);
+  return [range, setRange];
+}
 
 const card = {
   borderRadius: 26,
